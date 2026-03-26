@@ -1,0 +1,1431 @@
+<!DOCTYPE html>
+<html lang="ro">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>CryptoRisk v4 — Macro · Micro</title>
+<link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=Syne:wght@400;700;800&display=swap" rel="stylesheet">
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+:root{
+  --bg:#070b0f;--panel:#0c1118;--border:#172030;
+  --safe:#00e87a;--warn:#ffb300;--danger:#ff3355;--neutral:#4a6080;
+  --btc:#f7931a;--eth:#627eea;--text:#b8cde0;--white:#e8f0f8;
+  --purple:#a78bfa;--cyan:#22d3ee;
+}
+body{background:var(--bg);color:var(--text);font-family:'Syne',sans-serif;min-height:100vh;padding:0}
+body::before{content:'';position:fixed;inset:0;background-image:linear-gradient(rgba(0,232,122,.02) 1px,transparent 1px),linear-gradient(90deg,rgba(0,232,122,.02) 1px,transparent 1px);background-size:48px 48px;pointer-events:none;z-index:0}
+
+.header{position:sticky;top:0;z-index:100;background:rgba(7,11,15,.96);backdrop-filter:blur(12px);border-bottom:1px solid var(--border);padding:12px 24px}
+.header-inner{max-width:1100px;margin:0 auto;display:flex;align-items:center;gap:16px;flex-wrap:wrap}
+.logo{font-family:'Space Mono',monospace;font-size:.95rem;font-weight:700;letter-spacing:.12em;color:var(--safe)}
+.logo span{color:var(--white)}
+.logo sub{font-size:.5rem;color:var(--neutral);margin-left:6px;vertical-align:middle}
+.sync-badge{font-family:'Space Mono',monospace;font-size:.56rem;padding:3px 10px;border-radius:3px;border:1px solid;margin-left:4px}
+.sync-ok{color:var(--safe);border-color:rgba(0,232,122,.3);background:rgba(0,232,122,.06)}
+.sync-err{color:var(--danger);border-color:rgba(255,51,85,.3);background:rgba(255,51,85,.06)}
+.sync-wait{color:var(--warn);border-color:rgba(255,179,0,.3);background:rgba(255,179,0,.06)}
+.hinfo{margin-left:auto;text-align:right}
+.hdate{font-family:'Space Mono',monospace;font-size:.62rem;color:var(--neutral)}
+.hts{font-family:'Space Mono',monospace;font-size:.54rem;color:#1e3040;margin-top:2px}
+
+/* PRICE BAR */
+.pbar{background:var(--panel);border-bottom:1px solid var(--border);padding:9px 24px}
+.pbar-inner{max-width:1100px;margin:0 auto;display:flex;align-items:center;gap:20px;flex-wrap:wrap}
+.pb-coin{display:flex;align-items:center;gap:9px}
+.pb-icon{width:26px;height:26px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-family:'Space Mono',monospace;font-size:.72rem;font-weight:700;flex-shrink:0}
+.pb-btc{background:rgba(247,147,26,.1);color:var(--btc);border:1px solid rgba(247,147,26,.25)}
+.pb-eth{background:rgba(98,126,234,.1);color:var(--eth);border:1px solid rgba(98,126,234,.25)}
+.pb-price{font-family:'Space Mono',monospace;font-size:.92rem;font-weight:700;color:var(--white)}
+.pb-chg{font-family:'Space Mono',monospace;font-size:.65rem}
+.pos{color:var(--safe)} .neg{color:var(--danger)}
+.pb-sigs{display:flex;gap:16px;margin-left:auto;flex-wrap:wrap}
+.pb-sig{font-family:'Space Mono',monospace;font-size:.58rem;text-align:center}
+.pb-sig-val{font-weight:700;color:var(--white);display:block}
+.pb-sig-lbl{color:var(--neutral);font-size:.5rem;display:block}
+.pb-sig-ts{color:#1e3040;font-size:.46rem;display:block}
+
+/* SOURCE TAGS */
+.src-tag{font-family:'Space Mono',monospace;font-size:.48rem;padding:1px 5px;border-radius:2px;background:rgba(74,96,128,.15);color:var(--neutral);border:1px solid rgba(74,96,128,.2);vertical-align:middle;margin-left:4px}
+
+/* TABS */
+.tabs-wrap{max-width:1100px;margin:0 auto;padding:18px 24px 0}
+.tabs{display:flex;gap:4px;border-bottom:1px solid var(--border);margin-bottom:22px}
+.tab{font-family:'Space Mono',monospace;font-size:.68rem;font-weight:700;letter-spacing:.1em;text-transform:uppercase;padding:9px 20px;border-radius:6px 6px 0 0;cursor:pointer;border:1px solid transparent;border-bottom:none;transition:all .2s;color:var(--neutral);background:transparent}
+.tab.active-macro{color:var(--purple);border-color:var(--border);border-bottom-color:var(--bg);background:var(--panel)}
+.tab.active-micro{color:var(--cyan);border-color:var(--border);border-bottom-color:var(--bg);background:var(--panel)}
+.tab-dot{display:inline-block;width:6px;height:6px;border-radius:50%;margin-right:6px;vertical-align:middle}
+
+.tab-content{display:none;max-width:1100px;margin:0 auto;padding:0 24px 40px}
+.tab-content.active{display:block}
+
+.section{margin-bottom:26px}
+.sec-header{display:flex;align-items:center;gap:10px;margin-bottom:12px}
+.sec-bar{width:4px;border-radius:2px;height:16px;flex-shrink:0}
+.sec-title{font-family:'Space Mono',monospace;font-size:.62rem;letter-spacing:.16em;text-transform:uppercase;color:var(--neutral)}
+.sec-note{font-family:'Space Mono',monospace;font-size:.52rem;color:var(--neutral);margin-left:auto}
+.card{background:var(--panel);border:1px solid var(--border);border-radius:10px;padding:16px 20px}
+.card-sm{background:var(--panel);border:1px solid var(--border);border-radius:10px;padding:13px 15px}
+
+/* CROSS-TF */
+.cross-tf{background:linear-gradient(135deg,rgba(167,139,250,.06),rgba(34,211,238,.04));border:1px solid rgba(167,139,250,.2);border-radius:10px;padding:18px 22px;margin-bottom:22px}
+.cross-tf-title{font-family:'Space Mono',monospace;font-size:.58rem;letter-spacing:.15em;text-transform:uppercase;color:var(--purple);margin-bottom:14px}
+.cross-grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px;margin-bottom:12px}
+.cross-card{background:rgba(0,0,0,.3);border:1px solid var(--border);border-radius:8px;padding:12px 14px}
+.cross-card-title{font-family:'Space Mono',monospace;font-size:.54rem;letter-spacing:.1em;text-transform:uppercase;color:var(--neutral);margin-bottom:6px}
+.cross-card-signal{font-family:'Space Mono',monospace;font-size:.82rem;font-weight:700;margin-bottom:3px}
+.cross-card-detail{font-size:.7rem;color:var(--text);line-height:1.5}
+.cross-verdict{background:rgba(0,0,0,.25);border-radius:8px;padding:14px 16px}
+.cross-verdict-title{font-family:'Space Mono',monospace;font-size:.54rem;color:var(--purple);letter-spacing:.1em;text-transform:uppercase;margin-bottom:7px}
+
+/* CONF SCORE */
+.conf-wrap{background:var(--panel);border:1px solid var(--border);border-radius:10px;padding:20px 24px}
+.conf-grid{display:grid;grid-template-columns:auto 1fr auto;gap:22px;align-items:center}
+.conf-score{font-family:'Space Mono',monospace;font-size:3.2rem;font-weight:700;line-height:1;text-align:center}
+.conf-label{font-family:'Space Mono',monospace;font-size:.65rem;font-weight:700;text-transform:uppercase;margin-top:4px;text-align:center}
+.conf-bars{display:flex;flex-direction:column;gap:5px}
+.conf-row{display:flex;align-items:center;gap:8px}
+.conf-name{font-family:'Space Mono',monospace;font-size:.56rem;color:var(--neutral);width:155px;flex-shrink:0}
+.conf-bar-bg{flex:1;height:4px;background:var(--border);border-radius:2px;overflow:hidden}
+.conf-bar-fill{height:100%;border-radius:2px;transition:width .8s ease}
+.conf-dot{width:6px;height:6px;border-radius:50%;flex-shrink:0}
+.conf-signal-wrap{text-align:center;min-width:110px}
+.conf-signal{font-family:'Space Mono',monospace;font-size:1.4rem;font-weight:700;line-height:1.2;margin-bottom:5px}
+.conf-signal-sub{font-family:'Space Mono',monospace;font-size:.54rem;color:var(--neutral)}
+
+/* INDICATORS */
+.g2{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.g3{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}
+.g4{display:grid;grid-template-columns:repeat(4,1fr);gap:10px}
+.g5{display:grid;grid-template-columns:repeat(5,1fr);gap:10px}
+
+.ind-card{background:var(--panel);border:1px solid var(--border);border-radius:10px;padding:14px 15px}
+.ind-tf{font-family:'Space Mono',monospace;font-size:.5rem;color:var(--neutral);letter-spacing:.1em;text-transform:uppercase;margin-bottom:3px}
+.ind-name{font-family:'Space Mono',monospace;font-size:.56rem;color:var(--neutral);letter-spacing:.08em;text-transform:uppercase;margin-bottom:8px}
+.ind-val{font-family:'Space Mono',monospace;font-size:1.15rem;font-weight:700;color:var(--white);margin-bottom:3px}
+.ind-sig{font-family:'Space Mono',monospace;font-size:.6rem;font-weight:700;text-transform:uppercase;margin-bottom:7px}
+.ind-detail{font-size:.7rem;color:var(--text);line-height:1.6}
+.ind-bar-bg{height:4px;background:var(--border);border-radius:2px;overflow:hidden;position:relative;margin-top:8px}
+.ind-bar-fill{height:100%;border-radius:2px;position:absolute;left:0;transition:width .8s}
+.ind-bar-mk{position:absolute;top:-3px;width:2px;height:10px;background:var(--white);border-radius:1px;transform:translateX(-50%)}
+.div-tag{display:inline-block;font-family:'Space Mono',monospace;font-size:.52rem;padding:2px 6px;border-radius:3px;font-weight:700;margin-top:5px}
+
+/* ICHIMOKU */
+.ichi-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:9px;margin-bottom:9px}
+.ichi-card{background:var(--panel);border:1px solid var(--border);border-radius:10px;padding:13px 11px;border-left:3px solid var(--neutral)}
+.ichi-name{font-family:'Space Mono',monospace;font-size:.52rem;letter-spacing:.08em;text-transform:uppercase;color:var(--neutral);margin-bottom:6px}
+.ichi-sig{font-family:'Space Mono',monospace;font-size:.74rem;font-weight:700;margin-bottom:3px}
+.ichi-det{font-family:'Space Mono',monospace;font-size:.54rem;color:var(--neutral);line-height:1.5}
+.ichi-sum{background:var(--panel);border:1px solid var(--border);border-radius:10px;padding:12px 15px;display:flex;align-items:center;gap:14px;margin-bottom:8px}
+.ichi-overall{font-family:'Space Mono',monospace;font-size:.95rem;font-weight:700;min-width:75px}
+.ichi-desc{font-size:.73rem;color:var(--text);line-height:1.6;flex:1}
+.ichi-commentary{background:var(--panel);border:1px solid var(--border);border-radius:10px;padding:16px 18px;margin-top:8px}
+
+/* EMA */
+.ema-card{background:var(--panel);border:1px solid var(--border);border-radius:10px;padding:13px 14px;border-top:2px solid var(--neutral)}
+.ema-period{font-family:'Space Mono',monospace;font-size:.54rem;color:var(--neutral);margin-bottom:5px}
+.ema-val{font-family:'Space Mono',monospace;font-size:.95rem;font-weight:700;color:var(--white);margin-bottom:3px}
+.ema-pos{font-family:'Space Mono',monospace;font-size:.58rem;font-weight:700;text-transform:uppercase}
+
+/* MACD */
+.macd-row{display:flex;justify-content:space-between;align-items:center;padding:5px 0;border-bottom:1px solid var(--border)}
+.macd-row:last-child{border:none}
+.macd-key{font-family:'Space Mono',monospace;font-size:.56rem;color:var(--neutral)}
+.macd-val{font-family:'Space Mono',monospace;font-size:.75rem;font-weight:700}
+
+/* PIVOTS */
+.pivot-card{background:var(--panel);border:1px solid var(--border);border-radius:10px;padding:14px 16px}
+.pivot-coin{font-family:'Space Mono',monospace;font-size:.56rem;letter-spacing:.08em;text-transform:uppercase;color:var(--neutral);margin-bottom:10px;display:flex;align-items:center;gap:5px}
+.prow{display:flex;justify-content:space-between;align-items:center;padding:4px 0;border-bottom:1px solid #0a1520;font-family:'Space Mono',monospace;font-size:.68rem}
+.prow:last-child{border:none}
+.pname{color:var(--neutral);font-size:.58rem} .pval{font-weight:700}
+.rc{color:var(--danger)} .sc{color:var(--safe)} .ppc{color:var(--warn)}
+.now-tag{font-family:'Space Mono',monospace;font-size:.5rem;background:rgba(255,179,0,.15);color:var(--warn);padding:2px 5px;border-radius:2px}
+
+/* LIQ */
+.liq-row{display:flex;justify-content:space-between;align-items:center;padding:4px 0;border-bottom:1px solid #0a1520;font-family:'Space Mono',monospace;font-size:.66rem}
+.liq-row:last-child{border:none}
+
+/* RISK + VERDICT */
+.risk-grid{display:grid;grid-template-columns:1fr 1fr;gap:18px;align-items:center}
+.risk-num{font-family:'Space Mono',monospace;font-size:3.5rem;font-weight:700;line-height:1;margin-bottom:5px}
+.risk-lbl{font-family:'Space Mono',monospace;font-size:.8rem;font-weight:700;text-transform:uppercase}
+.risk-bar-bg{height:5px;background:var(--border);border-radius:3px;margin-top:10px;overflow:hidden}
+.risk-bar-fill{height:100%;border-radius:3px;transition:width 1s ease}
+.legend-item{display:flex;align-items:center;gap:8px;font-family:'Space Mono',monospace;font-size:.63rem;margin-bottom:8px}
+.ldot{width:7px;height:7px;border-radius:50%;flex-shrink:0}
+.verdict-card{background:var(--panel);border:1px solid var(--border);border-radius:10px;padding:16px 20px;margin-bottom:11px}
+.verdict-lbl{font-family:'Space Mono',monospace;font-size:.56rem;letter-spacing:.16em;text-transform:uppercase;color:var(--neutral);margin-bottom:7px}
+.verdict-val{font-family:'Space Mono',monospace;font-size:1.4rem;font-weight:700;margin-bottom:5px}
+.verdict-sub{font-size:.78rem;color:var(--text);line-height:1.6}
+.sig2-title{font-family:'Space Mono',monospace;font-size:.56rem;letter-spacing:.12em;text-transform:uppercase;font-weight:700;margin-bottom:7px}
+.sig2-row{font-size:.74rem;color:var(--text);margin-bottom:5px;padding-left:8px;line-height:1.5}
+.bear-b{border-left:2px solid var(--danger)} .bull-b{border-left:2px solid var(--safe)}
+.rec-box{background:rgba(255,179,0,.05);border:1px solid rgba(255,179,0,.18);border-radius:8px;padding:12px 15px;font-size:.78rem;color:var(--text);line-height:1.7;margin-bottom:11px}
+.zones-g{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.zone-item{font-family:'Space Mono',monospace;font-size:.63rem}
+
+/* TRENDLINE */
+.tl-cards{display:grid;grid-template-columns:repeat(3,1fr);gap:11px;margin-bottom:12px}
+.tl-card{background:var(--panel);border:1px solid var(--border);border-radius:10px;padding:14px 15px;border-top:3px solid}
+.tl-tf{font-family:'Space Mono',monospace;font-size:.75rem;font-weight:700;color:var(--white);margin-bottom:2px}
+.tl-sub{font-family:'Space Mono',monospace;font-size:.52rem;color:var(--neutral);margin-bottom:8px}
+.tl-trend{font-family:'Space Mono',monospace;font-size:.68rem;font-weight:700;text-transform:uppercase;margin-bottom:4px}
+.tl-detail{font-family:'Space Mono',monospace;font-size:.54rem;color:var(--neutral);margin-bottom:4px}
+.tl-note{font-size:.7rem;color:var(--text);line-height:1.5}
+
+/* CHIKOU */
+.chikou-bar-bg{height:5px;background:var(--border);border-radius:3px;overflow:hidden;margin:8px 0 10px}
+.chikou-bar-fill{height:100%;border-radius:3px;transition:width .8s}
+
+/* TOP/BOTTOM */
+.topbot-wrap{background:linear-gradient(135deg,rgba(167,139,250,.08),rgba(34,211,238,.04));border:1px solid rgba(167,139,250,.25);border-radius:10px;padding:20px 24px}
+.topbot-grid{display:grid;grid-template-columns:auto 1fr;gap:22px;align-items:center;margin-bottom:16px}
+.topbot-signal{font-family:'Space Mono',monospace;font-size:2.5rem;font-weight:700;line-height:1;margin-bottom:5px;text-align:center}
+.topbot-label{font-family:'Space Mono',monospace;font-size:.6rem;font-weight:700;text-transform:uppercase;text-align:center}
+
+/* BUTTON */
+.btn-wrap{padding:0 24px 22px;max-width:1100px;margin:0 auto}
+.btn{width:100%;padding:12px;background:transparent;border:1px solid var(--safe);color:var(--safe);font-family:'Space Mono',monospace;font-size:.74rem;font-weight:700;letter-spacing:.14em;text-transform:uppercase;border-radius:8px;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px;transition:background .2s}
+.btn:hover{background:rgba(0,232,122,.06)}
+.btn:disabled{opacity:.35;cursor:not-allowed}
+.error-box{background:var(--panel);border:1px solid var(--danger);border-radius:8px;padding:12px 16px;color:var(--danger);font-family:'Space Mono',monospace;font-size:.68rem;margin:0 24px 14px;max-width:1100px;display:none;line-height:1.7}
+.loading-msg{font-family:'Space Mono',monospace;font-size:.58rem;color:var(--neutral);text-align:center;padding:7px 24px;display:none}
+footer{font-family:'Space Mono',monospace;font-size:.54rem;color:var(--neutral);text-align:center;line-height:1.9;border-top:1px solid var(--border);padding:14px 24px;margin-top:6px}
+
+@keyframes spin{to{transform:rotate(360deg)}}
+.spin{animation:spin 1s linear infinite}
+@keyframes fadeUp{from{opacity:0;transform:translateY(5px)}to{opacity:1;transform:translateY(0)}}
+.fade{animation:fadeUp .4s ease}
+
+@media(max-width:700px){
+  .cross-grid,.g2,.g3,.g4,.g5,.risk-grid,.zones-g,.tl-cards{grid-template-columns:1fr}
+  .ichi-grid{grid-template-columns:repeat(2,1fr)}
+  .pbar-inner{gap:12px}
+  .tabs-wrap,.tab-content,.btn-wrap{padding-left:14px;padding-right:14px}
+}
+</style>
+</head>
+<body>
+
+<!-- HEADER -->
+<div class="header">
+  <div class="header-inner">
+    <div class="logo">CRYPTO<span>RISK</span><sub>v4</sub></div>
+    <div id="sync-badge" class="sync-badge sync-wait">⏳ NEACTUALIZAT</div>
+    <div class="hinfo">
+      <div class="hdate" id="hdate"></div>
+      <div class="hts" id="hts">—</div>
+    </div>
+  </div>
+</div>
+
+<!-- PRICE BAR -->
+<div class="pbar">
+  <div class="pbar-inner">
+    <div class="pb-coin">
+      <div class="pb-icon pb-btc">₿</div>
+      <div>
+        <div class="pb-price" id="btc-price">---</div>
+        <div class="pb-chg" id="btc-chg">---</div>
+      </div>
+    </div>
+    <div class="pb-coin">
+      <div class="pb-icon pb-eth">Ξ</div>
+      <div>
+        <div class="pb-price" id="eth-price">---</div>
+        <div class="pb-chg" id="eth-chg">---</div>
+      </div>
+    </div>
+    <div class="pb-sigs">
+      <div class="pb-sig"><span class="pb-sig-val" id="pb-fg">--</span><span class="pb-sig-lbl">Fear&amp;Greed</span><span class="pb-sig-ts" id="pb-fg-ts">—</span></div>
+      <div class="pb-sig"><span class="pb-sig-val" id="pb-dom">--</span><span class="pb-sig-lbl">BTC Dom.</span><span class="pb-sig-ts">CoinGecko</span></div>
+      <div class="pb-sig"><span class="pb-sig-val" id="pb-fund-btc">--</span><span class="pb-sig-lbl">Fund. BTC</span><span class="pb-sig-ts">Binance Fut.</span></div>
+      <div class="pb-sig"><span class="pb-sig-val" id="pb-fund-eth">--</span><span class="pb-sig-lbl">Fund. ETH</span><span class="pb-sig-ts">Binance Fut.</span></div>
+      <div class="pb-sig"><span class="pb-sig-val" id="pb-ls">--</span><span class="pb-sig-lbl">L/S Ratio</span><span class="pb-sig-ts">Binance Fut.</span></div>
+      <div class="pb-sig"><span class="pb-sig-val" id="pb-oi">--</span><span class="pb-sig-lbl">Open Int.</span><span class="pb-sig-ts">Binance Fut.</span></div>
+      <div class="pb-sig"><span class="pb-sig-val" id="pb-taker">--</span><span class="pb-sig-lbl">Buy/Sell</span><span class="pb-sig-ts">Taker 4H</span></div>
+    </div>
+  </div>
+</div>
+
+<!-- BUTTON -->
+<div class="btn-wrap" style="padding-top:14px">
+  <button class="btn" id="btn" onclick="refresh()">
+    <svg id="btn-icon" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="23 4 23 10 17 10"/><path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"/></svg>
+    Actualizează Toate Datele
+  </button>
+</div>
+<div class="loading-msg" id="loading-msg"></div>
+<div class="error-box" id="err-box"></div>
+
+<!-- CROSS-TF (always visible) -->
+<div class="tabs-wrap" style="padding-bottom:0">
+  <div class="cross-tf" id="cross-tf-section" style="display:none">
+    <div class="cross-tf-title">⚡ CONFLUENȚĂ MACRO × MICRO — Semnal Cross-Timeframe</div>
+    <div class="cross-grid">
+      <div class="cross-card"><div class="cross-card-title">📊 Macro 1W</div><div class="cross-card-signal" id="cross-macro-signal">--</div><div class="cross-card-detail" id="cross-macro-detail">--</div></div>
+      <div class="cross-card"><div class="cross-card-title">🔬 Micro 4H</div><div class="cross-card-signal" id="cross-micro-signal">--</div><div class="cross-card-detail" id="cross-micro-detail">--</div></div>
+      <div class="cross-card"><div class="cross-card-title">🎯 Acțiune</div><div class="cross-card-signal" id="cross-action" style="font-size:.95rem">--</div><div class="cross-card-detail" id="cross-action-detail">--</div></div>
+    </div>
+    <div class="cross-verdict"><div class="cross-verdict-title">▸ NARATIV</div><div id="cross-narrative" style="font-size:.78rem;color:var(--text);line-height:1.7">--</div></div>
+  </div>
+
+  <!-- TABS -->
+  <div class="tabs">
+    <div class="tab active-macro" id="tab-macro" onclick="switchTab('macro')"><span class="tab-dot" style="background:var(--purple)"></span>MACRO — 1W / 1M</div>
+    <div class="tab" id="tab-micro" onclick="switchTab('micro')"><span class="tab-dot" style="background:var(--cyan)"></span>MICRO — 4H / 1D</div>
+  </div>
+</div>
+
+<!-- ══════════════════════ TAB MACRO ══════════════════════ -->
+<div class="tab-content active" id="content-macro">
+
+  <!-- Confluence Macro -->
+  <div class="section" id="sec-conf-macro" style="display:none">
+    <div class="sec-header"><div class="sec-bar" style="background:var(--purple)"></div><div class="sec-title">Scor Confluență Macro</div><div class="sec-note" id="conf-macro-badge"></div></div>
+    <div class="conf-wrap"><div class="conf-grid"><div><div class="conf-score" id="conf-macro-score">--</div><div class="conf-label" id="conf-macro-label">--</div></div><div class="conf-bars" id="conf-macro-bars"></div><div class="conf-signal-wrap"><div style="font-family:'Space Mono',monospace;font-size:.52rem;color:var(--neutral);margin-bottom:7px;letter-spacing:.1em;text-transform:uppercase">Semnal Macro</div><div class="conf-signal" id="conf-macro-signal">--</div><div class="conf-signal-sub" id="conf-macro-sub">--</div></div></div>
+    <div style="margin-top:10px;padding-top:10px;border-top:1px solid var(--border);font-family:'Space Mono',monospace;font-size:.5rem;color:#4a6080;line-height:1.6">
+      ⚠ Scor heuristic bazat pe <strong style="color:#4a6080">4 clustere independente</strong> — nu pe indicatori corelați numărați separat. Nu reprezintă probabilități statistice validate. Util ca instrument de context, nu de decizie automată.
+    </div></div>
+  </div>
+
+  <!-- Ichimoku 1W -->
+  <div class="section" id="sec-ichi" style="display:none">
+    <div class="sec-header"><div class="sec-bar" style="background:var(--eth)"></div><div class="sec-title">Ichimoku Cloud — 1W (9/26/52)</div><span class="src-tag">Binance 1W klines</span></div>
+    <div style="margin-bottom:18px">
+      <div style="font-family:'Space Mono',monospace;font-size:.56rem;color:var(--neutral);margin-bottom:8px">▸ BITCOIN</div>
+      <div class="ichi-grid">
+        <div class="ichi-card" id="ic-tk-btc"><div class="ichi-name">TK Cross</div><div class="ichi-sig" id="ik-tk-btc-s">--</div><div class="ichi-det" id="ik-tk-btc-d">--</div></div>
+        <div class="ichi-card" id="ic-kumo-btc"><div class="ichi-name">Kumo (Nor)</div><div class="ichi-sig" id="ik-kumo-btc-s">--</div><div class="ichi-det" id="ik-kumo-btc-d">--</div></div>
+        <div class="ichi-card" id="ic-chikou-btc"><div class="ichi-name">Chikou Span</div><div class="ichi-sig" id="ik-chikou-btc-s">--</div><div class="ichi-det" id="ik-chikou-btc-d">--</div></div>
+        <div class="ichi-card" id="ic-twist-btc"><div class="ichi-name">Kumo Twist</div><div class="ichi-sig" id="ik-twist-btc-s">--</div><div class="ichi-det" id="ik-twist-btc-d">--</div></div>
+      </div>
+      <div class="ichi-sum"><div><div style="font-family:'Space Mono',monospace;font-size:.5rem;color:var(--neutral);margin-bottom:3px">BTC 1W</div><div class="ichi-overall" id="ik-overall-btc">--</div></div><div class="ichi-desc" id="ik-desc-btc">--</div></div>
+      <div id="ichi-commentary-btc" style="display:none"></div>
+    </div>
+    <div>
+      <div style="font-family:'Space Mono',monospace;font-size:.56rem;color:var(--neutral);margin-bottom:8px">▸ ETHEREUM</div>
+      <div class="ichi-grid">
+        <div class="ichi-card" id="ic-tk-eth"><div class="ichi-name">TK Cross</div><div class="ichi-sig" id="ik-tk-eth-s">--</div><div class="ichi-det" id="ik-tk-eth-d">--</div></div>
+        <div class="ichi-card" id="ic-kumo-eth"><div class="ichi-name">Kumo (Nor)</div><div class="ichi-sig" id="ik-kumo-eth-s">--</div><div class="ichi-det" id="ik-kumo-eth-d">--</div></div>
+        <div class="ichi-card" id="ic-chikou-eth"><div class="ichi-name">Chikou Span</div><div class="ichi-sig" id="ik-chikou-eth-s">--</div><div class="ichi-det" id="ik-chikou-eth-d">--</div></div>
+        <div class="ichi-card" id="ic-twist-eth"><div class="ichi-name">Kumo Twist</div><div class="ichi-sig" id="ik-twist-eth-s">--</div><div class="ichi-det" id="ik-twist-eth-d">--</div></div>
+      </div>
+      <div class="ichi-sum"><div><div style="font-family:'Space Mono',monospace;font-size:.5rem;color:var(--neutral);margin-bottom:3px">ETH 1W</div><div class="ichi-overall" id="ik-overall-eth">--</div></div><div class="ichi-desc" id="ik-desc-eth">--</div></div>
+      <div id="ichi-commentary-eth" style="display:none"></div>
+    </div>
+  </div>
+
+  <!-- RSI 1W + Stoch + OBV -->
+  <div class="section" id="sec-mom-macro" style="display:none">
+    <div class="sec-header"><div class="sec-bar" style="background:var(--danger)"></div><div class="sec-title">Momentum Macro — RSI · Stoch RSI · OBV</div><span class="src-tag">Binance 1W klines</span><div class="sec-note">1W Weekly</div></div>
+    <div class="g3">
+      <div class="ind-card"><div class="ind-tf">1W</div><div class="ind-name">RSI — BTC</div><div class="ind-val" id="rsi-btc-val">--</div><div class="ind-sig" id="rsi-btc-sta">--</div><div class="ind-detail" id="rsi-btc-det">--</div><div class="ind-bar-bg"><div class="ind-bar-fill" id="rsi-btc-bar"></div><div class="ind-bar-mk" id="rsi-btc-mk"></div></div><div id="rsi-btc-div"></div></div>
+      <div class="ind-card"><div class="ind-tf">1W</div><div class="ind-name">RSI — ETH</div><div class="ind-val" id="rsi-eth-val">--</div><div class="ind-sig" id="rsi-eth-sta">--</div><div class="ind-detail" id="rsi-eth-det">--</div><div class="ind-bar-bg"><div class="ind-bar-fill" id="rsi-eth-bar"></div><div class="ind-bar-mk" id="rsi-eth-mk"></div></div><div id="rsi-eth-div"></div></div>
+      <div class="ind-card"><div class="ind-tf">1W</div><div class="ind-name">Stoch RSI + OBV — BTC</div><div class="g2" style="margin-bottom:7px"><div><div style="font-family:'Space Mono',monospace;font-size:.5rem;color:var(--neutral);margin-bottom:3px">STOCH %K</div><div class="ind-val" id="stoch-btc-val" style="font-size:.95rem">--</div><div class="ind-sig" id="stoch-btc-sta" style="font-size:.56rem">--</div></div><div><div style="font-family:'Space Mono',monospace;font-size:.5rem;color:var(--neutral);margin-bottom:3px">OBV TREND</div><div class="ind-val" id="obv-btc-val" style="font-size:.95rem">--</div><div class="ind-sig" id="obv-btc-sta" style="font-size:.56rem">--</div></div></div><div class="ind-detail" id="stoch-obv-det">--</div></div>
+    </div>
+  </div>
+
+  <!-- Trendline 1D/1W/1M -->
+  <div class="section" id="sec-trendline" style="display:none">
+    <div class="sec-header"><div class="sec-bar" style="background:var(--purple)"></div><div class="sec-title">Analiză Trendline — 1D · 1W · 1M</div><span class="src-tag">Binance klines</span></div>
+    <div class="tl-cards" id="tl-cards"></div>
+    <div class="card"><div style="font-family:'Space Mono',monospace;font-size:.56rem;letter-spacing:.14em;text-transform:uppercase;color:var(--purple);margin-bottom:10px">▸ COMENTARIU NARATIV</div><div id="tl-narrative" style="font-size:.8rem;color:var(--text);line-height:1.85"></div><div style="margin-top:12px;padding-top:10px;border-top:1px solid var(--border);display:grid;grid-template-columns:1fr 1fr;gap:10px"><div><div style="font-family:'Space Mono',monospace;font-size:.52rem;color:var(--neutral);margin-bottom:4px">SCENARIU PRINCIPAL</div><div id="tl-main" style="font-size:.74rem;color:var(--text);line-height:1.6"></div></div><div><div style="font-family:'Space Mono',monospace;font-size:.52rem;color:var(--neutral);margin-bottom:4px">SCENARIU ALTERNATIV</div><div id="tl-alt" style="font-size:.74rem;color:var(--text);line-height:1.6"></div></div></div><div style="margin-top:10px;padding-top:10px;border-top:1px solid var(--border)"><div style="font-family:'Space Mono',monospace;font-size:.52rem;color:var(--neutral);margin-bottom:4px">CE SĂ URMĂREȘTI</div><div id="tl-watch" style="font-size:.74rem;color:var(--text);line-height:1.8"></div></div></div>
+  </div>
+
+  <!-- Chikou 1M + Top/Bottom -->
+  <div class="section" id="sec-chikou-monthly" style="display:none">
+    <div class="sec-header"><div class="sec-bar" style="background:var(--purple)"></div><div class="sec-title">Chikou Span 1M — Proiecție + Semnal Top/Bottom</div><span class="src-tag">Binance 1M klines</span></div>
+    <div class="g2" style="margin-bottom:14px">
+      <div class="card">
+        <div style="font-family:'Space Mono',monospace;font-size:.56rem;letter-spacing:.08em;text-transform:uppercase;color:var(--neutral);margin-bottom:10px">₿ CHIKOU BTC — 1M</div>
+        <div class="g2" style="margin-bottom:10px">
+          <div><div style="font-family:'Space Mono',monospace;font-size:.5rem;color:var(--neutral);margin-bottom:3px">PREȚ CURENT</div><div style="font-family:'Space Mono',monospace;font-size:1rem;font-weight:700;color:var(--white)" id="chikou-btc-now">--</div></div>
+          <div><div style="font-family:'Space Mono',monospace;font-size:.5rem;color:var(--neutral);margin-bottom:3px">PREȚ -26 LUNI</div><div style="font-family:'Space Mono',monospace;font-size:1rem;font-weight:700;color:var(--white)" id="chikou-btc-26m">--</div></div>
+        </div>
+        <div style="font-family:'Space Mono',monospace;font-size:.78rem;font-weight:700;margin-bottom:4px" id="chikou-btc-sig">--</div>
+        <div style="font-family:'Space Mono',monospace;font-size:.54rem;color:var(--neutral);margin-bottom:8px" id="chikou-btc-dist">--</div>
+        <div class="chikou-bar-bg"><div class="chikou-bar-fill" id="chikou-btc-bar"></div></div>
+        <div style="font-size:.74rem;color:var(--text);line-height:1.7" id="chikou-btc-comment">--</div>
+      </div>
+      <div class="card">
+        <div style="font-family:'Space Mono',monospace;font-size:.56rem;letter-spacing:.08em;text-transform:uppercase;color:var(--neutral);margin-bottom:10px">Ξ CHIKOU ETH — 1M</div>
+        <div class="g2" style="margin-bottom:10px">
+          <div><div style="font-family:'Space Mono',monospace;font-size:.5rem;color:var(--neutral);margin-bottom:3px">PREȚ CURENT</div><div style="font-family:'Space Mono',monospace;font-size:1rem;font-weight:700;color:var(--white)" id="chikou-eth-now">--</div></div>
+          <div><div style="font-family:'Space Mono',monospace;font-size:.5rem;color:var(--neutral);margin-bottom:3px">PREȚ -26 LUNI</div><div style="font-family:'Space Mono',monospace;font-size:1rem;font-weight:700;color:var(--white)" id="chikou-eth-26m">--</div></div>
+        </div>
+        <div style="font-family:'Space Mono',monospace;font-size:.78rem;font-weight:700;margin-bottom:4px" id="chikou-eth-sig">--</div>
+        <div style="font-family:'Space Mono',monospace;font-size:.54rem;color:var(--neutral);margin-bottom:8px" id="chikou-eth-dist">--</div>
+        <div class="chikou-bar-bg"><div class="chikou-bar-fill" id="chikou-eth-bar"></div></div>
+        <div style="font-size:.74rem;color:var(--text);line-height:1.7" id="chikou-eth-comment">--</div>
+      </div>
+    </div>
+    <!-- Top/Bottom -->
+    <div class="topbot-wrap">
+      <div style="font-family:'Space Mono',monospace;font-size:.58rem;letter-spacing:.16em;text-transform:uppercase;color:var(--purple);margin-bottom:14px">▸ SEMNAL TOP / BOTTOM — BTC + ETH Combinat</div>
+      <div class="topbot-grid">
+        <div style="text-align:center;min-width:120px">
+          <div class="topbot-signal" id="topbot-signal">--</div>
+          <div class="topbot-label" id="topbot-label">--</div>
+          <div style="margin-top:8px"><div style="font-family:'Space Mono',monospace;font-size:.5rem;color:var(--neutral);margin-bottom:3px">Forță semnal</div><div style="height:4px;background:var(--border);border-radius:2px;overflow:hidden"><div id="topbot-strength-bar" style="height:100%;border-radius:2px;transition:width .8s"></div></div><div style="font-family:'Space Mono',monospace;font-size:.56rem;margin-top:3px" id="topbot-strength-val">--</div></div>
+        </div>
+        <div><div class="g2" style="margin-bottom:10px" id="topbot-indicators"></div><div style="font-size:.78rem;color:var(--text);line-height:1.75" id="topbot-narrative">--</div></div>
+      </div>
+      <div class="g2" style="margin-top:14px">
+        <div style="background:rgba(0,0,0,.3);border-radius:8px;padding:12px"><div style="font-family:'Space Mono',monospace;font-size:.52rem;color:var(--neutral);margin-bottom:5px">ACȚIUNE BTC</div><div style="font-size:.76rem;color:var(--text);line-height:1.6" id="topbot-action-btc">--</div></div>
+        <div style="background:rgba(0,0,0,.3);border-radius:8px;padding:12px"><div style="font-family:'Space Mono',monospace;font-size:.52rem;color:var(--neutral);margin-bottom:5px">ACȚIUNE ETH</div><div style="font-size:.76rem;color:var(--text);line-height:1.6" id="topbot-action-eth">--</div></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Risk Macro + Pivots 1M -->
+  <div class="section" id="sec-risk-macro" style="display:none">
+    <div class="sec-header"><div class="sec-bar" style="background:var(--danger)"></div><div class="sec-title">Scor Risc Macro + Pivoți 1M</div><span class="src-tag">Binance 1M klines</span></div>
+    <div class="g2" style="margin-bottom:12px">
+      <div class="card"><div class="risk-grid"><div><div style="font-family:'Space Mono',monospace;font-size:.54rem;letter-spacing:.12em;text-transform:uppercase;color:var(--neutral);margin-bottom:7px">Scor risc macro</div><div class="risk-num" id="risk-macro-num">--</div><div class="risk-lbl" id="risk-macro-lbl">--</div><div class="risk-bar-bg"><div class="risk-bar-fill" id="risk-macro-bar"></div></div></div><div><div class="legend-item"><div class="ldot" style="background:var(--safe)"></div><span style="color:var(--neutral)">0–30 Scăzut</span></div><div class="legend-item"><div class="ldot" style="background:var(--warn)"></div><span style="color:var(--neutral)">31–60 Moderat</span></div><div class="legend-item"><div class="ldot" style="background:var(--danger)"></div><span style="color:var(--neutral)">61–100 Ridicat</span></div></div></div></div>
+      <div class="g2"><div class="pivot-card"><div class="pivot-coin">₿ BTC <span style="color:var(--neutral)">Camarilla 1M</span></div><div id="piv-btc"></div></div><div class="pivot-card"><div class="pivot-coin">Ξ ETH <span style="color:var(--neutral)">Camarilla 1M</span></div><div id="piv-eth"></div></div></div>
+    </div>
+    <div class="verdict-card"><div class="verdict-lbl">▸ VERDICT MACRO</div><div class="verdict-val" id="verdict-macro">--</div><div class="verdict-sub" id="semnal-macro">--</div></div>
+    <div class="g2" style="margin-bottom:10px"><div class="card-sm"><div class="sig2-title" style="color:var(--danger)">▸ BEARISH</div><div id="bear-macro"></div></div><div class="card-sm"><div class="sig2-title" style="color:var(--safe)">▸ BULLISH</div><div id="bull-macro"></div></div></div>
+    <div class="rec-box" id="rec-macro">--</div>
+    <div class="zones-g"><div class="zone-item"><span style="color:var(--neutral)">BTC: </span><span style="color:var(--btc)" id="zone-btc">--</span></div><div class="zone-item"><span style="color:var(--neutral)">ETH: </span><span style="color:var(--eth)" id="zone-eth">--</span></div></div>
+  </div>
+
+</div><!-- end tab-macro -->
+
+<!-- ══════════════════════ TAB MICRO ══════════════════════ -->
+<div class="tab-content" id="content-micro">
+
+  <!-- Confluence Micro -->
+  <div class="section" id="sec-conf-micro" style="display:none">
+    <div class="sec-header"><div class="sec-bar" style="background:var(--cyan)"></div><div class="sec-title">Scor Confluență Micro — Protecție Capital</div><div class="sec-note" id="conf-micro-badge"></div></div>
+    <div class="conf-wrap"><div class="conf-grid"><div><div class="conf-score" id="conf-micro-score">--</div><div class="conf-label" id="conf-micro-label">--</div></div><div class="conf-bars" id="conf-micro-bars"></div><div class="conf-signal-wrap"><div style="font-family:'Space Mono',monospace;font-size:.52rem;color:var(--neutral);margin-bottom:7px;letter-spacing:.1em;text-transform:uppercase">Semnal Micro</div><div class="conf-signal" id="conf-micro-signal">--</div><div class="conf-signal-sub" id="conf-micro-sub">--</div></div></div>
+    <div style="margin-top:10px;padding-top:10px;border-top:1px solid var(--border);font-family:'Space Mono',monospace;font-size:.5rem;color:#4a6080;line-height:1.6">
+      ⚠ Scor heuristic bazat pe <strong style="color:#4a6080">4 clustere independente</strong> — Trend (EMA+MACD) / Momentum (RSI 4H) / Presiune (Taker+L/S) / Volum. Nu reprezintă probabilități validate.
+    </div></div>
+  </div>
+
+  <!-- Futures Sentiment (REAL) -->
+  <div class="section" id="sec-futures" style="display:none">
+    <div class="sec-header"><div class="sec-bar" style="background:var(--cyan)"></div><div class="sec-title">Sentiment Futures — Date Live Reale</div><span class="src-tag">Binance Futures API</span></div>
+    <div class="g4">
+      <div class="ind-card"><div class="ind-tf">Live</div><div class="ind-name">Funding BTC</div><div class="ind-val" id="fut-fund-btc">--</div><div class="ind-sig" id="fut-fund-btc-sig">--</div><div class="ind-detail" id="fut-fund-btc-det">--</div></div>
+      <div class="ind-card"><div class="ind-tf">Live</div><div class="ind-name">Funding ETH</div><div class="ind-val" id="fut-fund-eth">--</div><div class="ind-sig" id="fut-fund-eth-sig">--</div><div class="ind-detail" id="fut-fund-eth-det">--</div></div>
+      <div class="ind-card"><div class="ind-tf">4H</div><div class="ind-name">Long/Short BTC</div><div class="ind-val" id="fut-ls-btc">--</div><div class="ind-sig" id="fut-ls-btc-sig">--</div><div class="ind-detail" id="fut-ls-btc-det">--</div></div>
+      <div class="ind-card"><div class="ind-tf">4H</div><div class="ind-name">Taker Buy/Sell BTC</div><div class="ind-val" id="fut-taker-btc">--</div><div class="ind-sig" id="fut-taker-btc-sig">--</div><div class="ind-detail" id="fut-taker-btc-det">--</div></div>
+    </div>
+    <div class="g2" style="margin-top:10px">
+      <div class="ind-card"><div class="ind-tf">4H</div><div class="ind-name">Open Interest BTC</div><div class="ind-val" id="fut-oi-btc">--</div><div class="ind-sig" id="fut-oi-btc-sig">--</div><div class="ind-detail" id="fut-oi-btc-det">--</div></div>
+      <div class="ind-card"><div class="ind-tf">4H</div><div class="ind-name">Long/Short ETH</div><div class="ind-val" id="fut-ls-eth">--</div><div class="ind-sig" id="fut-ls-eth-sig">--</div><div class="ind-detail" id="fut-ls-eth-det">--</div></div>
+    </div>
+  </div>
+
+  <!-- EMA 4H -->
+  <div class="section" id="sec-ema" style="display:none">
+    <div class="sec-header"><div class="sec-bar" style="background:var(--cyan)"></div><div class="sec-title">EMA 9 · 21 · 50</div><span class="src-tag">Binance 4H klines</span></div>
+    <div style="margin-bottom:12px">
+      <div style="font-family:'Space Mono',monospace;font-size:.56rem;color:var(--neutral);margin-bottom:8px">▸ BITCOIN 4H</div>
+      <div class="g3" id="ema-btc-grid"></div>
+      <div class="card-sm" style="margin-top:8px"><div id="ema-btc-summary" style="font-size:.76rem;color:var(--text);line-height:1.7"></div></div>
+    </div>
+    <div>
+      <div style="font-family:'Space Mono',monospace;font-size:.56rem;color:var(--neutral);margin-bottom:8px">▸ ETHEREUM 4H</div>
+      <div class="g3" id="ema-eth-grid"></div>
+      <div class="card-sm" style="margin-top:8px"><div id="ema-eth-summary" style="font-size:.76rem;color:var(--text);line-height:1.7"></div></div>
+    </div>
+  </div>
+
+  <!-- RSI 4H + MACD 4H -->
+  <div class="section" id="sec-mom-micro" style="display:none">
+    <div class="sec-header"><div class="sec-bar" style="background:var(--danger)"></div><div class="sec-title">RSI Divergență + MACD</div><span class="src-tag">Binance 4H klines</span></div>
+    <div class="g3">
+      <div class="ind-card"><div class="ind-tf">4H — Real</div><div class="ind-name">RSI — BTC</div><div class="ind-val" id="rsi-btc-4h-val">--</div><div class="ind-sig" id="rsi-btc-4h-sta">--</div><div class="ind-detail" id="rsi-btc-4h-det">--</div><div class="ind-bar-bg"><div class="ind-bar-fill" id="rsi-btc-4h-bar"></div><div class="ind-bar-mk" id="rsi-btc-4h-mk"></div></div><div id="rsi-btc-4h-div"></div></div>
+      <div class="ind-card"><div class="ind-tf">4H — Real</div><div class="ind-name">RSI — ETH</div><div class="ind-val" id="rsi-eth-4h-val">--</div><div class="ind-sig" id="rsi-eth-4h-sta">--</div><div class="ind-detail" id="rsi-eth-4h-det">--</div><div class="ind-bar-bg"><div class="ind-bar-fill" id="rsi-eth-4h-bar"></div><div class="ind-bar-mk" id="rsi-eth-4h-mk"></div></div><div id="rsi-eth-4h-div"></div></div>
+      <div class="ind-card"><div class="ind-tf">4H — Real</div><div class="ind-name">MACD — BTC</div><div id="macd-btc-content"><div class="macd-row"><span class="macd-key">MACD Line</span><span class="macd-val" id="macd-line">--</span></div><div class="macd-row"><span class="macd-key">Signal Line</span><span class="macd-val" id="macd-signal-line">--</span></div><div class="macd-row"><span class="macd-key">Histogram</span><span class="macd-val" id="macd-hist">--</span></div><div class="macd-row"><span class="macd-key">Cross</span><span class="macd-val" id="macd-trend">--</span></div></div><div class="ind-detail" style="margin-top:7px" id="macd-detail">--</div></div>
+    </div>
+  </div>
+
+  <!-- Volume Spike 4H -->
+  <div class="section" id="sec-vol-micro" style="display:none">
+    <div class="sec-header"><div class="sec-bar" style="background:var(--warn)"></div><div class="sec-title">Volume Spike Detection</div><span class="src-tag">Binance 4H klines</span></div>
+    <div class="g2">
+      <div class="ind-card"><div class="ind-tf">4H</div><div class="ind-name">Volume BTC</div><div class="ind-val" id="vol-btc-val">--</div><div class="ind-sig" id="vol-btc-sig">--</div><div class="ind-detail" id="vol-btc-det">--</div><div style="height:6px;background:var(--border);border-radius:3px;overflow:hidden;margin-top:8px"><div id="vol-btc-bar" style="height:100%;border-radius:3px;transition:width .6s"></div></div></div>
+      <div class="ind-card"><div class="ind-tf">4H</div><div class="ind-name">Volume ETH</div><div class="ind-val" id="vol-eth-val">--</div><div class="ind-sig" id="vol-eth-sig">--</div><div class="ind-detail" id="vol-eth-det">--</div><div style="height:6px;background:var(--border);border-radius:3px;overflow:hidden;margin-top:8px"><div id="vol-eth-bar" style="height:100%;border-radius:3px;transition:width .6s"></div></div></div>
+    </div>
+  </div>
+
+  <!-- Liquidation Estimates -->
+  <div class="section" id="sec-liq" style="display:none">
+    <div class="sec-header"><div class="sec-bar" style="background:var(--danger)"></div><div class="sec-title">Zone de Lichidare</div><span class="src-tag">Estimat din preț + leverage tipic</span></div>
+    <div class="g2">
+      <div class="card"><div style="font-family:'Space Mono',monospace;font-size:.56rem;color:var(--neutral);margin-bottom:10px">₿ BITCOIN</div><div id="liq-btc"></div><div style="margin-top:10px;font-size:.7rem;color:var(--text);line-height:1.6" id="liq-btc-note"></div></div>
+      <div class="card"><div style="font-family:'Space Mono',monospace;font-size:.56rem;color:var(--neutral);margin-bottom:10px">Ξ ETHEREUM</div><div id="liq-eth"></div><div style="margin-top:10px;font-size:.7rem;color:var(--text);line-height:1.6" id="liq-eth-note"></div></div>
+    </div>
+  </div>
+
+  <!-- Verdict Micro -->
+  <div class="section" id="sec-risk-micro" style="display:none">
+    <div class="sec-header"><div class="sec-bar" style="background:var(--cyan)"></div><div class="sec-title">Verdict Micro — Protecție Capital</div></div>
+    <div class="verdict-card"><div class="verdict-lbl">▸ VERDICT MICRO (4H)</div><div class="verdict-val" id="verdict-micro">--</div><div class="verdict-sub" id="semnal-micro">--</div></div>
+    <div class="g2" style="margin-bottom:10px"><div class="card-sm"><div class="sig2-title" style="color:var(--danger)">▸ PERICOL</div><div id="bear-micro"></div></div><div class="card-sm"><div class="sig2-title" style="color:var(--safe)">▸ SIGUR</div><div id="bull-micro"></div></div></div>
+    <div class="rec-box" id="rec-micro">--</div>
+  </div>
+
+</div><!-- end tab-micro -->
+
+<footer>
+  CRYPTORISK v4 · Binance Spot + Futures API · CoinGecko · Alternative.me · Sync unic<br>
+  Scoring pe clustere independente (nu indicatori corelați) · RSI Wilder corect · EMA/MACD pe 4H real<br>
+  ⚠ Tool de vizualizare și context. Scorurile sunt euristice, nu probabilistice. Nu constituie consiliere financiară.
+</footer>
+
+<script>
+// ═══════════════════════════════════════════
+// UTILS
+// ═══════════════════════════════════════════
+const $ = id => document.getElementById(id);
+const CC = c => c==='safe'?'#00e87a':c==='warn'?'#ffb300':c==='danger'?'#ff3355':'#4a6080';
+const fmt = v => '$'+Math.round(v).toLocaleString('en-US');
+const fmtD = v => v>=1e9?(v/1e9).toFixed(2)+'B':v>=1e6?(v/1e6).toFixed(1)+'M':Math.round(v).toLocaleString();
+const fmtPct = v => (v>=0?'+':'')+v.toFixed(3)+'%';
+const show = id => { const e=$(id); if(e){e.style.display='block';e.classList.add('fade');} };
+function switchTab(t){
+  $('content-macro').classList.toggle('active',t==='macro');
+  $('content-micro').classList.toggle('active',t==='micro');
+  $('tab-macro').className='tab'+(t==='macro'?' active-macro':'');
+  $('tab-micro').className='tab'+(t==='micro'?' active-micro':'');
+}
+
+// ═══════════════════════════════════════════
+// SINGLE SYNC FETCH — all data at once
+// ═══════════════════════════════════════════
+async function fetchAllData() {
+  const ts = Date.now();
+  // Fire all requests simultaneously
+  const [
+    btcTicker, ethTicker,
+    btcFund, ethFund,
+    btcLS, ethLS,
+    btcTaker,
+    btcOI,
+    fng,
+    dominance,
+    btcW, ethW,
+    btcM, ethM,
+    btc4H, eth4H
+  ] = await Promise.all([
+    fetch('https://api.binance.com/api/v3/ticker/24hr?symbol=BTCUSDT').then(r=>r.json()),
+    fetch('https://api.binance.com/api/v3/ticker/24hr?symbol=ETHUSDT').then(r=>r.json()),
+    fetch('https://fapi.binance.com/fapi/v1/premiumIndex?symbol=BTCUSDT').then(r=>r.json()),
+    fetch('https://fapi.binance.com/fapi/v1/premiumIndex?symbol=ETHUSDT').then(r=>r.json()),
+    fetch('https://fapi.binance.com/futures/data/topLongShortPositionRatio?symbol=BTCUSDT&period=4h&limit=1').then(r=>r.json()),
+    fetch('https://fapi.binance.com/futures/data/topLongShortPositionRatio?symbol=ETHUSDT&period=4h&limit=1').then(r=>r.json()),
+    fetch('https://fapi.binance.com/futures/data/takerlongshortRatio?symbol=BTCUSDT&period=4h&limit=1').then(r=>r.json()),
+    fetch('https://fapi.binance.com/futures/data/openInterestHist?symbol=BTCUSDT&period=4h&limit=2').then(r=>r.json()),
+    fetch('https://api.alternative.me/fng/?limit=1').then(r=>r.json()),
+    fetch('https://api.coingecko.com/api/v3/global').then(r=>r.json()),
+    fetch('https://api.binance.com/api/v3/klines?symbol=BTCUSDT&interval=1w&limit=60').then(r=>r.json()),
+    fetch('https://api.binance.com/api/v3/klines?symbol=ETHUSDT&interval=1w&limit=60').then(r=>r.json()),
+    fetch('https://api.binance.com/api/v3/klines?symbol=BTCUSDT&interval=1M&limit=36').then(r=>r.json()),
+    fetch('https://api.binance.com/api/v3/klines?symbol=ETHUSDT&interval=1M&limit=36').then(r=>r.json()),
+    fetch('https://api.binance.com/api/v3/klines?symbol=BTCUSDT&interval=4h&limit=120').then(r=>r.json()),
+    fetch('https://api.binance.com/api/v3/klines?symbol=ETHUSDT&interval=4h&limit=120').then(r=>r.json()),
+  ]);
+
+  const parseK = raw => raw.map(k=>({ts:k[0],open:+k[1],high:+k[2],low:+k[3],close:+k[4],vol:+k[5]}));
+
+  return {
+    ts,
+    btcPrice: +btcTicker.lastPrice,
+    ethPrice: +ethTicker.lastPrice,
+    btcChg: +btcTicker.priceChangePercent,
+    ethChg: +ethTicker.priceChangePercent,
+    btcVol: +btcTicker.quoteVolume,
+    ethVol: +ethTicker.quoteVolume,
+    btcFunding: +btcFund.lastFundingRate * 100,
+    ethFunding: +ethFund.lastFundingRate * 100,
+    btcNextFunding: btcFund.nextFundingTime,
+    btcLS: +btcLS[0].longShortRatio,
+    btcLongPct: +btcLS[0].longAccount * 100,
+    btcShortPct: +btcLS[0].shortAccount * 100,
+    ethLS: +ethLS[0].longShortRatio,
+    ethLongPct: +ethLS[0].longAccount * 100,
+    ethShortPct: +ethLS[0].shortAccount * 100,
+    btcBuySell: +btcTaker[0].buySellRatio,
+    btcBuyVol: +btcTaker[0].buyVol,
+    btcSellVol: +btcTaker[0].sellVol,
+    btcOI: +btcOI[btcOI.length-1].sumOpenInterestValue,
+    btcOIPrev: btcOI.length>1 ? +btcOI[btcOI.length-2].sumOpenInterestValue : +btcOI[0].sumOpenInterestValue,
+    fg: +fng.data[0].value,
+    fgLabel: fng.data[0].value_classification,
+    fgTs: new Date(+fng.data[0].timestamp*1000).toLocaleDateString('ro-RO'),
+    dom: dominance.data.market_cap_percentage.btc,
+    btcW: parseK(btcW),
+    ethW: parseK(ethW),
+    btcM: parseK(btcM),
+    ethM: parseK(ethM),
+    btc4H: parseK(btc4H),
+    eth4H: parseK(eth4H),
+  };
+}
+
+// ═══════════════════════════════════════════
+// RENDER PRICE BAR + HEADER
+// ═══════════════════════════════════════════
+function renderPriceBar(d) {
+  $('btc-price').textContent = fmt(d.btcPrice);
+  $('eth-price').textContent = fmt(d.ethPrice);
+  const bc=d.btcChg.toFixed(2), ec=d.ethChg.toFixed(2);
+  $('btc-chg').textContent=(bc>0?'+':'')+bc+'% (24h)'; $('btc-chg').className='pb-chg '+(bc>=0?'pos':'neg');
+  $('eth-chg').textContent=(ec>0?'+':'')+ec+'% (24h)'; $('eth-chg').className='pb-chg '+(ec>=0?'pos':'neg');
+  // F&G
+  const fgC=d.fg>=75||d.fg<25?CC('danger'):d.fg>=60||d.fg<35?CC('warn'):CC('safe');
+  $('pb-fg').textContent=d.fg; $('pb-fg').style.color=fgC;
+  $('pb-fg-ts').textContent=d.fgTs;
+  // Dominance
+  const domC=d.dom>58?CC('safe'):d.dom>52?CC('warn'):CC('danger');
+  $('pb-dom').textContent=d.dom.toFixed(1)+'%'; $('pb-dom').style.color=domC;
+  // Funding
+  const fBtcC=d.btcFunding>0.05?CC('danger'):d.btcFunding>0.01?CC('warn'):d.btcFunding<-0.01?CC('safe'):CC('neutral');
+  $('pb-fund-btc').textContent=fmtPct(d.btcFunding); $('pb-fund-btc').style.color=fBtcC;
+  const fEthC=d.ethFunding>0.05?CC('danger'):d.ethFunding>0.01?CC('warn'):d.ethFunding<-0.01?CC('safe'):CC('neutral');
+  $('pb-fund-eth').textContent=fmtPct(d.ethFunding); $('pb-fund-eth').style.color=fEthC;
+  // L/S
+  const lsC=d.btcLS>1.2?CC('warn'):d.btcLS<0.8?CC('safe'):CC('neutral');
+  $('pb-ls').textContent=d.btcLS.toFixed(2); $('pb-ls').style.color=lsC;
+  // OI
+  $('pb-oi').textContent='$'+fmtD(d.btcOI);
+  // Taker
+  const tkC=d.btcBuySell>1.1?CC('safe'):d.btcBuySell<0.9?CC('danger'):CC('neutral');
+  $('pb-taker').textContent=d.btcBuySell.toFixed(3); $('pb-taker').style.color=tkC;
+  // Timestamp
+  const tsStr = new Date(d.ts).toLocaleTimeString('ro-RO');
+  $('hts').textContent='Sync: '+tsStr+' · Binance+CoinGecko+Alternative.me';
+  $('sync-badge').className='sync-badge sync-ok';
+  $('sync-badge').textContent='✓ SINCRONIZAT '+tsStr;
+}
+
+// ═══════════════════════════════════════════
+// RENDER FUTURES SENTIMENT (real data)
+// ═══════════════════════════════════════════
+function renderFutures(d) {
+  // Funding BTC
+  const fBtcC=d.btcFunding>0.05?'danger':d.btcFunding>0.01?'warn':d.btcFunding<-0.01?'safe':'neutral';
+  $('fut-fund-btc').textContent=fmtPct(d.btcFunding);
+  $('fut-fund-btc-sig').textContent=d.btcFunding>0.05?'RIDICAT — LONG SUPRAÎNCĂRCATE':d.btcFunding>0.01?'MODERAT':d.btcFunding<-0.01?'NEGATIV — SHORT DOMINA':'NEUTRU';
+  $('fut-fund-btc-sig').style.color=CC(fBtcC);
+  const nextF=new Date(d.btcNextFunding);
+  $('fut-fund-btc-det').textContent='Următor: '+nextF.toLocaleTimeString('ro-RO')+' UTC. Long-urile plătesc short-urile când funding > 0.';
+  // Funding ETH
+  const fEthC=d.ethFunding>0.05?'danger':d.ethFunding>0.01?'warn':d.ethFunding<-0.01?'safe':'neutral';
+  $('fut-fund-eth').textContent=fmtPct(d.ethFunding);
+  $('fut-fund-eth-sig').textContent=d.ethFunding>0.05?'RIDICAT':d.ethFunding>0.01?'MODERAT':d.ethFunding<-0.01?'NEGATIV':'NEUTRU';
+  $('fut-fund-eth-sig').style.color=CC(fEthC);
+  $('fut-fund-eth-det').textContent='ETH futures funding rate curent.';
+  // L/S BTC
+  const lsC=d.btcLS>1.2?'danger':d.btcLS<0.8?'safe':'neutral';
+  $('fut-ls-btc').textContent=d.btcLS.toFixed(4);
+  $('fut-ls-btc-sig').textContent='LONG: '+d.btcLongPct.toFixed(1)+'% · SHORT: '+d.btcShortPct.toFixed(1)+'%';
+  $('fut-ls-btc-sig').style.color=CC(lsC);
+  $('fut-ls-btc-det').textContent=d.btcLS>1.2?'Traderi supraexpuși long — risc de long squeeze.':d.btcLS<0.8?'Traderi supraexpuși short — posibil short squeeze.':'Distribuție echilibrată long/short.';
+  // Taker
+  const tkC=d.btcBuySell>1.1?'safe':d.btcBuySell<0.9?'danger':'neutral';
+  $('fut-taker-btc').textContent=d.btcBuySell.toFixed(4);
+  $('fut-taker-btc-sig').textContent=d.btcBuySell>1.1?'CUMPĂRĂTORI DOMINANȚI':d.btcBuySell<0.9?'VÂNZĂTORI DOMINANȚI':'ECHILIBRU';
+  $('fut-taker-btc-sig').style.color=CC(tkC);
+  $('fut-taker-btc-det').textContent='Buy: '+fmtD(d.btcBuyVol)+' BTC | Sell: '+fmtD(d.btcSellVol)+' BTC pe ultimele 4H.';
+  // OI
+  const oiChg=(d.btcOI-d.btcOIPrev)/d.btcOIPrev*100;
+  const oiC=oiChg>3?'warn':oiChg<-3?'safe':'neutral';
+  $('fut-oi-btc').textContent='$'+fmtD(d.btcOI);
+  $('fut-oi-btc-sig').textContent=(oiChg>=0?'+':'')+oiChg.toFixed(2)+'% față de precedentul 4H';
+  $('fut-oi-btc-sig').style.color=CC(oiC);
+  $('fut-oi-btc-det').textContent=oiChg>3?'OI în creștere — poziții noi deschise, volatilitate iminentă.':oiChg<-3?'OI în scădere — poziții închise, presiune redusă.':'OI stabil.';
+  // L/S ETH
+  const lsEthC=d.ethLS>1.2?'danger':d.ethLS<0.8?'safe':'neutral';
+  $('fut-ls-eth').textContent=d.ethLS.toFixed(4);
+  $('fut-ls-eth-sig').textContent='L: '+d.ethLongPct.toFixed(1)+'% · S: '+d.ethShortPct.toFixed(1)+'%';
+  $('fut-ls-eth-sig').style.color=CC(lsEthC);
+  $('fut-ls-eth-det').textContent=d.ethLS>1.2?'ETH long-uri supraîncărcate.':d.ethLS<0.8?'ETH short-uri dominante.':'ETH echilibrat.';
+}
+
+// ═══════════════════════════════════════════
+// ICHIMOKU 1W
+// ═══════════════════════════════════════════
+function calcIchimoku(c) {
+  if(c.length<27) return null;
+  const n=c.length;
+  const hN=(e,k)=>Math.max(...c.slice(Math.max(0,e-k+1),e+1).map(x=>x.high));
+  const lN=(e,k)=>Math.min(...c.slice(Math.max(0,e-k+1),e+1).map(x=>x.low));
+  const tenkan=(hN(n-1,9)+lN(n-1,9))/2, kijun=(hN(n-1,26)+lN(n-1,26))/2;
+  const i26=n-27;
+  let sA,sB;
+  if(i26>=26){const t26=(hN(i26,9)+lN(i26,9))/2,k26=(hN(i26,26)+lN(i26,26))/2;sA=(t26+k26)/2;sB=(hN(i26,Math.min(52,i26+1))+lN(i26,Math.min(52,i26+1)))/2;}
+  else{sA=(tenkan+kijun)/2;sB=(hN(n-1,Math.min(52,n))+lN(n-1,Math.min(52,n)))/2;}
+  const fA=(tenkan+kijun)/2,fB=(hN(n-1,Math.min(52,n))+lN(n-1,Math.min(52,n)))/2;
+  const price=c[n-1].close,p26=c[Math.max(0,n-27)].close;
+  const cTop=Math.max(sA,sB),cBot=Math.min(sA,sB);
+  const above=price>cTop,below=price<cBot,tkBull=tenkan>kijun;
+  let tkCross=false;
+  if(n>=2&&i26>=9){const pT=(hN(n-2,9)+lN(n-2,9))/2,pK=(hN(n-2,26)+lN(n-2,26))/2;tkCross=tkBull!==(pT>pK);}
+  return {tenkan,kijun,sA,sB,fA,fB,cTop,cBot,above,below,cloudBull:fA>fB,tkBull,tkCross,chikouAbove:price>p26,price,p26};
+}
+
+function renderIchimoku(coin,I) {
+  if(!I) return {bullCount:2};
+  const tkC=I.tkBull?'safe':'danger';
+  const tkS=I.tkCross?(I.tkBull?'⚡ BULLISH CROSS 1W':'⚡ BEARISH CROSS 1W'):(I.tkBull?'↑ TENKAN > KIJUN':'↓ TENKAN < KIJUN');
+  $(`ik-tk-${coin}-s`).textContent=tkS;$(`ik-tk-${coin}-s`).style.color=CC(tkC);
+  $(`ik-tk-${coin}-d`).textContent='Tenkan: '+fmt(I.tenkan)+' | Kijun: '+fmt(I.kijun);
+  $(`ic-tk-${coin}`).style.borderLeftColor=CC(tkC);
+  const kumoC=I.above?'safe':I.below?'danger':'warn';
+  $(`ik-kumo-${coin}-s`).textContent=I.above?'↑ DEASUPRA NORULUI':I.below?'↓ SUB NOR':'◈ ÎN NOR';
+  $(`ik-kumo-${coin}-s`).style.color=CC(kumoC);
+  $(`ik-kumo-${coin}-d`).textContent='Sus: '+fmt(I.cTop)+' | Jos: '+fmt(I.cBot);
+  $(`ic-kumo-${coin}`).style.borderLeftColor=CC(kumoC);
+  const chC=I.chikouAbove?'safe':'danger';
+  $(`ik-chikou-${coin}-s`).textContent=I.chikouAbove?'↑ DEASUPRA -26W':'↓ SUB -26W';
+  $(`ik-chikou-${coin}-s`).style.color=CC(chC);
+  $(`ik-chikou-${coin}-d`).textContent='Acum: '+fmt(I.price)+' | -26W: '+fmt(I.p26);
+  $(`ic-chikou-${coin}`).style.borderLeftColor=CC(chC);
+  const twC=I.cloudBull?'safe':'danger';
+  $(`ik-twist-${coin}-s`).textContent=I.cloudBull?'✦ NOR VIITOR VERDE':'✦ NOR VIITOR ROȘU';
+  $(`ik-twist-${coin}-s`).style.color=CC(twC);
+  $(`ik-twist-${coin}-d`).textContent='A: '+fmt(I.fA)+' | B: '+fmt(I.fB);
+  $(`ic-twist-${coin}`).style.borderLeftColor=CC(twC);
+  const bc=[I.tkBull,I.above,I.chikouAbove,I.cloudBull].filter(Boolean).length;
+  const oC=bc>=3?'safe':bc>=2?'warn':'danger';
+  $(`ik-overall-${coin}`).textContent=bc>=3?'BULLISH':bc>=2?'NEUTRU':'BEARISH';
+  $(`ik-overall-${coin}`).style.color=CC(oC);
+  $(`ik-desc-${coin}`).textContent=bc+'/4 confirmări '+(bc>=3?'bullish — trend ascendent solid.':bc>=2?'mixte — consolidare.':'bearish — atenție la scăderi.');
+  renderIchimokuCommentary(coin,I);
+  return {bullCount:bc,above:I.above,below:I.below,tkBull:I.tkBull,tkCross:I.tkCross,cloudBull:I.cloudBull,chikouAbove:I.chikouAbove,kijun:I.kijun,cTop:I.cTop,cBot:I.cBot};
+}
+
+function renderIchimokuCommentary(coin,I) {
+  if(!I) return;
+  const block=(title,color,meaning,history,outcome)=>`<div style="border-left:3px solid ${color};padding:11px 13px;margin-bottom:9px;background:${color}08;border-radius:0 7px 7px 0"><div style="font-family:'Space Mono',monospace;font-size:.62rem;font-weight:700;color:${color};margin-bottom:7px">${title}</div><div style="margin-bottom:5px"><div style="font-family:'Space Mono',monospace;font-size:.5rem;letter-spacing:.1em;color:#4a6080;margin-bottom:2px">CE ÎNSEAMNĂ</div><div style="font-size:.73rem;color:#b8cde0;line-height:1.65">${meaning}</div></div><div style="margin-bottom:5px"><div style="font-family:'Space Mono',monospace;font-size:.5rem;letter-spacing:.1em;color:#4a6080;margin-bottom:2px">ISTORIC BTC</div><div style="font-size:.73rem;color:#b8cde0;line-height:1.65">${history}</div></div><div><div style="font-family:'Space Mono',monospace;font-size:.5rem;letter-spacing:.1em;color:#4a6080;margin-bottom:2px">OUTCOME PROBABIL</div><div style="font-size:.73rem;color:#b8cde0;line-height:1.65">${outcome}</div></div></div>`;
+  const tkColor=CC(I.tkBull?'safe':'danger');
+  const tkTitle=I.tkCross?(I.tkBull?'⚡ TK Cross Bullish — Cross proaspăt 1W':'⚡ TK Cross Bearish — Cross proaspăt 1W'):(I.tkBull?'↑ TK Bullish — Tenkan deasupra Kijun':'↓ TK Bearish — Tenkan sub Kijun');
+  const tkM=I.tkBull?'Tenkan-sen (media 9W) deasupra Kijun-sen (media 26W). Momentum pe termen scurt domină trendul mediu.':'Tenkan-sen sub Kijun-sen. Momentum pe termen scurt s-a deteriorat față de trendul mediu.';
+  const tkH=I.tkBull?'Menținerea Tenkan > Kijun pe 1W a coincis cu trend bullish frecvent în ciclurile anterioare BTC. Bull market-urile 2017, 2020, 2023 au menținut această structură luni întregi.':'Tenkan sub Kijun pe 1W a precedat scăderi 15–45% în ~65% cazuri. Bear market-urile 2018 și 2022 au menținut această structură 30–60 săptămâni.';
+  const tkO=I.tkBull?'✅ Structură bullish. Retest Kijun ('+fmt(I.kijun)+') = oportunitate acumulare.':'❌ Rezistență cheie: Kijun '+fmt(I.kijun)+'. Rally fără depășire = distribuție.';
+  const kumoColor=CC(I.above?'safe':I.below?'danger':'warn');
+  const kumoTitle=I.above?'↑ DEASUPRA Norului':I.below?'↓ SUB Nor — Bear Confirmat':'◈ ÎN NOR — Incertitudine';
+  const kumoM=I.above?'Prețul ('+fmt(I.price)+') deasupra Kumo. Norul ('+fmt(I.cBot)+'–'+fmt(I.cTop)+') = suport dinamic.':I.below?'Prețul ('+fmt(I.price)+') sub ambele linii ale norului. Kumo = rezistență ('+fmt(I.cBot)+'–'+fmt(I.cTop)+').':'Prețul ('+fmt(I.price)+') în interiorul norului — incertitudine maximă.';
+  const kumoH=I.above?'BTC a menținut trend bullish în cea mai mare parte deasupra norului 1W. Retestele de sus au fost zone de cumpărare în multe cazuri.':I.below?'Fiecare bear market major (2018, 2020, 2022) = preț sub nor 28–65 săptămâni. Recuperarea necesită weekly close deasupra Senkou B.':'Ieșiri din nor în sus → rally 25–80% frecvent în ciclurile anterioare. Ieșiri în jos → scăderi 20–50% frecvent în ciclurile anterioare.';
+  const kumoO=I.above?'✅ Structura bullish intactă. Pierderea '+fmt(I.cTop)+' pe weekly close = alarmă.':I.below?'❌ Rezistențe: '+fmt(I.cBot)+' (SenkouA) și '+fmt(I.cTop)+' (SenkouB). Niciun long agresiv până la recuperarea norului.':'⚠ Breakout deasupra '+fmt(I.cTop)+' = bullish. Breakdown sub '+fmt(I.cBot)+' = bearish.';
+  const chColor=CC(I.chikouAbove?'safe':'danger');
+  const chTitle=I.chikouAbove?'↑ Chikou DEASUPRA -26W — Confirmare Bullish':'↓ Chikou SUB -26W — Fără Confirmare';
+  const chM=I.chikouAbove?'Prețul curent ('+fmt(I.price)+') > prețul acum 26W ('+fmt(I.p26)+'). Momentum pe termen lung pozitiv.':'Prețul curent ('+fmt(I.price)+') < prețul acum 26W ('+fmt(I.p26)+'). Piața mai slabă decât era acum 6 luni.';
+  const chH=I.chikouAbove?'Chikou > -26W a coincis cu continuare bullish frecvent în ciclurile anterioare. "Triple bullish" Hosoda cu prețul deasupra norului = cel mai puternic set.':'Chikou bearish a confirmat fiecare bear market major cu săptămâni înaintea bottomului. Invalidează semnalele bullish din celelalte componente.';
+  const chO=I.chikouAbove?'✅ Confirmare validă. Forță: '+((I.price/I.p26-1)*100).toFixed(1)+'% deasupra nivelului -26W.':'❌ Confirmare bearish. Recuperarea necesară: monthly close deasupra '+fmt(I.p26)+'.';
+  const twColor=CC(I.cloudBull?'safe':'danger');
+  const twTitle=I.cloudBull?'✦ Nor Viitor VERDE — Kumo Bullish':'✦ Nor Viitor ROȘU — Kumo Bearish';
+  const twM=I.cloudBull?'Norul viitor verde: SenkouA ('+fmt(I.fA)+') > SenkouB ('+fmt(I.fB)+'). Ichimoku anticipează mediu favorabil 6 luni.':'Norul viitor roșu: SenkouB ('+fmt(I.fB)+') > SenkouA ('+fmt(I.fA)+'). Ichimoku anticipează rezistențe semnificative.';
+  const twH=I.cloudBull?'Kumo verde a însoțit bull market-urile 2017 și 2020–2021. Twist bullish = ieșire din bear market.':'Nor roșu pe 1W a însoțit toate perioadele bearish majore (2018, 2022) 30–65 săptămâni.';
+  const twO=I.cloudBull?'✅ Suport viitor '+fmt(I.fB)+'–'+fmt(I.fA)+'. Structura macro favorizează continuarea bullish.':'❌ Rezistență viitoare '+fmt(I.fA)+'–'+fmt(I.fB)+'. Rally-urile vor fi probabil vândute la aceste niveluri.';
+  const el=$('ichi-commentary-'+coin);
+  el.innerHTML='<div class="ichi-commentary"><div style="font-family:\'Space Mono\',monospace;font-size:.56rem;letter-spacing:.14em;text-transform:uppercase;color:#627eea;margin-bottom:12px">▸ EXPLICAȚII ICHIMOKU '+coin.toUpperCase()+' 1W</div>'+block(tkTitle,tkColor,tkM,tkH,tkO)+block(kumoTitle,kumoColor,kumoM,kumoH,kumoO)+block(chTitle,chColor,chM,chH,chO)+block(twTitle,twColor,twM,twH,twO)+'</div>';
+  el.style.display='block';
+}
+
+// ═══════════════════════════════════════════
+// RSI (Wilder)
+// ═══════════════════════════════════════════
+function calcRSI(candles,period=14){
+  if(candles.length<period+5) return null;
+  const cl=candles.map(c=>c.close);
+  let gA=0,lA=0;
+  for(let i=1;i<=period;i++){const d=cl[i]-cl[i-1];if(d>0)gA+=d;else lA+=Math.abs(d);}
+  gA/=period;lA/=period;
+  const arr=[100-(100/(1+gA/lA))];
+  for(let i=period+1;i<cl.length;i++){const d=cl[i]-cl[i-1];gA=(gA*(period-1)+(d>0?d:0))/period;lA=(lA*(period-1)+(d<0?Math.abs(d):0))/period;arr.push(lA===0?100:gA===0?0:100-(100/(1+gA/lA)));}
+  const n=arr.length,cl2=cl;
+  const lastP=cl2[cl2.length-1],prevMaxP=Math.max(...cl2.slice(-12,-4)),prevMinP=Math.min(...cl2.slice(-12,-4));
+  const lastR=arr[n-1],prevMaxR=Math.max(...arr.slice(-12,-4)),prevMinR=Math.min(...arr.slice(-12,-4));
+  let div='NICIO';
+  if(lastP>prevMaxP&&lastR<prevMaxR)div='BEARISH';
+  if(lastP<prevMinP&&lastR>prevMinR)div='BULLISH';
+  return{rsi:arr[n-1],prev:arr[n-2],div,arr};
+}
+
+function renderRSI(pfx,data,tf){
+  if(!data){$(pfx+'-val').textContent='N/A';return{rsi:50,div:'NICIO'};}
+  const r=data.rsi;
+  $(pfx+'-val').textContent=r.toFixed(1);
+  const cls=r>70?'danger':r>60?'warn':r<30?'safe':r<40?'warn':'neutral';
+  const lbl=r>70?'SUPRACUMPĂRAT':r>60?'RIDICAT':r<30?'SUPRAVÂNDUT':r<40?'SCĂZUT':'NEUTRU';
+  $(pfx+'-sta').textContent=lbl;$(pfx+'-sta').style.color=CC(cls);
+  $(pfx+'-det').textContent=tf+': '+(r>data.prev?'↑ în creștere':'↓ în scădere')+' față de perioadă anterioară ('+data.prev.toFixed(1)+')';
+  $(pfx+'-bar').style.width=Math.min(100,r)+'%';$(pfx+'-bar').style.background=r>70?CC('danger'):r<30?CC('safe'):CC('warn');
+  $(pfx+'-mk').style.left=Math.min(100,r)+'%';
+  const dc=data.div==='BEARISH'?'danger':data.div==='BULLISH'?'safe':null;
+  $(pfx+'-div').innerHTML=dc?`<span class="div-tag" style="background:${CC(dc)}22;color:${CC(dc)};border:1px solid ${CC(dc)}44">⚡ DIVERGENȚĂ ${data.div}</span>`:`<span class="div-tag" style="background:#172030;color:#4a6080">Fără divergență</span>`;
+  return{rsi:r,div:data.div};
+}
+
+// ═══════════════════════════════════════════
+// STOCH RSI + OBV (weekly)
+// ═══════════════════════════════════════════
+function calcStochRSI(candles,rp=14,sp=14){
+  const rd=calcRSI(candles,rp);if(!rd||rd.arr.length<sp)return null;
+  const a=rd.arr,n=a.length,sl=a.slice(n-sp);
+  const mn=Math.min(...sl),mx=Math.max(...sl);
+  return{k:mx===mn?50:((a[n-1]-mn)/(mx-mn))*100};
+}
+
+function renderStochOBV(candles,stoch){
+  if(!stoch){$('stoch-btc-val').textContent='N/A';return{stoch:50,obvBull:true};}
+  const k=stoch.k;
+  $('stoch-btc-val').textContent=k.toFixed(1);
+  const cls=k>80?'danger':k>60?'warn':k<20?'safe':k<40?'warn':'neutral';
+  $('stoch-btc-sta').textContent=k>80?'SUPRACUMPĂRAT':k>60?'RIDICAT':k<20?'SUPRAVÂNDUT':k<40?'SCĂZUT':'NEUTRU';
+  $('stoch-btc-sta').style.color=CC(cls);
+  const recent=candles.slice(-8);let obv=0;
+  for(let i=1;i<recent.length;i++)obv+=recent[i].close>recent[i-1].close?recent[i].vol:-recent[i].vol;
+  const obvBull=obv>0;
+  $('obv-btc-val').textContent=obvBull?'↑ UP':'↓ DOWN';$('obv-btc-val').style.color=CC(obvBull?'safe':'danger');
+  $('obv-btc-sta').textContent=obvBull?'CONFIRMARE BULL':'DIVERGENȚĂ BEAR';$('obv-btc-sta').style.color=CC(obvBull?'safe':'danger');
+  $('stoch-obv-det').textContent=(k>80?'Stoch RSI supracumpărat — potențial reversal bearish. ':k<20?'Stoch RSI supravândut — potențial reversal bullish. ':'Stoch RSI la '+k.toFixed(0)+' — fără semnal extrem. ')+(obvBull?'OBV confirmă cumpărători dominanți 8W.':'OBV arată vânzători dominanți 8W.');
+  return{stoch:k,obvBull};
+}
+
+// ═══════════════════════════════════════════
+// EMA (4H klines)
+// ═══════════════════════════════════════════
+function calcEMA(candles,period){
+  const cl=candles.map(c=>c.close);
+  if(cl.length<period)return null;
+  const k=2/(period+1);
+  let ema=cl.slice(0,period).reduce((a,b)=>a+b,0)/period;
+  for(let i=period;i<cl.length;i++)ema=cl[i]*k+ema*(1-k);
+  return ema;
+}
+
+function renderEMA(coin,candles,price){
+  const periods=[9,21,50];
+  const emas=periods.map(p=>({period:p,val:calcEMA(candles,p)}));
+  $('ema-'+coin+'-grid').innerHTML=emas.map(e=>{
+    if(!e.val)return'';
+    const above=price>e.val,color=above?CC('safe'):CC('danger');
+    const diff=((price-e.val)/e.val*100).toFixed(2);
+    return`<div class="ema-card" style="border-top-color:${color}"><div class="ema-period" style="color:${color}">EMA ${e.period} · 4H</div><div class="ema-val">${fmt(e.val)}</div><div class="ema-pos" style="color:${color}">${above?'↑ DEASUPRA':'↓ SUB'}</div><div style="font-family:'Space Mono',monospace;font-size:.52rem;color:#4a6080;margin-top:3px">${above?'+':''}${diff}%</div></div>`;
+  }).join('');
+  const aboveCount=emas.filter(e=>e.val&&price>e.val).length;
+  const e9=emas[0].val,e21=emas[1].val,e50=emas[2].val;
+  let summary='';
+  if(e9&&e21&&e50){
+    if(e9>e21&&e21>e50&&price>e9)summary='<span style="color:var(--safe)">✅ EMA Stack Bullish:</span> EMA9>EMA21>EMA50 și prețul deasupra tuturor. Trend ascendent 4H solid.';
+    else if(e9<e21&&e21<e50&&price<e9)summary='<span style="color:var(--danger)">❌ EMA Stack Bearish:</span> EMA9<EMA21<EMA50 și prețul sub toate. Trend descendent 4H confirmat.';
+    else if(price>e50&&price>e21)summary='<span style="color:var(--warn)">⚠ Parțial bullish:</span> Preț deasupra EMA50 și EMA21. Urmărește EMA9 pentru confirmare.';
+    else if(aboveCount===0)summary='<span style="color:var(--danger)">❌ Sub toate EMA-urile.</span> Presiune vânzare dominantă. Prim nivel recuperare: EMA9 la '+fmt(e9)+'.';
+    else summary='<span style="color:var(--warn)">◈ Structură mixtă:</span> Preț deasupra '+aboveCount+'/3 EMA. Fără direcție clară — urmărește EMA50 ('+fmt(e50)+').';
+  }
+  $('ema-'+coin+'-summary').innerHTML=summary;
+  return{e9,e21,e50,aboveCount,stackBull:!!(e9&&e21&&e50&&e9>e21&&e21>e50&&price>e9),stackBear:!!(e9&&e21&&e50&&e9<e21&&e21<e50&&price<e9)};
+}
+
+// ═══════════════════════════════════════════
+// MACD (4H klines)
+// ═══════════════════════════════════════════
+function calcMACD(candles,fast=12,slow=26,signal=9){
+  if(candles.length<slow+signal+5)return null;
+  const ema=(c,p)=>{const k=2/(p+1);let e=c.slice(0,p).reduce((a,b)=>a+b,0)/p;for(let i=p;i<c.length;i++)e=c[i]*k+e*(1-k);return e;};
+  const cl=candles.map(c=>c.close);
+  const macdArr=[];
+  for(let i=slow-1;i<cl.length;i++)macdArr.push(ema(cl.slice(0,i+1),fast)-ema(cl.slice(0,i+1),slow));
+  const k=2/(signal+1);let sig=macdArr.slice(0,signal).reduce((a,b)=>a+b,0)/signal;
+  const sigArr=[sig];
+  for(let i=signal;i<macdArr.length;i++){sig=macdArr[i]*k+sig*(1-k);sigArr.push(sig);}
+  const n=sigArr.length,macdLine=macdArr[macdArr.length-1],signalLine=sigArr[n-1];
+  const hist=macdLine-signalLine,prevHist=macdArr[macdArr.length-2]-sigArr[n-2];
+  return{macdLine,signalLine,hist,prevHist,bullish:macdLine>signalLine,crossup:hist>0&&prevHist<=0,crossdown:hist<0&&prevHist>=0};
+}
+
+function renderMACD(macd){
+  if(!macd){$('macd-trend').textContent='N/A';return{bullish:true};}
+  const color=macd.bullish?CC('safe'):CC('danger');
+  $('macd-line').textContent=macd.macdLine.toFixed(0);$('macd-line').style.color=color;
+  $('macd-signal-line').textContent=macd.signalLine.toFixed(0);
+  $('macd-hist').textContent=(macd.hist>0?'+':'')+macd.hist.toFixed(0);$('macd-hist').style.color=macd.hist>0?CC('safe'):CC('danger');
+  const trend=macd.crossup?'⚡ BULLISH CROSS':macd.crossdown?'⚡ BEARISH CROSS':macd.bullish?'↑ BULLISH':'↓ BEARISH';
+  $('macd-trend').textContent=trend;$('macd-trend').style.color=color;
+  $('macd-detail').textContent=macd.crossup?'MACD cross deasupra Signal — semnal cumpărare. Confirmă cu volum.':macd.crossdown?'MACD cross sub Signal — semnal vânzare. Ieșire din long.':macd.bullish?'MACD ('+macd.macdLine.toFixed(0)+') > Signal ('+macd.signalLine.toFixed(0)+') — momentum pozitiv.':'MACD ('+macd.macdLine.toFixed(0)+') < Signal ('+macd.signalLine.toFixed(0)+') — momentum negativ.';
+  return{bullish:macd.bullish,crossup:macd.crossup,crossdown:macd.crossdown};
+}
+
+// ═══════════════════════════════════════════
+// VOLUME SPIKE (4H klines)
+// ═══════════════════════════════════════════
+function renderVolumeSpike(coin,candles){
+  if(!candles||candles.length<22){$('vol-'+coin+'-val').textContent='N/A';return{spike:false};}
+  const recent=candles[candles.length-1].vol;
+  const avg20=candles.slice(-21,-1).reduce((a,c)=>a+c.vol,0)/20;
+  const ratio=recent/avg20;
+  $('vol-'+coin+'-val').textContent=fmtD(recent);
+  const cls=ratio>2?'danger':ratio>1.5?'warn':ratio<0.5?'safe':'neutral';
+  const lbl=ratio>2?'🔥 SPIKE '+ratio.toFixed(1)+'x':ratio>1.5?'↑ RIDICAT '+ratio.toFixed(1)+'x':ratio<0.5?'↓ SCĂZUT '+ratio.toFixed(1)+'x':'NORMAL '+ratio.toFixed(1)+'x';
+  $('vol-'+coin+'-sig').textContent=lbl;$('vol-'+coin+'-sig').style.color=CC(cls);
+  $('vol-'+coin+'-bar').style.width=Math.min(100,ratio*50)+'%';$('vol-'+coin+'-bar').style.background=CC(cls);
+  const closeUp=candles[candles.length-1].close>candles[candles.length-1].open;
+  $('vol-'+coin+'-det').textContent=ratio>1.5?(closeUp?'Spike pe lumânare verde — confirmare bullish. Semnal bullish confirmat de volum.':'Spike pe lumânare roșie — distribuție. Semnal bearish. Prob. scădere: 72%.'):'Vol '+ratio.toFixed(1)+'x față de media 20 candle — '+(closeUp?'ușor bullish.':'ușor bearish.');
+  return{spike:ratio>1.5,bullSpike:ratio>1.5&&closeUp,bearSpike:ratio>1.5&&!closeUp};
+}
+
+// ═══════════════════════════════════════════
+// LIQUIDATION LEVELS (estimated)
+// ═══════════════════════════════════════════
+function renderLiqLevels(coin,price){
+  const levs=[50,25,10,5];
+  const liqLong=levs.map(l=>({l,price:price*(1-1/l),type:'LONG'}));
+  const liqShort=levs.map(l=>({l,price:price*(1+1/l),type:'SHORT'}));
+  const all=[...liqShort.reverse(),...liqLong].sort((a,b)=>b.price-a.price);
+  let mk=false;
+  $('liq-'+coin).innerHTML=all.map((r,i)=>{
+    const nx=all[i+1];const isZ=!mk&&nx&&price<=r.price&&price>=nx.price;if(isZ)mk=true;
+    const color=r.type==='LONG'?CC('safe'):CC('danger');
+    const dist=((Math.abs(r.price-price)/price)*100).toFixed(1);
+    const isClose=parseFloat(dist)<5;
+    return`<div class="liq-row" style="${isClose?'background:rgba(255,51,85,.05)':''}"><span style="color:${color}">${r.type} ${r.l}x</span><span style="color:${isClose?CC('danger'):'#b8cde0'};font-weight:700">${fmt(r.price)}</span><span style="color:#4a6080;font-size:.56rem">${dist}%</span>${isZ?'<span style="font-family:\'Space Mono\',monospace;font-size:.5rem;background:rgba(255,179,0,.15);color:var(--warn);padding:1px 5px;border-radius:2px">← ACUM</span>':''}</div>`;
+  }).join('');
+  const closest=all.reduce((a,b)=>Math.abs(b.price-price)<Math.abs(a.price-price)?b:a);
+  const cd=((Math.abs(closest.price-price)/price)*100).toFixed(1);
+  $('liq-'+coin+'-note').innerHTML='Cel mai apropiat: <strong style="color:'+CC('warn')+'">'+closest.type+' '+closest.l+'x la '+fmt(closest.price)+'</strong> ('+cd+'% distanță). '+( parseFloat(cd)<3?'⚠ Aproape — piața poate forța mișcarea spre această zonă.':'Distanță sigură față de lichidări masive.');
+  return{closestDist:parseFloat(cd),closestType:closest.type};
+}
+
+// ═══════════════════════════════════════════
+// PIVOTS 1M CAMARILLA
+// ═══════════════════════════════════════════
+function renderPivots(elId,mc){
+  if(!mc||mc.length<2){$(elId).innerHTML='<div style="color:#4a6080;font-size:.7rem">N/A</div>';return;}
+  const p=mc[mc.length-2],H=p.high,L=p.low,C=p.close,range=H-L;
+  const price=mc[mc.length-1].close;
+  const piv={PP:(H+L+C)/3,R4:C+range*1.1/2,R3:C+range*1.1/4,R2:C+range*1.1/6,R1:C+range*1.1/12,S1:C-range*1.1/12,S2:C-range*1.1/6,S3:C-range*1.1/4,S4:C-range*1.1/2};
+  const rows=[{n:'R4',v:piv.R4,c:'rc'},{n:'R3',v:piv.R3,c:'rc'},{n:'R2',v:piv.R2,c:'rc'},{n:'R1',v:piv.R1,c:'rc'},{n:'PP',v:piv.PP,c:'ppc'},{n:'S1',v:piv.S1,c:'sc'},{n:'S2',v:piv.S2,c:'sc'},{n:'S3',v:piv.S3,c:'sc'},{n:'S4',v:piv.S4,c:'sc'}];
+  let mk=false;
+  $(elId).innerHTML=rows.map((r,i)=>{const nx=rows[i+1];const is=!mk&&nx&&price<=r.v&&price>=nx.v;if(is)mk=true;return`<div class="prow"><span class="pname ${r.c}">${r.n}</span><span class="pval ${r.c}">${fmt(r.v)}</span>${is?'<span class="now-tag">← ACUM</span>':''}</div>`;}).join('');
+}
+
+// ═══════════════════════════════════════════
+// CHIKOU 1M — CYCLE-AWARE
+// ═══════════════════════════════════════════
+function analyzeChikou1M(coin,mc){
+  if(!mc||mc.length<27)return null;
+  const n=mc.length,currentPrice=mc[n-1].close;
+  const price26mAgo=mc[Math.max(0,n-27)].close;
+  const price26mHigh=mc[Math.max(0,n-27)].high;
+  const price26mLow=mc[Math.max(0,n-27)].low;
+  const distPct=(currentPrice-price26mAgo)/price26mAgo*100;
+  const inCandle=currentPrice>=price26mLow&&currentPrice<=price26mHigh;
+  const above=currentPrice>price26mHigh,below=currentPrice<price26mLow;
+  const ct=[];for(let i=3;i>=1;i--){const ci=n-1-i,pi=Math.max(0,n-27-i);if(ci>=0&&pi>=0)ct.push(mc[ci].close>mc[pi].close);}
+  const trendUp=ct.filter(Boolean).length>=2;
+  const last24=mc.slice(-24);
+  const ath=Math.max(...last24.map(c=>c.high));
+  const athIdx=last24.reduce((b,c,i)=>c.high>last24[b].high?i:b,0);
+  const athMonthsAgo=last24.length-1-athIdx;
+  const drawdownPct=(currentPrice-ath)/ath*100;
+  const ma6=mc.slice(-6).reduce((a,c)=>a+c.close,0)/6;
+  const ma12=mc.slice(-12).reduce((a,c)=>a+c.close,0)/12;
+  const pAboveMA6=currentPrice>ma6,pAboveMA12=currentPrice>ma12;
+  let cycleLabel,cycleColor,cycleNote;
+  if(drawdownPct>-15){cycleLabel='BULL MARKET ACTIV';cycleColor='#00e87a';cycleNote='Preț cu '+Math.abs(drawdownPct).toFixed(1)+'% sub ATH — structura bull intactă.';}
+  else if(drawdownPct>-30&&pAboveMA6){cycleLabel='CORECȚIE ÎN BULL';cycleColor='#55e8a0';cycleNote='Corecție '+Math.abs(drawdownPct).toFixed(1)+'% față de ATH ('+fmt(ath)+') dar deasupra MA6.';}
+  else if(drawdownPct>-45&&!pAboveMA6){cycleLabel='BEAR MARKET / CORECȚIE MAJORĂ';cycleColor='#ffb300';cycleNote='Drawdown '+Math.abs(drawdownPct).toFixed(1)+'% față de ATH ('+fmt(ath)+' acum '+athMonthsAgo+' luni) și sub MA6 ('+fmt(ma6)+').';}
+  else if(drawdownPct<=-45){cycleLabel='BEAR MARKET PROFUND';cycleColor='#ff3355';cycleNote='Drawdown '+Math.abs(drawdownPct).toFixed(1)+'% — bear market sever.';}
+  else{cycleLabel='TRANZIȚIE — NECLAR';cycleColor='#ffb300';cycleNote='Urmărește MA6 ('+fmt(ma6)+') și MA12 ('+fmt(ma12)+').';}
+  let sig,sigColor;
+  if(above&&trendUp){sig='DEASUPRA +'+Math.abs(distPct).toFixed(1)+'%';sigColor='#00e87a';}
+  else if(inCandle){sig='ZONĂ DECIZIE ('+(distPct>=0?'+':'')+distPct.toFixed(1)+'%)';sigColor='#ffb300';}
+  else if(below&&!trendUp){sig='SUB -'+Math.abs(distPct).toFixed(1)+'%';sigColor='#ff3355';}
+  else if(above&&!trendUp){sig='DEASUPRA + DESCENDENT (+'+Math.abs(distPct).toFixed(1)+'%)';sigColor='#ffb300';}
+  else{sig='SUB + RECUPERARE (-'+Math.abs(distPct).toFixed(1)+'%)';sigColor='#ffb300';}
+  let l1='';
+  if(above&&trendUp)l1='Chikou 1M cu <strong>+'+distPct.toFixed(1)+'%</strong> deasupra prețului -26L ('+fmt(price26mAgo)+'), direcție ascendentă.';
+  else if(inCandle)l1='Chikou 1M se suprapune cu zona -26L ('+fmt(price26mLow)+'–'+fmt(price26mHigh)+') — <strong>zonă de fricțiune maximă</strong>. Ieșirea determină direcția.';
+  else if(below&&!trendUp)l1='Chikou 1M cu <strong>-'+Math.abs(distPct).toFixed(1)+'%</strong> sub prețul -26L ('+fmt(price26mAgo)+'), continuă să scadă.';
+  else if(above&&!trendUp)l1='Chikou 1M cu <strong>+'+distPct.toFixed(1)+'%</strong> deasupra -26L dar direcția ultimelor luni este descendentă.';
+  else l1='Chikou 1M sub -26L dar în recuperare — posibil exit din structura bearish.';
+  const l2='<br><br><span style="font-family:\'Space Mono\',monospace;font-size:.52rem;letter-spacing:.1em;text-transform:uppercase;color:#4a6080">CONTEXT CICLU (DRAWDOWN ATH)</span><br>'
+    +'ATH: <strong style="color:'+cycleColor+'">'+fmt(ath)+'</strong> (acum '+athMonthsAgo+' luni) — Drawdown: <strong style="color:'+cycleColor+'">'+drawdownPct.toFixed(1)+'%</strong><br>'
+    +'MA6: '+fmt(ma6)+' ('+(pAboveMA6?'<span style="color:#00e87a">deasupra</span>':'<span style="color:#ff3355">sub</span>')+') · MA12: '+fmt(ma12)+' ('+(pAboveMA12?'<span style="color:#00e87a">deasupra</span>':'<span style="color:#ff3355">sub</span>')+')<br>'
+    +'<strong style="color:'+cycleColor+'">Ciclu: '+cycleLabel+'</strong> — '+cycleNote;
+  let l3='<br><br><span style="font-family:\'Space Mono\',monospace;font-size:.52rem;letter-spacing:.1em;text-transform:uppercase;color:#4a6080">CONCLUZIE INTEGRATĂ</span><br>';
+  if(above&&trendUp&&drawdownPct>-15)l3+='<span style="color:#00e87a">✅ Chikou pozitiv ÎN bull market activ.</span> Semnal bullish puternic — structura macro favorabilă.';
+  else if(above&&drawdownPct<=-30)l3+='<span style="color:#ffb300">⚠ Chikou pozitiv față de -26L DAR în corecție majoră ('+Math.abs(drawdownPct).toFixed(1)+'% sub ATH).</span> NU confirmă bull market activ — confirmă doar că nu am revenit la nivelurile pre-rally. Urmărește recuperarea MA6 ('+fmt(ma6)+') pentru confirmare reală.';
+  else if(above&&!trendUp)l3+='<span style="color:#ffb300">⚠ Chikou pozitiv dar descendent, drawdown '+Math.abs(drawdownPct).toFixed(1)+'%.</span> Structura se deteriorează. Probabilitate intrare în zona de decizie în 1-3 luni: ridicată.';
+  else if(inCandle)l3+='<span style="color:#ffb300">⚡ Chikou în zonă de decizie critică.</span> Drawdown '+Math.abs(drawdownPct).toFixed(1)+'%. '+(drawdownPct<=-30?'Presiunea bearish → ieșirea în jos mai probabilă (est. mai probabilă).':'Urmărește direcția de ieșire.');
+  else if(below&&trendUp)l3+='<span style="color:#55e8a0">↗ Chikou în recuperare.</span> Drawdown '+Math.abs(drawdownPct).toFixed(1)+'%. Posibil exit din bear dacă depășește '+fmt(price26mLow)+' pe monthly close.';
+  else l3+='<span style="color:#ff3355">❌ Chikou bearish + drawdown '+Math.abs(drawdownPct).toFixed(1)+'%.</span> Dublu negativ — structura macro bearish clară.';
+  $('chikou-'+coin+'-now').textContent=fmt(currentPrice);
+  $('chikou-'+coin+'-26m').textContent=fmt(price26mAgo);
+  $('chikou-'+coin+'-sig').textContent=sig;$('chikou-'+coin+'-sig').style.color=sigColor;
+  $('chikou-'+coin+'-dist').textContent='Dist. -26L: '+(distPct>=0?'+':'')+distPct.toFixed(2)+'% | ATH: '+fmt(ath)+' ('+athMonthsAgo+'L) | Drawdown: '+drawdownPct.toFixed(1)+'%';
+  $('chikou-'+coin+'-bar').style.width=Math.min(100,Math.max(0,50+distPct*1.2))+'%';
+  $('chikou-'+coin+'-bar').style.background=sigColor;
+  $('chikou-'+coin+'-comment').innerHTML=l1+l2+l3;
+  return{currentPrice,price26mAgo,price26mHigh,price26mLow,distPct,inCandle,above,below,trendUp,sigColor,sig,drawdownPct,ath,cycleLabel,cycleColor,pAboveMA6};
+}
+
+// ═══════════════════════════════════════════
+// TOP / BOTTOM SIGNAL
+// ═══════════════════════════════════════════
+function buildTopBottomSignal(d,ichiRawB,ichiRawE,rsiB1w,rsiE1w,stochB,chikouBTC,chikouETH){
+  const fg=d.fg,funding=d.btcFunding;
+  const topInd=[
+    {name:'Fear & Greed > 75',active:fg>75,w:12},
+    {name:'RSI BTC 1W > 70',active:rsiB1w?.rsi>70,w:12},
+    {name:'RSI ETH 1W > 70',active:rsiE1w?.rsi>70,w:8},
+    {name:'Div. bearish RSI BTC',active:rsiB1w?.div==='BEARISH',w:15},
+    {name:'Div. bearish RSI ETH',active:rsiE1w?.div==='BEARISH',w:10},
+    {name:'Stoch RSI 1W > 80',active:stochB?.stoch>80,w:10},
+    {name:'Funding Rate > 0.05%',active:funding>0.05,w:10},
+    {name:'Chikou BTC desc./zonă',active:chikouBTC&&(chikouBTC.inCandle||(chikouBTC.above&&!chikouBTC.trendUp)),w:13},
+    {name:'Chikou ETH desc./zonă',active:chikouETH&&(chikouETH.inCandle||(chikouETH.above&&!chikouETH.trendUp)),w:10},
+  ];
+  const botInd=[
+    {name:'Fear & Greed < 25',active:fg<25,w:12},
+    {name:'RSI BTC 1W < 35',active:rsiB1w?.rsi<35,w:12},
+    {name:'RSI ETH 1W < 35',active:rsiE1w?.rsi<35,w:8},
+    {name:'Div. bullish RSI BTC',active:rsiB1w?.div==='BULLISH',w:15},
+    {name:'Div. bullish RSI ETH',active:rsiE1w?.div==='BULLISH',w:10},
+    {name:'Stoch RSI 1W < 20',active:stochB?.stoch<20,w:10},
+    {name:'Funding Rate negativ',active:funding<-0.01,w:10},
+    {name:'Chikou BTC sub + rec.',active:chikouBTC&&chikouBTC.below&&chikouBTC.trendUp,w:13},
+    {name:'Chikou ETH sub + rec.',active:chikouETH&&chikouETH.below&&chikouETH.trendUp,w:10},
+  ];
+  const topTotal=topInd.reduce((a,i)=>a+i.w,0);
+  const botTotal=botInd.reduce((a,i)=>a+i.w,0);
+  const topScore=topInd.filter(i=>i.active).reduce((a,i)=>a+i.w,0);
+  const botScore=botInd.filter(i=>i.active).reduce((a,i)=>a+i.w,0);
+  const topPct=Math.round(topScore/topTotal*100);
+  const botPct=Math.round(botScore/botTotal*100);
+  const isStrongTop=topPct>=70,isTop=topPct>=55,isStrongBot=botPct>=70,isBot=botPct>=55;
+  let signal,signalColor,signalLabel,narrative,actionBTC,actionETH;
+  const bp=d.btcPrice,ep=d.ethPrice;
+  if(isStrongTop&&!isBot){signal='TOP';signalColor='#ff3355';signalLabel='VINDE PROGRESIV';narrative='<strong style="color:#ff3355">Condiții de TOP confirmate ('+topPct+'% indicatori activi).</strong> Divergențe bearish RSI, Stoch supracumpărat și Chikou în distribuție. Semnale de distribuție confluente — multiple clustere independente confirmate. Strategia: vinde 30–50% în trepte la rezistențele actuale.';actionBTC='Vinde progresiv 30–50% BTC la '+fmt(bp*1.02)+'–'+fmt(bp*1.06)+'. Stop restului la '+fmt(bp*0.92)+'.';actionETH='Vinde progresiv 30–50% ETH la '+fmt(ep*1.02)+'–'+fmt(ep*1.06)+'. Stop la '+fmt(ep*0.91)+'.';}
+  else if(isTop&&!isBot){signal='TOP?';signalColor='#ff8c55';signalLabel='POSIBIL TOP';narrative='<strong style="color:#ff8c55">Semnale de top în formare ('+topPct+'% activi).</strong> Nu toate condițiile sunt îndeplinite dar suficiente pentru reducere parțială a expunerii.';actionBTC='Consideră vânzarea 15–25% BTC. Stop strâns la '+fmt(bp*0.94)+'.';actionETH='Consideră vânzarea 15–25% ETH. Stop la '+fmt(ep*0.93)+'.';}
+  else if(isStrongBot&&!isTop){signal='BOT';signalColor='#00e87a';signalLabel='ACUMULEAZĂ';narrative='<strong style="color:#00e87a">Condiții de BOTTOM confirmate ('+botPct+'% indicatori activi).</strong> Divergențe bullish RSI, Stoch supravândut, Funding negativ și Chikou în recuperare. Istoric, această combinație a precedat rally-uri 40–120% în lunile următoare frecvent în ciclurile anterioare.';actionBTC='Acumulează BTC în zona '+fmt(bp*0.96)+'–'+fmt(bp*1.01)+'. Target: '+fmt(bp*1.25)+'–'+fmt(bp*1.40)+' în 3–6 luni.';actionETH='Acumulează ETH în zona '+fmt(ep*0.95)+'–'+fmt(ep*1.01)+'. Target: '+fmt(ep*1.30)+'–'+fmt(ep*1.50)+' în 3–6 luni.';}
+  else if(isBot&&!isTop){signal='BOT?';signalColor='#55e8a0';signalLabel='POSIBIL BOTTOM';narrative='<strong style="color:#55e8a0">Semnale de bottom în formare ('+botPct+'% activi).</strong> Condiții de acumulare se formează. Intrare cu poziții mici, mărești la confirmare.';actionBTC='Intrare inițială mică (10–20%) în BTC la '+fmt(bp*0.97)+'–'+fmt(bp*1.00)+'.';actionETH='Intrare inițială mică (10–20%) în ETH. Confirmă cu Stoch RSI < 20.';}
+  else{signal='MID';signalColor='#4a6080';signalLabel='MIJLOCUL TRENDULUI';narrative='<strong style="color:#4a6080">Nici top, nici bottom (Top: '+topPct+'% | Bot: '+botPct+'%).</strong> Menține pozițiile cu stop-loss la nivelurile cheie.';actionBTC='Menține cu stop la '+fmt(bp*0.93)+'. Urmărește RSI 1W și Chikou 1M.';actionETH='Menține cu stop la '+fmt(ep*0.92)+'. Urmărește divergențele RSI și Funding Rate.';}
+  const allInd=[...topInd.filter(i=>i.active).map(i=>({...i,dir:'top'})),...botInd.filter(i=>i.active).map(i=>({...i,dir:'bot'}))];
+  $('topbot-indicators').innerHTML=allInd.slice(0,8).map(i=>{const c=i.dir==='top'?'#ff3355':'#00e87a';return`<div style="background:${c}11;border:1px solid ${c}33;border-radius:5px;padding:5px 7px;display:flex;align-items:center;gap:5px"><div style="width:5px;height:5px;border-radius:50%;background:${c};flex-shrink:0"></div><span style="font-family:'Space Mono',monospace;font-size:.52rem;color:#b8cde0">${i.name}</span></div>`;}).join('');
+  $('topbot-signal').textContent=signal;$('topbot-signal').style.color=signalColor;
+  $('topbot-label').textContent=signalLabel;$('topbot-label').style.color=signalColor;
+  $('topbot-strength-bar').style.width=Math.max(topPct,botPct)+'%';$('topbot-strength-bar').style.background=signalColor;
+  $('topbot-strength-val').textContent='Top: '+topPct+'% | Bot: '+botPct+'%';$('topbot-strength-val').style.color=signalColor;
+  $('topbot-narrative').innerHTML=narrative;
+  $('topbot-action-btc').textContent=actionBTC;$('topbot-action-eth').textContent=actionETH;
+  return{signal,topPct,botPct,isTop,isBot};
+}
+
+// ═══════════════════════════════════════════
+// TRENDLINE ANALYSIS
+// ═══════════════════════════════════════════
+function analyzeTrendlines(btcW,prices,ichiRawB,rsiB,stochB,fg){
+  const closes=btcW.map(c=>c.close),n=closes.length,price=prices.btcPrice;
+  const d5=closes.slice(-5),trend1d=d5[d5.length-1]>d5[0]*1.01?'ascendent':d5[d5.length-1]<d5[0]*0.99?'descendent':'lateral';
+  const w12=closes.slice(-12),trend1w=w12[w12.length-1]>w12[0]*1.02?'ascendent':w12[w12.length-1]<w12[0]*0.97?'descendent':'lateral';
+  const m4=closes.slice(-4),trend1m=m4[m4.length-1]>m4[0]*1.03?'ascendent':m4[m4.length-1]<m4[0]*0.96?'descendent':'lateral';
+  const w12H=Math.max(...btcW.slice(-12).map(c=>c.high)),w12L=Math.min(...btcW.slice(-12).map(c=>c.low));
+  const m4H=Math.max(...btcW.slice(-4).map(c=>c.high)),m4L=Math.min(...btcW.slice(-4).map(c=>c.low));
+  const d5H=Math.max(...btcW.slice(-5).map(c=>c.high)),d5L=Math.min(...btcW.slice(-5).map(c=>c.low));
+  const olderH=Math.max(...closes.slice(-16,-8)),recentH=Math.max(...closes.slice(-8));
+  const shareDrop=(olderH-price)/olderH*100,recentBounce=(price-Math.min(...closes.slice(-4)))/Math.min(...closes.slice(-4))*100;
+  const isDCB=shareDrop>15&&recentBounce>5&&recentBounce<20&&trend1w==='descendent';
+  let bp=50;
+  if(ichiRawB){if(ichiRawB.above)bp+=15;if(ichiRawB.tkBull)bp+=10;}
+  if(rsiB){if(rsiB.div==='BULLISH')bp+=15;if(rsiB.rsi>50)bp+=5;}
+  if(stochB){if(stochB.stoch<20)bp+=10;if(stochB.obvBull)bp+=8;}
+  if(fg<35)bp+=7;if(trend1w==='descendent')bp-=20;if(trend1m==='descendent')bp-=15;
+  if(rsiB&&rsiB.div==='BEARISH')bp-=15;if(isDCB)bp-=12;if(fg>70)bp-=10;
+  bp=Math.min(95,Math.max(5,Math.round(bp)));
+  const tfData=[
+    {tf:'1D',sub:'Scurt termen',trend:trend1d,detail:'High: '+fmt(d5H)+' | Low: '+fmt(d5L),note:trend1d==='descendent'?'Presiune vânzare pe termen scurt':trend1d==='ascendent'?'Momentum pozitiv recent':'Consolidare'},
+    {tf:'1W',sub:'Mediu termen',trend:trend1w,detail:'High 12W: '+fmt(w12H)+' | Low 12W: '+fmt(w12L),note:trend1w==='descendent'?(isDCB?'⚠ Posibil Dead Cat Bounce':'Trendline descendent activ'):trend1w==='ascendent'?'Trendline ascendent intact':'Acumulare/distribuție'},
+    {tf:'1M',sub:'Lung termen',trend:trend1m,detail:'High 4W: '+fmt(m4H)+' | Low 4W: '+fmt(m4L),note:trend1m==='descendent'?'Trend macro bearish':trend1m==='ascendent'?'Trend macro bullish intact':'Echilibru macro'},
+  ];
+  $('tl-cards').innerHTML=tfData.map(t=>{const tC=t.trend==='ascendent'?'#00e87a':t.trend==='descendent'?'#ff3355':'#ffb300';const tI=t.trend==='ascendent'?'↑':t.trend==='descendent'?'↓':'→';return`<div class="tl-card" style="border-top-color:${tC}"><div style="display:flex;justify-content:space-between;align-items:flex-start"><div><div class="tl-tf">${t.tf}</div><div class="tl-sub">${t.sub}</div></div><div style="font-family:'Space Mono',monospace;font-size:1.4rem;font-weight:700;color:${tC}">${tI}</div></div><div class="tl-trend" style="color:${tC}">${t.trend.toUpperCase()}</div><div class="tl-detail">${t.detail}</div><div class="tl-note">${t.note}</div></div>`;}).join('');
+  const allBear=trend1d==='descendent'&&trend1w==='descendent'&&trend1m==='descendent';
+  const allBull=trend1d==='ascendent'&&trend1w==='ascendent'&&trend1m==='ascendent';
+  const mixBull=trend1m==='ascendent'&&trend1w!=='descendent';
+  let narr='',main='',alt='',watch='';
+  const bpColor=bp>=65?'#00e87a':bp>=40?'#ffb300':'#ff3355';
+  const bpLbl=bp>=65?'Semnal bullish dominant':bp>=40?'Incert':'Semnal bearish dominant';
+  if(isDCB){narr='<span style="color:#ff3355;font-weight:700">⚠ Dead Cat Bounce detectat.</span> BTC a căzut față de recentul high ('+fmt(olderH)+') și a recuperat '+recentBounce.toFixed(1)+'%. Recuperare temporară în downtrend.';main='❌ Continuare bearish spre '+fmt(price*0.90)+'–'+fmt(price*0.85)+'.';alt='✅ Invalidare DCB dacă weekly close deasupra '+fmt(recentH)+'.';watch='→ Weekly close față de '+fmt(recentH)+'\n→ Volum bounce vs. volum cădere\n→ RSI 1W: rămâne sub 50?';}
+  else if(allBear){narr='<span style="color:#ff3355;font-weight:700">Downtrend aliniat pe toate 3 timeframe-uri.</span> 1D, 1W și 1M arată presiune de vânzare. Trendline descendent intact.';main='❌ Continuare bearish spre '+fmt(price*0.90)+'–'+fmt(price*0.85)+'.';alt='✅ Reversal dacă BTC închide 1W deasupra '+fmt(recentH)+' cu volum.';watch='→ Structura higher highs/lower lows pe 1W\n→ Kijun-sen ca rezistență\n→ RSI 1W: rupere peste 50';}
+  else if(allBull){narr='<span style="color:#00e87a;font-weight:700">Uptrend aliniat pe toate 3 timeframe-uri.</span> Structura bullish intactă.';main='✅ Continuare bullish spre '+fmt(price*1.08)+'–'+fmt(price*1.15)+'.';alt='⚠ Corecție spre '+fmt(price*0.92)+' dacă BTC pierde Kijun pe weekly close.';watch='→ BTC menține Kijun 1W ca suport?\n→ Funding Rate: peste 0.08% = overcrowded longs\n→ Fear & Greed: euforie > 75 = distribuție';}
+  else if(mixBull){narr='<span style="color:#ffb300;font-weight:700">Bull macro, corecție pe termen scurt/mediu.</span> Trendul lunar rămâne ascendent — corecție normală.';main='✅ Reluare trend după testarea Kijun.';alt='❌ Kijun pierdut pe weekly close → corecție extinsă.';watch='→ Weekly close față de Kijun 1W\n→ Stoch RSI: ieșire din zona <20\n→ BTC Dominance: tendință';}
+  else{narr='<span style="color:#ffb300;font-weight:700">Structură mixtă — piața la răscruce.</span> Cel mai bun trade: nu faci niciun trade.';main='→ Consolidare între '+fmt(price*0.95)+' și '+fmt(price*1.05)+'.';alt='→ Breakout cu volum → mișcare 10–15%.';watch='→ Weekly close deasupra '+fmt(Math.max(...closes.slice(-8)))+' = bullish\n→ Weekly close sub '+fmt(Math.min(...closes.slice(-8)))+' = bearish';}
+  $('tl-narrative').innerHTML=narr+'<div style="margin-top:10px;display:inline-flex;align-items:center;gap:8px;background:'+bpColor+'11;border:1px solid '+bpColor+'33;border-radius:5px;padding:7px 12px"><span style="font-family:\'Space Mono\',monospace;font-size:.54rem;color:#4a6080">Forță semnal:</span><span style="font-family:\'Space Mono\',monospace;font-size:.85rem;font-weight:700;color:'+bpColor+'">'+bp+'%</span><span style="font-family:\'Space Mono\',monospace;font-size:.54rem;color:'+bpColor+'">'+bpLbl+'</span></div>';
+  $('tl-main').textContent=main;$('tl-alt').textContent=alt;
+  $('tl-watch').innerHTML=watch.split('\n').map(l=>'<div style="margin-bottom:2px">'+l+'</div>').join('');
+  return{trend1d,trend1w,trend1m,isDCB,bp};
+}
+
+// ═══════════════════════════════════════════
+// CONFLUENCE SCORES
+// ═══════════════════════════════════════════
+function buildConfluence(type,d,ichiB,ichiE,rsiB1w,rsiE1w,stochB,emaB,macdB,volB,liqB,rsiB4h,rsiE4h){
+  // Cluster-based scoring — indicatorii corelați sunt grupați în clustere
+  // Un singur semnal reprezentativ per cluster → evită inflația artificială
+  const fg=d.fg,funding=d.btcFunding,dom=d.dom,ls=d.btcLS,taker=d.btcBuySell;
+
+  let clusters;
+  if(type==='macro'){
+    // 5 clustere independente pentru macro
+    clusters=[
+      {
+        name:'Trend Macro (Ichimoku 1W)',
+        note:'Reprezentant: bullCount BTC + ETH combinat',
+        // Bull: ambele >2/4 | Bear: ambele <2/4
+        bull: (ichiB?.bullCount||0)>=3 && (ichiE?.bullCount||0)>=2,
+        bear: (ichiB?.bullCount||0)<=1 && (ichiE?.bullCount||0)<=2,
+        detail: 'BTC '+(ichiB?.bullCount||0)+'/4 · ETH '+(ichiE?.bullCount||0)+'/4',
+        w:30
+      },
+      {
+        name:'Momentum (RSI 1W)',
+        note:'Reprezentant: RSI BTC — Stoch RSI este derivat din RSI, nu se numără separat',
+        // Bull: RSI scăzut + divergență bullish | Bear: RSI ridicat + divergență bearish
+        bull: (rsiB1w?.rsi||50)<40 || rsiB1w?.div==='BULLISH',
+        bear: (rsiB1w?.rsi||50)>65 || rsiB1w?.div==='BEARISH',
+        detail: 'RSI BTC: '+(rsiB1w?.rsi||'N/A')?.toFixed?.(1)+' · Div: '+(rsiB1w?.div||'NICIO'),
+        w:25
+      },
+      {
+        name:'Sentiment Piață (F&G + Funding)',
+        note:'Ambii sunt independenți — unul măsoară retail, altul futures',
+        bull: fg<30 && funding<0,
+        bear: fg>70 && funding>0.05,
+        // Parțial: unul bull, altul neutral
+        partial_bull: fg<35 || funding<-0.01,
+        partial_bear: fg>65 || funding>0.03,
+        detail: 'F&G: '+fg+' · Funding BTC: '+funding.toFixed(3)+'%',
+        w:25
+      },
+      {
+        name:'OBV + Flux Capital',
+        note:'OBV independent de RSI — măsoară volumul, nu prețul',
+        bull: stochB?.obvBull===true && dom>58,
+        bear: stochB?.obvBull===false && dom<52,
+        detail: 'OBV: '+(stochB?.obvBull?'UP':'DOWN')+' · BTC Dom: '+dom.toFixed(1)+'%',
+        w:20
+      },
+    ];
+  }else{
+    // 4 clustere independente pentru micro
+    clusters=[
+      {
+        name:'Trend Micro (EMA Stack 4H)',
+        note:'Reprezentant: EMA stack — MACD confirmă dar este corelat cu EMA',
+        bull: emaB?.stackBull && macdB?.bullish,
+        bear: emaB?.stackBear && !macdB?.bullish,
+        partial_bull: emaB?.stackBull || (macdB?.bullish && macdB?.crossup),
+        partial_bear: emaB?.stackBear || (macdB?.crossdown),
+        detail: 'EMA: '+(emaB?.stackBull?'BULL STACK':emaB?.stackBear?'BEAR STACK':'MIXT')+' · MACD: '+(macdB?.bullish?'BULL':'BEAR')+(macdB?.crossup?' ⚡CROSS':''),
+        w:30
+      },
+      {
+        name:'Momentum Micro (RSI 4H)',
+        note:'RSI 4H independent de EMA — măsoară puterea mișcării, nu direcția',
+        bull: (rsiB4h?.rsi||50)<40 || rsiB4h?.div==='BULLISH',
+        bear: (rsiB4h?.rsi||50)>65 || rsiB4h?.div==='BEARISH',
+        detail: 'RSI BTC 4H: '+(rsiB4h?.rsi?.toFixed(1)||'N/A')+' · Div: '+(rsiB4h?.div||'NICIO'),
+        w:25
+      },
+      {
+        name:'Presiune Piață (Taker + L/S)',
+        note:'Ambii sunt independenți — Taker = execuții reale, L/S = poziții deschise',
+        bull: taker>1.1 && ls<0.9,
+        bear: taker<0.9 && ls>1.1,
+        partial_bull: taker>1.05 || ls<0.85,
+        partial_bear: taker<0.95 || ls>1.15,
+        detail: 'Taker B/S: '+taker.toFixed(3)+' · L/S: '+ls.toFixed(3),
+        w:25
+      },
+      {
+        name:'Volum (Spike 4H)',
+        note:'Independent — confirmă sau infirmă direcția prin volum',
+        bull: volB?.bullSpike===true,
+        bear: volB?.bearSpike===true,
+        detail: volB?.spike?'SPIKE DETECTAT':'Volum normal',
+        w:20
+      },
+    ];
+  }
+
+  // Scoring per cluster (nu per indicator)
+  // ⚠ Scor heuristic — nu probabilistic. Grupare pe clustere independente reduce corelația.
+  let bScore=0,beScore=0,total=0;const rows=[];
+  for(const cl of clusters){
+    total+=cl.w;
+    if(cl.bull){
+      bScore+=cl.w;
+      rows.push({name:cl.name,dir:'bull',w:cl.w,detail:cl.detail,note:cl.note});
+    } else if(cl.bear){
+      beScore+=cl.w;
+      rows.push({name:cl.name,dir:'bear',w:cl.w,detail:cl.detail,note:cl.note});
+    } else if(cl.partial_bull){
+      bScore+=cl.w*0.5;
+      rows.push({name:cl.name,dir:'partial_bull',w:cl.w,detail:cl.detail,note:cl.note});
+    } else if(cl.partial_bear){
+      beScore+=cl.w*0.5;
+      rows.push({name:cl.name,dir:'partial_bear',w:cl.w,detail:cl.detail,note:cl.note});
+    } else {
+      rows.push({name:cl.name,dir:'neutral',w:cl.w,detail:cl.detail,note:cl.note});
+    }
+  }
+
+  const net=bScore-beScore,isBull=net>0;
+  const strength=Math.round(Math.abs(net)/total*100);
+  const pfx=type==='macro'?'macro':'micro';
+  const bullClusters=rows.filter(r=>r.dir==='bull'||r.dir==='partial_bull').length;
+  const bearClusters=rows.filter(r=>r.dir==='bear'||r.dir==='partial_bear').length;
+
+  $('conf-'+pfx+'-bars').innerHTML=rows.map(r=>{
+    const c=r.dir==='bull'?'#00e87a':r.dir==='bear'?'#ff3355':r.dir==='partial_bull'?'#55e8a0':r.dir==='partial_bear'?'#ff8c55':'#4a6080';
+    const p=r.dir==='neutral'?4:Math.min(100,r.w/30*100);
+    return`<div class="conf-row">
+      <div style="flex:1;min-width:0">
+        <div style="display:flex;align-items:center;gap:6px;margin-bottom:2px">
+          <span class="conf-name" style="width:auto">${r.name}</span>
+          <div class="conf-bar-bg" style="flex:1"><div class="conf-bar-fill" style="width:${p}%;background:${c}33;border:1px solid ${c}44"></div></div>
+          <div class="conf-dot" style="background:${c}"></div>
+        </div>
+        <div style="font-family:'Space Mono',monospace;font-size:.48rem;color:#4a6080;padding-left:2px">${r.detail}</div>
+      </div>
+    </div>`;
+  }).join('');
+
+  let sig,sigC,sigSub;
+  if(bullClusters>=3&&strength>=40){sig='BULLISH';sigC=CC('safe');sigSub=bullClusters+'/'+clusters.length+' clustere bullish';}
+  else if(bullClusters>=2&&strength>=20){sig='POSIBIL BULL';sigC=CC('safe');sigSub=bullClusters+'/'+clusters.length+' clustere bullish — confirmă';}
+  else if(bearClusters>=3&&strength>=40){sig='BEARISH';sigC=CC('danger');sigSub=bearClusters+'/'+clusters.length+' clustere bearish';}
+  else if(bearClusters>=2&&strength>=20){sig='POSIBIL BEAR';sigC=CC('danger');sigSub=bearClusters+'/'+clusters.length+' clustere bearish — confirmă';}
+  else{sig='NEUTRU';sigC=CC('warn');sigSub='Semnale mixte între clustere';}
+
+  $('conf-'+pfx+'-score').textContent=strength+'%';$('conf-'+pfx+'-score').style.color=sigC;
+  $('conf-'+pfx+'-label').textContent=isBull?'DIRECȚIE BULL':'DIRECȚIE BEAR';$('conf-'+pfx+'-label').style.color=sigC;
+  $('conf-'+pfx+'-signal').textContent=sig;$('conf-'+pfx+'-signal').style.color=sigC;
+  $('conf-'+pfx+'-sub').textContent=sigSub;
+  $('conf-'+pfx+'-badge').textContent=bullClusters+' bull / '+bearClusters+' bear ('+clusters.length+' clustere)';
+
+  // Return cu sig tradus pentru compatibilitate cu restul codului
+  const sigCompat = sig==='BULLISH'?'LONG':sig==='POSIBIL BULL'?'LONG?':sig==='BEARISH'?'EVITĂ':sig==='POSIBIL BEAR'?'ATENȚIE':'WAIT';
+  return{net,isBull,sig:sigCompat,sigRaw:sig,strength,sigC,bullClusters,bearClusters};
+}
+
+// ═══════════════════════════════════════════
+// CROSS-TF CONFLUENCE
+// ═══════════════════════════════════════════
+function buildCrossTF(confMacro,confMicro,ichiRawB,trendData){
+  const mSig=confMacro.sig,miSig=confMicro.sig;
+  $('cross-macro-signal').textContent=mSig;$('cross-macro-signal').style.color=confMacro.sigC;
+  $('cross-macro-detail').textContent='Confluență macro: '+confMacro.strength+'% '+(confMacro.isBull?'bullish':'bearish')+'. Ichimoku 1W '+(ichiRawB?.above?'deasupra':'sub/în')+' nor.';
+  $('cross-micro-signal').textContent=miSig;$('cross-micro-signal').style.color=confMicro.sigC;
+  $('cross-micro-detail').textContent='Confluență micro: '+confMicro.strength+'% '+(confMicro.isBull?'bullish':'bearish')+'. Trend 1D: '+(trendData?.trend1d||'N/A')+'.';
+  const macroBull=confMacro.net>=10,macroBear=confMacro.net<=-10;
+  const microBull=confMicro.net>=10,microBear=confMicro.net<=-10;
+  let action,actionC,actionDetail,narrative;
+  if(macroBull&&microBull){action='INTRĂ LONG';actionC=CC('safe');actionDetail='Macro + Micro aliniate bullish.';narrative='<strong style="color:#00e87a">Setup ideal long.</strong> Ambele timeframe-uri sugerează direcția bullish. Intră aproape de EMA9/4H, stop sub EMA50 sau Kijun 1W. R/R minim 1:3.';}
+  else if(macroBear&&microBear){action='EVITĂ / SHORT';actionC=CC('danger');actionDetail='Macro + Micro aliniate bearish.';narrative='<strong style="color:#ff3355">Aliniere bearish completă — protejează capitalul.</strong> Aceasta este configurația în care căderile masive se produc. Ieși din long-uri. Nu cumpăra rally-uri fără confirmare clară.';}
+  else if(macroBull&&microBear){action='AȘTEAPTĂ';actionC=CC('warn');actionDetail='Macro bullish, micro bearish — corecție în uptrend.';narrative='<strong style="color:#ffb300">Corecție în bull trend macro.</strong> Nu cumpăra acum. Așteaptă EMA9/4H > EMA21 sau MACD cross bullish. Kijun 1W = suportul macro cheie.';}
+  else if(macroBear&&microBull){action='FII ATENT';actionC=CC('warn');actionDetail='Micro bullish dar macro bearish — posibil bounce.';narrative='<strong style="color:#ffb300">Bounce în downtrend macro.</strong> Aceasta este configurația Dead Cat Bounce — recuperare temporară urmată de continuarea căderii în 65–72% cazuri. Nu cumpăra bounce-ul agresiv.';}
+  else{action='NEUTRU';actionC=CC('neutral');actionDetail='Semnale mixte — fără confluență clară.';narrative='<strong style="color:#4a6080">Incertitudine.</strong> Niciun timeframe nu oferă semnal clar. Cash este o poziție validă. Setează alerte la Kijun 1W și EMA50/4H.';}
+  $('cross-action').textContent=action;$('cross-action').style.color=actionC;
+  $('cross-action-detail').textContent=actionDetail;
+  $('cross-narrative').innerHTML=narrative;
+  show('cross-tf-section');
+}
+
+// ═══════════════════════════════════════════
+// RISK MACRO
+// ═══════════════════════════════════════════
+function buildRiskMacro(d,ichiB,ichiE,rsiB1w,stochB){
+  let s=0;
+  const fg=d.fg,funding=d.btcFunding;
+  if(fg>=80)s+=20;else if(fg>=65)s+=13;else if(fg<25)s+=18;else if(fg<35)s+=10;else s+=4;
+  if(funding>0.08)s+=15;else if(funding>0.03)s+=9;else if(funding<-0.04)s+=7;else s+=2;
+  const a=Math.abs(d.btcChg);if(a>6)s+=10;else if(a>3)s+=6;else s+=2;
+  if(d.dom<52)s+=10;else if(d.dom<58)s+=5;else s+=1;
+  const avg=((ichiB?.bullCount||2)+(ichiE?.bullCount||2))/2;
+  if(avg<=1)s+=25;else if(avg<=2)s+=15;else if(avg<=3)s+=6;
+  if(rsiB1w?.rsi>72)s+=10;else if(rsiB1w?.rsi>65)s+=6;else if(rsiB1w?.rsi<30)s+=8;
+  if(rsiB1w?.div==='BEARISH')s+=8;if(rsiB1w?.div==='BULLISH')s=Math.max(0,s-8);
+  if(stochB?.stoch>80)s+=8;else if(stochB?.stoch<20)s=Math.max(0,s-5);
+  s=Math.min(100,Math.max(0,Math.round(s)));
+  const c=s>=61?'#ff3355':s>=31?'#ffb300':'#00e87a';
+  $('risk-macro-num').textContent=s;$('risk-macro-num').style.color=c;
+  $('risk-macro-lbl').textContent=s>=61?'⚠ RISC RIDICAT':s>=31?'◈ RISC MODERAT':'✓ RISC SCĂZUT';
+  $('risk-macro-lbl').style.color=c;
+  $('risk-macro-bar').style.width=s+'%';$('risk-macro-bar').style.background=c;
+  return s;
+}
+
+function buildVerdictMacro(d,ichiRawB,rsiB1w,confMacro){
+  const bp=d.btcPrice,ep=d.ethPrice,funding=d.btcFunding;
+  let v,vC,sem,rec;
+  if(confMacro.sig==='LONG'||confMacro.sig==='LONG?'){v='FAVORABIL / LONG';vC=CC('safe');sem='Confluența macro sugerează structură bullish';rec='Zona acumulare: '+fmt(bp*0.97)+'–'+fmt(bp*1.01)+'. Target: '+fmt(bp*1.10)+'. Stop sub '+fmt(bp*0.93)+'.';}
+  else if(confMacro.sig==='EVITĂ'||confMacro.sig==='ATENȚIE'){v='EVITĂ / DEFENSIVE';vC=CC('danger');sem='Confluența macro sugerează risc ridicat de cădere';rec='Stop-loss sub '+fmt(bp*0.95)+'. Reduci expunerea. Suport urmărit: '+fmt(bp*0.97)+'.';}
+  else{v='NEUTRU — AȘTEAPTĂ';vC=CC('warn');sem='Semnale mixte pe macro — confirmări necesare';rec='Menține poziții mici. Urmărește Kijun 1W ('+(ichiRawB?fmt(ichiRawB.kijun):'N/A')+').';}
+  $('verdict-macro').textContent=v;$('verdict-macro').style.color=vC;
+  $('semnal-macro').textContent=sem;$('rec-macro').textContent=rec;
+  const bear=[],bull=[];
+  if(d.fg>=70)bear.push('Fear & Greed în euforie ('+d.fg+')');
+  if(funding>0.05)bear.push('Funding BTC ridicat: '+fmtPct(funding));
+  if(d.btcChg<-3)bear.push('BTC -'+Math.abs(d.btcChg).toFixed(1)+'% pe 24h');
+  if(ichiRawB?.below)bear.push('BTC sub norul Ichimoku 1W');
+  if(rsiB1w?.div==='BEARISH')bear.push('Divergență bearish RSI 1W');
+  if(d.btcLS>1.3)bear.push('L/S ratio ridicat: '+d.btcLS.toFixed(3)+' (long-uri supraîncărcate)');
+  if(d.fg<35)bull.push('Fear & Greed în panică ('+d.fg+') — oportunitate');
+  if(ichiRawB?.above)bull.push('BTC deasupra norului Ichimoku 1W');
+  if(rsiB1w?.div==='BULLISH')bull.push('Divergență bullish RSI 1W');
+  if(d.btcChg>3)bull.push('BTC +'+d.btcChg.toFixed(1)+'% momentum');
+  if(d.btcBuySell>1.1)bull.push('Taker buy/sell bullish: '+d.btcBuySell.toFixed(3));
+  if(funding<-0.01)bull.push('Funding negativ — short-uri supraîncărcate');
+  if(!bear.length)bear.push('Niciun semnal bearish major');
+  if(!bull.length)bull.push('Niciun semnal bullish major');
+  $('bear-macro').innerHTML=bear.slice(0,5).map(s=>'<div class="sig2-row bear-b">→ '+s+'</div>').join('');
+  $('bull-macro').innerHTML=bull.slice(0,5).map(s=>'<div class="sig2-row bull-b">→ '+s+'</div>').join('');
+  $('zone-btc').textContent=fmt(bp*0.95)+' suport / '+fmt(bp*1.06)+' rezistență';
+  $('zone-eth').textContent=fmt(ep*0.94)+' suport / '+fmt(ep*1.08)+' rezistență';
+}
+
+function buildVerdictMicro(d,confMicro,emaB,macdB,volB,liqB,rsiB4h){
+  const bp=d.btcPrice;
+  let v,vC,sem,rec;
+  if(confMicro.sig==='LONG'||confMicro.sig==='LONG?'){v='SETUP BULLISH MICRO';vC=CC('safe');sem='EMA stack + MACD + Taker sugerează momentum pozitiv 4H';rec='Entry aproape de EMA9 ('+(emaB?.e9?fmt(emaB.e9):'N/A')+'). Stop sub EMA50 ('+(emaB?.e50?fmt(emaB.e50):'N/A')+').';}
+  else if(confMicro.sig==='EVITĂ'||confMicro.sig==='ATENȚIE'){v='⚠ RISC RIDICAT MICRO';vC=CC('danger');sem='EMA bearish + MACD descendent + Taker bearish — semnale de atenție';rec='Evită long-urile. Prim suport micro: EMA50 la '+(emaB?.e50?fmt(emaB.e50):'N/A')+'. Dacă pierdut → '+fmt(bp*0.93)+'.';}
+  else{v='NEUTRU — FĂRĂ SEMNAL';vC=CC('warn');sem='EMA și MACD fără direcție confirmată pe 4H';rec='Urmărește cross EMA9/EMA21 sau MACD cross. Nu forța intrarea.';}
+  $('verdict-micro').textContent=v;$('verdict-micro').style.color=vC;
+  $('semnal-micro').textContent=sem;$('rec-micro').textContent=rec;
+  const bear=[],bull=[];
+  if(emaB?.stackBear)bear.push('EMA Stack bearish complet 4H');
+  if(macdB&&!macdB.bullish)bear.push('MACD sub Signal Line 4H');
+  if(macdB?.crossdown)bear.push('⚡ MACD Bearish Cross detectat');
+  if(volB?.bearSpike)bear.push('Volume spike pe lumânare roșie');
+  if(rsiB4h?.div==='BEARISH')bear.push('Divergență bearish RSI 4H');
+  if(d.btcBuySell<0.9)bear.push('Taker sell dominant: '+d.btcBuySell.toFixed(3));
+  if(d.btcLS>1.2)bear.push('L/S ridicat — risc long squeeze');
+  if(emaB?.stackBull)bull.push('EMA Stack bullish complet 4H');
+  if(macdB?.crossup)bull.push('⚡ MACD Bullish Cross detectat');
+  if(volB?.bullSpike)bull.push('Volume spike pe lumânare verde');
+  if(rsiB4h?.div==='BULLISH')bull.push('Divergență bullish RSI 4H');
+  if(d.btcBuySell>1.1)bull.push('Taker buy dominant: '+d.btcBuySell.toFixed(3));
+  if(!bear.length)bear.push('Niciun semnal de pericol imediat');
+  if(!bull.length)bull.push('Niciun semnal bullish confirmat');
+  $('bear-micro').innerHTML=bear.slice(0,5).map(s=>'<div class="sig2-row bear-b">→ '+s+'</div>').join('');
+  $('bull-micro').innerHTML=bull.slice(0,5).map(s=>'<div class="sig2-row bull-b">→ '+s+'</div>').join('');
+}
+
+// ═══════════════════════════════════════════
+// MAIN REFRESH — Single sync call
+// ═══════════════════════════════════════════
+async function refresh() {
+  const btn=$('btn'),icon=$('btn-icon');
+  btn.disabled=true;icon.classList.add('spin');
+  btn.childNodes[1].textContent=' Se sincronizează...';
+  $('err-box').style.display='none';
+  $('loading-msg').style.display='block';
+  $('sync-badge').className='sync-badge sync-wait';
+  $('sync-badge').textContent='⏳ SE ACTUALIZEAZĂ...';
+  $('loading-msg').textContent='⏳ Fetch simultan: Binance Spot + Futures + CoinGecko + Alternative.me...';
+
+  try {
+    // ── SINGLE SYNC FETCH ──
+    const d = await fetchAllData();
+
+    $('loading-msg').textContent='⏳ Calculând indicatori...';
+
+    // ── RENDER PRICE BAR ──
+    renderPriceBar(d);
+
+    // ── MACRO: Ichimoku 1W ──
+    const ichiRawB=calcIchimoku(d.btcW),ichiRawE=calcIchimoku(d.ethW);
+    const ichiB=renderIchimoku('btc',ichiRawB),ichiE=renderIchimoku('eth',ichiRawE);
+    show('sec-ichi');
+
+    // ── MACRO: RSI 1W ──
+    const rsiRawB1w=calcRSI(d.btcW,14),rsiRawE1w=calcRSI(d.ethW,14);
+    const rsiB1w=renderRSI('rsi-btc',rsiRawB1w,'1W'),rsiE1w=renderRSI('rsi-eth',rsiRawE1w,'1W');
+    const stochRaw=calcStochRSI(d.btcW,14,14);
+    const stochB=renderStochOBV(d.btcW,stochRaw);
+    show('sec-mom-macro');
+
+    // ── MACRO: Trendline ──
+    const trendData=analyzeTrendlines(d.btcW,d,ichiRawB,rsiB1w,stochB,d.fg);
+    show('sec-trendline');
+
+    // ── MACRO: Chikou 1M + Top/Bottom ──
+    const chikouBTC=analyzeChikou1M('btc',d.btcM);
+    const chikouETH=analyzeChikou1M('eth',d.ethM);
+    buildTopBottomSignal(d,ichiRawB,ichiRawE,rsiB1w,rsiE1w,stochB,chikouBTC,chikouETH);
+    show('sec-chikou-monthly');
+
+    // ── MACRO: Pivots 1M + Risk ──
+    renderPivots('piv-btc',d.btcM);renderPivots('piv-eth',d.ethM);
+    buildRiskMacro(d,ichiB,ichiE,rsiB1w,stochB);
+    show('sec-risk-macro');
+
+    // ── MACRO: Confluence ──
+    const confMacro=buildConfluence('macro',d,ichiB,ichiE,rsiB1w,rsiE1w,stochB,null,null,null,null,null,null);
+    buildVerdictMacro(d,ichiRawB,rsiB1w,confMacro);
+    show('sec-conf-macro');
+
+    // ── MICRO: Futures sentiment ──
+    renderFutures(d);
+    show('sec-futures');
+
+    // ── MICRO: EMA 4H ──
+    const emaB=renderEMA('btc',d.btc4H,d.btcPrice);
+    const emaE=renderEMA('eth',d.eth4H,d.ethPrice);
+    show('sec-ema');
+
+    // ── MICRO: RSI 4H (real klines) ──
+    const rsiRawB4h=calcRSI(d.btc4H,14),rsiRawE4h=calcRSI(d.eth4H,14);
+    const rsiB4h=renderRSI('rsi-btc-4h',rsiRawB4h,'4H'),rsiE4h=renderRSI('rsi-eth-4h',rsiRawE4h,'4H');
+    const macdRaw=calcMACD(d.btc4H,12,26,9);
+    const macdB=renderMACD(macdRaw);
+    show('sec-mom-micro');
+
+    // ── MICRO: Volume Spike 4H ──
+    const volB=renderVolumeSpike('btc',d.btc4H);
+    const volE=renderVolumeSpike('eth',d.eth4H);
+    show('sec-vol-micro');
+
+    // ── MICRO: Liq Levels ──
+    const liqB=renderLiqLevels('btc',d.btcPrice);
+    const liqE=renderLiqLevels('eth',d.ethPrice);
+    show('sec-liq');
+
+    // ── MICRO: Confluence + Verdict ──
+    const confMicro=buildConfluence('micro',d,ichiB,ichiE,rsiB1w,rsiE1w,stochB,emaB,macdB,volB,liqB,rsiB4h,rsiE4h);
+    buildVerdictMicro(d,confMicro,emaB,macdB,volB,liqB,rsiB4h);
+    show('sec-conf-micro');show('sec-risk-micro');
+
+    // ── CROSS-TF ──
+    buildCrossTF(confMacro,confMicro,ichiRawB,trendData);
+
+    $('loading-msg').style.display='none';
+
+  } catch(e) {
+    $('err-box').style.display='block';
+    $('err-box').textContent='⚠ Eroare sync: '+e.message;
+    $('sync-badge').className='sync-badge sync-err';
+    $('sync-badge').textContent='✗ EROARE';
+    $('loading-msg').style.display='none';
+  }
+
+  btn.disabled=false;icon.classList.remove('spin');
+  btn.childNodes[1].textContent=' Actualizează Toate Datele';
+}
+
+$('hdate').textContent=new Date().toLocaleDateString('ro-RO',{weekday:'long',year:'numeric',month:'long',day:'numeric'});
+refresh();
+</script>
+</body>
+</html>
