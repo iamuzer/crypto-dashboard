@@ -883,7 +883,7 @@ function renderFutures(d) {
   $('fut-fund-btc-sig').textContent=d.btcFunding>0.05?'RIDICAT — LONG SUPRAÎNCĂRCATE':d.btcFunding>0.01?'MODERAT':d.btcFunding<-0.01?'NEGATIV — SHORT DOMINA':'NEUTRU';
   $('fut-fund-btc-sig').style.color=CC(fBtcC);
   const nextF=new Date(d.btcNextFunding);
-  $('fut-fund-btc-det').textContent='Următor: '+nextF.toLocaleTimeString('ro-RO')+' UTC. Long-urile plătesc short-urile când funding > 0.';
+  $('fut-fund-btc-det').textContent='Următor: '+nextF.toLocaleTimeString('ro-RO')+' UTC. Pozițiile long plătesc pozițiile short atunci când funding-ul este pozitiv.';
   // Funding ETH
   const fEthC=d.ethFunding>0.05?'danger':d.ethFunding>0.01?'warn':d.ethFunding<-0.01?'safe':'neutral';
   $('fut-fund-eth').textContent=fmtPct(d.ethFunding);
@@ -1498,11 +1498,11 @@ function buildCrossTF(confMacro,confMicro,ichiRawB,trendData){
   const macroBull=confMacro.net>=10,macroBear=confMacro.net<=-10;
   const microBull=confMicro.net>=10,microBear=confMicro.net<=-10;
   let action,actionC,actionDetail,narrative;
-  if(macroBull&&microBull){action='INTRĂ LONG';actionC=CC('safe');actionDetail='Macro + Micro aliniate bullish.';narrative='<strong style="color:#00e87a">Setup ideal long.</strong> Ambele timeframe-uri sugerează direcția bullish. Intră aproape de EMA9/4H, stop sub EMA50 sau Kijun 1W. R/R minim 1:3.';}
-  else if(macroBear&&microBear){action='EVITĂ / SHORT';actionC=CC('danger');actionDetail='Macro + Micro aliniate bearish.';narrative='<strong style="color:#ff3355">Aliniere bearish completă — protejează capitalul.</strong> Aceasta este configurația în care căderile masive se produc. Ieși din long-uri. Nu cumpăra rally-uri fără confirmare clară.';}
-  else if(macroBull&&microBear){action='AȘTEAPTĂ';actionC=CC('warn');actionDetail='Macro bullish, micro bearish — corecție în uptrend.';narrative='<strong style="color:#ffb300">Corecție în bull trend macro.</strong> Nu cumpăra acum. Așteaptă EMA9/4H > EMA21 sau MACD cross bullish. Kijun 1W = suportul macro cheie.';}
-  else if(macroBear&&microBull){action='FII ATENT';actionC=CC('warn');actionDetail='Micro bullish dar macro bearish — posibil bounce.';narrative='<strong style="color:#ffb300">Bounce în downtrend macro.</strong> Aceasta este configurația Dead Cat Bounce — recuperare temporară urmată de continuarea căderii în 65–72% cazuri. Nu cumpăra bounce-ul agresiv.';}
-  else{action='NEUTRU';actionC=CC('neutral');actionDetail='Semnale mixte — fără confluență clară.';narrative='<strong style="color:#4a6080">Incertitudine.</strong> Niciun timeframe nu oferă semnal clar. Cash este o poziție validă. Setează alerte la Kijun 1W și EMA50/4H.';}
+  if(macroBull&&microBull){action='INTRĂ LONG';actionC=CC('safe');actionDetail='Macro + Micro aliniate bullish.';narrative='<strong style="color:#00e87a">Setup ideal pentru long.</strong> Ambele timeframe-uri sugerează direcția bullish. Intră aproape de EMA9 pe 4H, cu stop sub EMA50 sau Kijun pe 1W. Raport risc/recompensă minim 1:3.';}
+  else if(macroBear&&microBear){action='EVITĂ / SHORT';actionC=CC('danger');actionDetail='Macro + Micro aliniate bearish.';narrative='<strong style="color:#ff3355">Aliniere bearish completă — protejează capitalul.</strong> Aceasta este configurația în care căderile semnificative se produc. Ieși din poziții long. Nu cumpăra rally-uri fără o confirmare clară.';}
+  else if(macroBull&&microBear){action='AȘTEAPTĂ';actionC=CC('warn');actionDetail='Macro bullish, micro bearish — corecție în uptrend.';narrative='<strong style="color:#ffb300">Corecție într-un trend macro bullish.</strong> Nu cumpăra acum. Așteaptă ca EMA9 pe 4H să treacă peste EMA21 sau un cross bullish pe MACD. Kijun pe 1W este suportul macro-cheie.';}
+  else if(macroBear&&microBull){action='FII ATENT';actionC=CC('warn');actionDetail='Micro bullish dar macro bearish — posibil bounce.';narrative='<strong style="color:#ffb300">Recuperare temporară într-un downtrend macro.</strong> Aceasta este configurația de tip Dead Cat Bounce — o recuperare temporară urmată, de regulă, de continuarea căderii. Nu cumpăra recuperarea agresiv.';}
+  else{action='NEUTRU';actionC=CC('neutral');actionDetail='Semnale mixte — fără confluență clară.';narrative='<strong style="color:#4a6080">Incertitudine.</strong> Niciun timeframe nu oferă un semnal clar. A sta în cash este o poziție validă. Setează alerte la Kijun pe 1W și EMA50 pe 4H.';}
   $('cross-action').textContent=action;$('cross-action').style.color=actionC;
   $('cross-action-detail').textContent=actionDetail;
   $('cross-narrative').innerHTML=narrative;
@@ -1536,9 +1536,9 @@ function buildRiskMacro(d,ichiB,ichiE,rsiB1w,stochB){
 function buildVerdictMacro(d,ichiRawB,rsiB1w,confMacro){
   const bp=d.btcPrice,ep=d.ethPrice,funding=d.btcFunding;
   let v,vC,sem,rec;
-  if(confMacro.sig==='LONG'||confMacro.sig==='LONG?'){v='FAVORABIL / LONG';vC=CC('safe');sem='Confluența macro sugerează structură bullish';rec='Zona acumulare: '+fmt(bp*0.97)+'–'+fmt(bp*1.01)+'. Target: '+fmt(bp*1.10)+'. Stop sub '+fmt(bp*0.93)+'.';}
-  else if(confMacro.sig==='EVITĂ'||confMacro.sig==='ATENȚIE'){v='EVITĂ / DEFENSIVE';vC=CC('danger');sem='Confluența macro sugerează risc ridicat de cădere';rec='Stop-loss sub '+fmt(bp*0.95)+'. Reduci expunerea. Suport urmărit: '+fmt(bp*0.97)+'.';}
-  else{v='NEUTRU — AȘTEAPTĂ';vC=CC('warn');sem='Semnale mixte pe macro — confirmări necesare';rec='Menține poziții mici. Urmărește Kijun 1W ('+(ichiRawB?fmt(ichiRawB.kijun):'N/A')+').';}
+  if(confMacro.sig==='LONG'||confMacro.sig==='LONG?'){v='FAVORABIL / LONG';vC=CC('safe');sem='Confluența macro sugerează o structură bullish';rec='Zona acumulare: '+fmt(bp*0.97)+'–'+fmt(bp*1.01)+'. Target: '+fmt(bp*1.10)+'. Stop sub '+fmt(bp*0.93)+'.';}
+  else if(confMacro.sig==='EVITĂ'||confMacro.sig==='ATENȚIE'){v='EVITĂ / DEFENSIVE';vC=CC('danger');sem='Confluența macro sugerează un risc ridicat de cădere';rec='Stop-loss sub '+fmt(bp*0.95)+'. Reduci expunerea. Suport urmărit: '+fmt(bp*0.97)+'.';}
+  else{v='NEUTRU — AȘTEAPTĂ';vC=CC('warn');sem='Semnale mixte pe macro — confirmări necesare';rec='Menține poziții mici. Urmărește Kijun pe 1W ('+(ichiRawB?fmt(ichiRawB.kijun):'N/A')+').';}
   $('verdict-macro').textContent=v;$('verdict-macro').style.color=vC;
   $('semnal-macro').textContent=sem;$('rec-macro').textContent=rec;
   const bear=[],bull=[];
@@ -1565,9 +1565,9 @@ function buildVerdictMacro(d,ichiRawB,rsiB1w,confMacro){
 function buildVerdictMicro(d,confMicro,emaB,macdB,volB,liqB,rsiB4h){
   const bp=d.btcPrice;
   let v,vC,sem,rec;
-  if(confMicro.sig==='LONG'||confMicro.sig==='LONG?'){v='SETUP BULLISH MICRO';vC=CC('safe');sem='EMA stack + MACD + Taker sugerează momentum pozitiv 4H';rec='Entry aproape de EMA9 ('+(emaB?.e9?fmt(emaB.e9):'N/A')+'). Stop sub EMA50 ('+(emaB?.e50?fmt(emaB.e50):'N/A')+').';}
-  else if(confMicro.sig==='EVITĂ'||confMicro.sig==='ATENȚIE'){v='⚠ RISC RIDICAT MICRO';vC=CC('danger');sem='EMA bearish + MACD descendent + Taker bearish — semnale de atenție';rec='Evită long-urile. Prim suport micro: EMA50 la '+(emaB?.e50?fmt(emaB.e50):'N/A')+'. Dacă pierdut → '+fmt(bp*0.93)+'.';}
-  else{v='NEUTRU — FĂRĂ SEMNAL';vC=CC('warn');sem='EMA și MACD fără direcție confirmată pe 4H';rec='Urmărește cross EMA9/EMA21 sau MACD cross. Nu forța intrarea.';}
+  if(confMicro.sig==='LONG'||confMicro.sig==='LONG?'){v='SETUP BULLISH MICRO';vC=CC('safe');sem='EMA stack, MACD și Taker sugerează un momentum pozitiv pe 4H';rec='Intră aproape de EMA9 ('+(emaB?.e9?fmt(emaB.e9):'N/A')+'). Stop sub EMA50 ('+(emaB?.e50?fmt(emaB.e50):'N/A')+').';}
+  else if(confMicro.sig==='EVITĂ'||confMicro.sig==='ATENȚIE'){v='⚠ RISC RIDICAT MICRO';vC=CC('danger');sem='EMA bearish, MACD descendent și Taker bearish — semnale de atenție';rec='Evită pozițiile long. Prim suport micro: EMA50 la '+(emaB?.e50?fmt(emaB.e50):'N/A')+'. Dacă pierdut → '+fmt(bp*0.93)+'.';}
+  else{v='NEUTRU — FĂRĂ SEMNAL';vC=CC('warn');sem='EMA și MACD nu au o direcție confirmată pe 4H';rec='Urmărește un cross EMA9/EMA21 sau un cross pe MACD. Nu forța intrarea.';}
   $('verdict-micro').textContent=v;$('verdict-micro').style.color=vC;
   $('semnal-micro').textContent=sem;$('rec-micro').textContent=rec;
   const bear=[],bull=[];
@@ -1687,13 +1687,13 @@ function buildEthRelative(d, rsiDbtc, rsiDeth) {
   let state, stateColor, narrative;
   if(score >= 65) {
     state = 'STRENGTH'; stateColor = '#00e87a';
-    narrative = 'ETH outperformă BTC — semnal de rotație risk-on. Reduce încrederea în scenariul bearish imediat, dar nu invalidează riscul macro. Când ETH e puternic față de BTC, piața în general caută risc.';
+    narrative = 'ETH depășește performanța BTC — un semnal de rotație risk-on. Aceasta reduce încrederea în scenariul bearish imediat, dar nu invalidează riscul macro. Când ETH este puternic față de BTC, piața caută, în general, mai mult risc.';
   } else if(score <= 35) {
     state = 'WEAKNESS'; stateColor = '#ff3355';
-    narrative = 'ETH underperformă BTC — avertisment timpuriu de risk-off. ETH este în general primul activ care cedează într-o corecție. Această slăbiciune relativă poate preceda o mișcare bearish mai largă cu 1-5 zile.';
+    narrative = 'ETH subperformează BTC — un avertisment timpuriu de risk-off. ETH este, în general, primul activ care cedează într-o corecție. Această slăbiciune relativă poate preceda o mișcare bearish mai amplă cu 1–5 zile.';
   } else {
     state = 'NEUTRU'; stateColor = '#4a6080';
-    narrative = 'ETH și BTC se comportă similar — fără semnal directional clar din relația relativă. Nu adaugă informație suplimentară față de analiza individuală.';
+    narrative = 'ETH și BTC se comportă similar — fără un semnal direcțional clar din relația relativă. Nu adaugă informație suplimentară față de analiza individuală.';
   }
 
   // Render
@@ -1756,13 +1756,13 @@ function buildActionMap(coin, price, riskScore, rsiDaily, rsiWeekly, ema200Dist,
 
   const actions = [
     { name: 'Hold', val: hold, color: '#00e87a',
-      text: hold >= 60 ? 'Context relativ sănătos sau constructiv.' : 'Hold-ul nu mai are edge dominant.' },
+      text: hold >= 60 ? 'Contextul este relativ sănătos sau constructiv.' : 'Poziția de hold nu mai are un avantaj dominant.' },
     { name: 'Take Partial Profit', val: partial, color: '#ffb300',
-      text: partial >= 60 ? 'Merită apărat profitul. Distribuie progresiv.' : 'Profit-taking nu domină încă.' },
+      text: partial >= 60 ? 'Merită apărat profitul — distribuie progresiv.' : 'Profit-taking-ul nu domină încă.' },
     { name: 'Wait / Confirmă', val: wait, color: '#22d3ee',
-      text: wait >= 60 ? 'Confirmarea lipsește. Răbdarea are edge.' : 'Nu e doar o fază de așteptare.' },
+      text: wait >= 60 ? 'Confirmarea lipsește. Răbdarea este avantajoasă.' : 'Nu este doar o fază de așteptare.' },
     { name: 'Re-acumulează', val: reacc, color: '#a78bfa',
-      text: reacc >= 55 ? 'Apare teren pentru re-acumulare.' : 'Nu există setup bun de re-acumulare.' },
+      text: reacc >= 55 ? 'Apare un teren propice pentru re-acumulare.' : 'Nu există încă un setup bun de re-acumulare.' },
   ];
 
   $('action-map-'+coin.toLowerCase()).innerHTML = actions.map(a => `
