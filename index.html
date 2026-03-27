@@ -421,6 +421,118 @@ footer{font-family:'Space Mono',monospace;font-size:.54rem;color:var(--neutral);
     </div>
   </div>
 
+
+  <!-- ALERT BANNER — Short-term bearish signal -->
+  <div id="alert-banner" style="display:none;background:rgba(255,51,85,.08);border:1px solid rgba(255,51,85,.3);border-radius:10px;padding:12px 18px;margin-bottom:14px">
+    <div style="display:flex;align-items:center;gap:10px">
+      <span style="font-size:1.2rem">⚠</span>
+      <div>
+        <div style="font-family:'Space Mono',monospace;font-size:.72rem;font-weight:700;color:#ff3355;margin-bottom:3px" id="alert-banner-title">SEMNAL BEARISH MICRO ACTIV</div>
+        <div style="font-size:.74rem;color:#b8cde0" id="alert-banner-detail">--</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- EMA200 Distance + RSI Daily -->
+  <div class="section" id="sec-ema200" style="display:none">
+    <div class="sec-header"><div class="sec-bar" style="background:var(--warn)"></div><div class="sec-title">EMA200 Distanță + RSI Daily</div><span class="src-tag">Binance 1D klines · 200 zile</span></div>
+    <div class="g2">
+      <div class="card">
+        <div style="font-family:'Space Mono',monospace;font-size:.56rem;color:var(--neutral);margin-bottom:10px;letter-spacing:.08em;text-transform:uppercase">₿ BTC — EMA200 Daily</div>
+        <div class="g2" style="margin-bottom:10px">
+          <div><div style="font-family:'Space Mono',monospace;font-size:.5rem;color:var(--neutral);margin-bottom:3px">EMA200</div><div style="font-family:'Space Mono',monospace;font-size:1rem;font-weight:700;color:var(--white)" id="ema200-btc-val">--</div></div>
+          <div><div style="font-family:'Space Mono',monospace;font-size:.5rem;color:var(--neutral);margin-bottom:3px">DISTANȚĂ</div><div style="font-family:'Space Mono',monospace;font-size:1rem;font-weight:700" id="ema200-btc-dist">--</div></div>
+        </div>
+        <div style="font-family:'Space Mono',monospace;font-size:.62rem;font-weight:700;margin-bottom:6px" id="ema200-btc-sig">--</div>
+        <div style="height:5px;background:var(--border);border-radius:3px;overflow:hidden;margin-bottom:8px"><div id="ema200-btc-bar" style="height:100%;border-radius:3px;transition:width .8s"></div></div>
+        <div style="font-size:.72rem;color:var(--text);line-height:1.6" id="ema200-btc-note">--</div>
+      </div>
+      <div class="card">
+        <div style="font-family:'Space Mono',monospace;font-size:.56rem;color:var(--neutral);margin-bottom:10px;letter-spacing:.08em;text-transform:uppercase">Ξ ETH — EMA200 Daily</div>
+        <div class="g2" style="margin-bottom:10px">
+          <div><div style="font-family:'Space Mono',monospace;font-size:.5rem;color:var(--neutral);margin-bottom:3px">EMA200</div><div style="font-family:'Space Mono',monospace;font-size:1rem;font-weight:700;color:var(--white)" id="ema200-eth-val">--</div></div>
+          <div><div style="font-family:'Space Mono',monospace;font-size:.5rem;color:var(--neutral);margin-bottom:3px">DISTANȚĂ</div><div style="font-family:'Space Mono',monospace;font-size:1rem;font-weight:700" id="ema200-eth-dist">--</div></div>
+        </div>
+        <div style="font-family:'Space Mono',monospace;font-size:.62rem;font-weight:700;margin-bottom:6px" id="ema200-eth-sig">--</div>
+        <div style="height:5px;background:var(--border);border-radius:3px;overflow:hidden;margin-bottom:8px"><div id="ema200-eth-bar" style="height:100%;border-radius:3px;transition:width .8s"></div></div>
+        <div style="font-size:.72rem;color:var(--text);line-height:1.6" id="ema200-eth-note">--</div>
+      </div>
+    </div>
+    <!-- RSI Daily -->
+    <div class="g2" style="margin-top:12px">
+      <div class="ind-card">
+        <div class="ind-tf">1D</div><div class="ind-name">RSI Daily — BTC</div>
+        <div class="ind-val" id="rsi-btc-1d-val">--</div>
+        <div class="ind-sig" id="rsi-btc-1d-sta">--</div>
+        <div class="ind-detail" id="rsi-btc-1d-det">--</div>
+        <div class="ind-bar-bg"><div class="ind-bar-fill" id="rsi-btc-1d-bar"></div><div class="ind-bar-mk" id="rsi-btc-1d-mk"></div></div>
+        <div id="rsi-btc-1d-div"></div>
+      </div>
+      <div class="ind-card">
+        <div class="ind-tf">1D</div><div class="ind-name">RSI Daily — ETH</div>
+        <div class="ind-val" id="rsi-eth-1d-val">--</div>
+        <div class="ind-sig" id="rsi-eth-1d-sta">--</div>
+        <div class="ind-detail" id="rsi-eth-1d-det">--</div>
+        <div class="ind-bar-bg"><div class="ind-bar-fill" id="rsi-eth-1d-bar"></div><div class="ind-bar-mk" id="rsi-eth-1d-mk"></div></div>
+        <div id="rsi-eth-1d-div"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ETH Relative Engine -->
+  <div class="section" id="sec-eth-relative" style="display:none">
+    <div class="sec-header"><div class="sec-bar" style="background:var(--eth)"></div><div class="sec-title">ETH Relative Engine — Rotație Risk-On/Off</div><span class="src-tag">ETH/BTC ratio · RSI relativ · Dominance</span></div>
+    <div class="g4">
+      <div class="ind-card">
+        <div class="ind-name">ETH/BTC Ratio</div>
+        <div class="ind-val" id="ethrel-ratio">--</div>
+        <div class="ind-sig" id="ethrel-ratio-sig">--</div>
+        <div class="ind-detail" id="ethrel-ratio-det">--</div>
+      </div>
+      <div class="ind-card">
+        <div class="ind-name">RSI ETH vs BTC</div>
+        <div class="ind-val" id="ethrel-rsi">--</div>
+        <div class="ind-sig" id="ethrel-rsi-sig">--</div>
+        <div class="ind-detail" id="ethrel-rsi-det">--</div>
+      </div>
+      <div class="ind-card">
+        <div class="ind-name">Performanță 24h</div>
+        <div class="ind-val" id="ethrel-perf">--</div>
+        <div class="ind-sig" id="ethrel-perf-sig">--</div>
+        <div class="ind-detail" id="ethrel-perf-det">--</div>
+      </div>
+      <div class="ind-card">
+        <div class="ind-name">ETH Relative Score</div>
+        <div class="ind-val" id="ethrel-score">--</div>
+        <div class="ind-sig" id="ethrel-state">--</div>
+        <div class="ind-detail" id="ethrel-text">--</div>
+      </div>
+    </div>
+    <div class="card-sm" style="margin-top:10px">
+      <div style="font-family:'Space Mono',monospace;font-size:.56rem;color:var(--neutral);margin-bottom:6px;letter-spacing:.1em;text-transform:uppercase">▸ Interpretare ETH Relative</div>
+      <div style="font-size:.76rem;color:var(--text);line-height:1.7" id="ethrel-narrative">--</div>
+    </div>
+  </div>
+
+  <!-- Action Map -->
+  <div class="section" id="sec-action-map" style="display:none">
+    <div class="sec-header"><div class="sec-bar" style="background:var(--purple)"></div><div class="sec-title">Action Map — BTC + ETH</div></div>
+    <div class="g2">
+      <div class="card">
+        <div style="font-family:'Space Mono',monospace;font-size:.58rem;color:var(--neutral);margin-bottom:12px;letter-spacing:.08em;text-transform:uppercase">₿ BTC — Acțiuni posibile</div>
+        <div id="action-map-btc"></div>
+      </div>
+      <div class="card">
+        <div style="font-family:'Space Mono',monospace;font-size:.58rem;color:var(--neutral);margin-bottom:12px;letter-spacing:.08em;text-transform:uppercase">Ξ ETH — Acțiuni posibile</div>
+        <div id="action-map-eth"></div>
+      </div>
+    </div>
+    <div class="card-sm" style="margin-top:10px">
+      <div style="font-family:'Space Mono',monospace;font-size:.54rem;color:var(--neutral);margin-bottom:5px">⚠ Action Map — context</div>
+      <div style="font-size:.72rem;color:#4a6080;line-height:1.6">Barele indică forța relativă a fiecărei acțiuni în contextul actual — nu sunt probabilități statistice validate. Folosește ca ghid de reflecție, nu ca semnal automat.</div>
+    </div>
+  </div>
+
   <!-- EMA 4H -->
   <div class="section" id="sec-ema" style="display:none">
     <div class="sec-header"><div class="sec-bar" style="background:var(--cyan)"></div><div class="sec-title">EMA 9 · 21 · 50</div><span class="src-tag">Binance 4H klines</span></div>
@@ -513,7 +625,8 @@ async function fetchAllData() {
     dominance,
     btcW, ethW,
     btcM, ethM,
-    btc4H, eth4H
+    btc4H, eth4H,
+    btcD, ethD
   ] = await Promise.all([
     fetch('https://api.binance.com/api/v3/ticker/24hr?symbol=BTCUSDT').then(r=>r.json()),
     fetch('https://api.binance.com/api/v3/ticker/24hr?symbol=ETHUSDT').then(r=>r.json()),
@@ -531,6 +644,8 @@ async function fetchAllData() {
     fetch('https://api.binance.com/api/v3/klines?symbol=ETHUSDT&interval=1M&limit=36').then(r=>r.json()),
     fetch('https://api.binance.com/api/v3/klines?symbol=BTCUSDT&interval=4h&limit=120').then(r=>r.json()),
     fetch('https://api.binance.com/api/v3/klines?symbol=ETHUSDT&interval=4h&limit=120').then(r=>r.json()),
+    fetch('https://api.binance.com/api/v3/klines?symbol=BTCUSDT&interval=1d&limit=220').then(r=>r.json()),
+    fetch('https://api.binance.com/api/v3/klines?symbol=ETHUSDT&interval=1d&limit=220').then(r=>r.json()),
   ]);
 
   const parseK = raw => raw.map(k=>({ts:k[0],open:+k[1],high:+k[2],low:+k[3],close:+k[4],vol:+k[5]}));
@@ -543,6 +658,7 @@ async function fetchAllData() {
     ethChg: +ethTicker.priceChangePercent,
     btcVol: +btcTicker.quoteVolume,
     ethVol: +ethTicker.quoteVolume,
+    ethbtc: +ethTicker.lastPrice / +btcTicker.lastPrice,
     btcFunding: +btcFund.lastFundingRate * 100,
     ethFunding: +ethFund.lastFundingRate * 100,
     btcNextFunding: btcFund.nextFundingTime,
@@ -567,6 +683,8 @@ async function fetchAllData() {
     ethM: parseK(ethM),
     btc4H: parseK(btc4H),
     eth4H: parseK(eth4H),
+    btcD: parseK(btcD),
+    ethD: parseK(ethD),
   };
 }
 
@@ -1322,6 +1440,249 @@ function buildVerdictMicro(d,confMicro,emaB,macdB,volB,liqB,rsiB4h){
   $('bull-micro').innerHTML=bull.slice(0,5).map(s=>'<div class="sig2-row bull-b">→ '+s+'</div>').join('');
 }
 
+
+// ═══════════════════════════════════════════════════════
+// EMA200 DISTANCE (daily) — independent indicator
+// ═══════════════════════════════════════════════════════
+function calcEMA200(candles) {
+  // EMA with full Wilder smoothing on daily closes
+  const cl = candles.map(c => c.close);
+  if(cl.length < 200) return null;
+  const period = 200, k = 2/(period+1);
+  // Seed: simple average of first 200
+  let ema = cl.slice(0,200).reduce((a,b)=>a+b,0)/200;
+  for(let i=200;i<cl.length;i++) ema = cl[i]*k + ema*(1-k);
+  return ema;
+}
+
+function renderEMA200(coin, candles, price) {
+  const ema200 = calcEMA200(candles);
+  if(!ema200) { $('ema200-'+coin+'-sig').textContent='Date insuficiente'; return { dist:0, above:true }; }
+
+  const dist = (price - ema200) / ema200 * 100;
+  const above = price > ema200;
+
+  // Color logic
+  let color, sig, note;
+  if(dist > 25) {
+    color='#ff3355'; sig='SUPRAEXTINS +'+dist.toFixed(1)+'%';
+    note='Prețul este cu '+dist.toFixed(1)+'% deasupra EMA200. Zona de risc maxim — istoric corecțiile apar când distanța depășește +25%.';
+  } else if(dist > 10) {
+    color='#ffb300'; sig='DEASUPRA +'+dist.toFixed(1)+'%';
+    note='Prețul este deasupra EMA200 cu o marjă sănătoasă. Trend bullish intact dar urmărește deteriorarea.';
+  } else if(dist >= 0) {
+    color='#00e87a'; sig='APROAPE EMA200 +'+dist.toFixed(1)+'%';
+    note='Prețul testează EMA200 ca suport. Zona cheie — menținerea deasupra confirmă structura bullish.';
+  } else if(dist > -15) {
+    color='#ff8c55'; sig='SUB EMA200 '+dist.toFixed(1)+'%';
+    note='Prețul a pierdut EMA200. Semnal bearish semnificativ — în toate bear market-urile majore BTC a stat sub EMA200 luni întregi.';
+  } else {
+    color='#ff3355'; sig='CAPITULARE '+dist.toFixed(1)+'%';
+    note='Prețul este cu '+Math.abs(dist).toFixed(1)+'% sub EMA200. Zona istorică de acumulare după capitulare.';
+  }
+
+  $('ema200-'+coin+'-val').textContent = fmt(ema200);
+  $('ema200-'+coin+'-dist').textContent = (dist>=0?'+':'')+dist.toFixed(2)+'%';
+  $('ema200-'+coin+'-dist').style.color = color;
+  $('ema200-'+coin+'-sig').textContent = sig;
+  $('ema200-'+coin+'-sig').style.color = color;
+  // Bar: center at 50%, ±25% = full bar
+  const barPct = Math.min(100, Math.max(0, 50 + dist*2));
+  $('ema200-'+coin+'-bar').style.width = barPct+'%';
+  $('ema200-'+coin+'-bar').style.background = color;
+  $('ema200-'+coin+'-note').textContent = note;
+
+  return { ema200, dist, above, color };
+}
+
+// ═══════════════════════════════════════════════════════
+// ETH RELATIVE ENGINE (from V16, adapted)
+// ═══════════════════════════════════════════════════════
+function buildEthRelative(d, rsiDbtc, rsiDeth) {
+  const ethbtc = d.ethbtc;
+  const dom = d.dom;
+  const ethChg = d.ethChg;
+  const btcChg = d.btcChg;
+
+  let score = 50;
+  const reasons = [];
+
+  // ETH/BTC ratio
+  if(ethbtc < 0.025) { score -= 20; reasons.push('ETH/BTC extrem de slab ('+ethbtc.toFixed(4)+')'); }
+  else if(ethbtc < 0.04) { score -= 12; reasons.push('ETH/BTC slab ('+ethbtc.toFixed(4)+')'); }
+  else if(ethbtc > 0.055) { score += 12; reasons.push('ETH/BTC arată forță relativă ('+ethbtc.toFixed(4)+')'); }
+  else if(ethbtc > 0.045) { score += 6; reasons.push('ETH/BTC neutru-pozitiv ('+ethbtc.toFixed(4)+')'); }
+
+  // BTC Dominance
+  if(dom > 58) { score -= 12; reasons.push('BTC dominance ridicat ('+dom.toFixed(1)+'%) — capital concentrat în BTC'); }
+  else if(dom > 55) { score -= 6; reasons.push('BTC dominance moderat-ridicat ('+dom.toFixed(1)+'%)'); }
+  else if(dom < 50) { score += 10; reasons.push('BTC dominance scăzut ('+dom.toFixed(1)+'%) — rotație spre altcoins'); }
+  else if(dom < 53) { score += 5; reasons.push('BTC dominance se relaxează ('+dom.toFixed(1)+'%)'); }
+
+  // RSI relativ
+  if(rsiDeth !== null && rsiDbtc !== null) {
+    const rsiDiff = rsiDeth - rsiDbtc;
+    if(rsiDiff < -8) { score -= 10; reasons.push('RSI ETH cu '+Math.abs(rsiDiff).toFixed(1)+' sub RSI BTC — ETH mai slab'); }
+    else if(rsiDiff > 8) { score += 10; reasons.push('RSI ETH cu '+rsiDiff.toFixed(1)+' peste RSI BTC — ETH mai puternic'); }
+    else reasons.push('RSI ETH ≈ RSI BTC (diff: '+(rsiDiff>=0?'+':'')+rsiDiff.toFixed(1)+')');
+  }
+
+  // Performanță relativă 24h
+  const perfDiff = ethChg - btcChg;
+  if(perfDiff < -3) { score -= 10; reasons.push('ETH underperformă BTC cu '+Math.abs(perfDiff).toFixed(1)+'% pe 24h'); }
+  else if(perfDiff > 3) { score += 10; reasons.push('ETH outperformă BTC cu '+perfDiff.toFixed(1)+'% pe 24h'); }
+  else reasons.push('Performanță ETH/BTC similară pe 24h (diff: '+(perfDiff>=0?'+':'')+perfDiff.toFixed(1)+'%)');
+
+  score = Math.max(0, Math.min(100, Math.round(score)));
+
+  let state, stateColor, narrative;
+  if(score >= 65) {
+    state = 'STRENGTH'; stateColor = '#00e87a';
+    narrative = 'ETH outperformă BTC — semnal de rotație risk-on. Reduce încrederea în scenariul bearish imediat, dar nu invalidează riscul macro. Când ETH e puternic față de BTC, piața în general caută risc.';
+  } else if(score <= 35) {
+    state = 'WEAKNESS'; stateColor = '#ff3355';
+    narrative = 'ETH underperformă BTC — avertisment timpuriu de risk-off. ETH este în general primul activ care cedează într-o corecție. Această slăbiciune relativă poate preceda o mișcare bearish mai largă cu 1-5 zile.';
+  } else {
+    state = 'NEUTRU'; stateColor = '#4a6080';
+    narrative = 'ETH și BTC se comportă similar — fără semnal directional clar din relația relativă. Nu adaugă informație suplimentară față de analiza individuală.';
+  }
+
+  // Render
+  $('ethrel-ratio').textContent = ethbtc.toFixed(4);
+  $('ethrel-ratio').style.color = ethbtc > 0.045 ? '#00e87a' : ethbtc < 0.03 ? '#ff3355' : '#ffb300';
+  $('ethrel-ratio-sig').textContent = ethbtc > 0.055 ? 'PUTERNIC' : ethbtc < 0.03 ? 'SLAB' : 'MODERAT';
+  $('ethrel-ratio-sig').style.color = ethbtc > 0.045 ? '#00e87a' : ethbtc < 0.03 ? '#ff3355' : '#ffb300';
+  $('ethrel-ratio-det').textContent = 'ETH/BTC ratio curent. Sub 0.03 = ETH slab istoric. Peste 0.055 = rotație risk-on.';
+
+  const rsiDiff = rsiDeth !== null && rsiDbtc !== null ? (rsiDeth - rsiDbtc) : 0;
+  $('ethrel-rsi').textContent = (rsiDiff>=0?'+':'')+rsiDiff.toFixed(1);
+  $('ethrel-rsi').style.color = rsiDiff > 5 ? '#00e87a' : rsiDiff < -5 ? '#ff3355' : '#4a6080';
+  $('ethrel-rsi-sig').textContent = rsiDiff > 5 ? 'ETH MAI PUTERNIC' : rsiDiff < -5 ? 'ETH MAI SLAB' : 'SIMILAR';
+  $('ethrel-rsi-sig').style.color = rsiDiff > 5 ? '#00e87a' : rsiDiff < -5 ? '#ff3355' : '#4a6080';
+  $('ethrel-rsi-det').textContent = 'RSI Daily ETH ('+rsiDeth?.toFixed(1)+') vs BTC ('+rsiDbtc?.toFixed(1)+')';
+
+  $('ethrel-perf').textContent = (perfDiff>=0?'+':'')+perfDiff.toFixed(2)+'%';
+  $('ethrel-perf').style.color = perfDiff > 2 ? '#00e87a' : perfDiff < -2 ? '#ff3355' : '#4a6080';
+  $('ethrel-perf-sig').textContent = perfDiff > 2 ? 'OUTPERFORMANCE' : perfDiff < -2 ? 'UNDERPERFORMANCE' : 'SIMILAR';
+  $('ethrel-perf-sig').style.color = perfDiff > 2 ? '#00e87a' : perfDiff < -2 ? '#ff3355' : '#4a6080';
+  $('ethrel-perf-det').textContent = 'ETH '+d.ethChg.toFixed(2)+'% vs BTC '+d.btcChg.toFixed(2)+'% pe 24h';
+
+  $('ethrel-score').textContent = score+'/100';
+  $('ethrel-score').style.color = stateColor;
+  $('ethrel-state').textContent = state;
+  $('ethrel-state').style.color = stateColor;
+  $('ethrel-text').textContent = reasons.length ? reasons[0] : '--';
+  $('ethrel-narrative').textContent = narrative;
+
+  return { score, state, stateColor, reasons, narrative };
+}
+
+// ═══════════════════════════════════════════════════════
+// ACTION MAP — Hold / Take Profit / Wait / Re-accumulate
+// Based on V16 logic adapted to our data
+// ═══════════════════════════════════════════════════════
+function buildActionMap(coin, price, riskScore, rsiDaily, rsiWeekly, ema200Dist, shortBias, ethRelState) {
+  // Hold: invers proporțional cu riscul
+  let hold = Math.max(0, 100 - riskScore);
+  // Take Partial Profit
+  let partial = riskScore;
+  // Wait for Confirmation
+  let wait = 40;
+  // Re-accumulate
+  let reacc = 20;
+
+  // Adjustments based on signals
+  if(rsiWeekly < 50 && ema200Dist < 0) { wait = 70; reacc = 30; } // sub EMA200 + RSI weak
+  if(rsiWeekly < 40 && ema200Dist < -10) { reacc = 60; wait = 55; } // capitulare
+  if(shortBias === 'Bearish' && riskScore >= 45) { wait = 35; reacc = 15; }
+  if(rsiWeekly > 70 || ema200Dist > 25) partial = Math.min(100, partial + 15);
+  if(riskScore < 35 && shortBias === 'Bullish') hold = Math.min(100, hold + 15);
+  if(ethRelState === 'WEAKNESS' && coin === 'ETH') { partial = Math.min(100, partial + 10); hold = Math.max(0, hold - 10); }
+  if(ethRelState === 'STRENGTH' && coin === 'ETH') { hold = Math.min(100, hold + 10); }
+
+  hold = Math.round(Math.min(100, Math.max(0, hold)));
+  partial = Math.round(Math.min(100, Math.max(0, partial)));
+  wait = Math.round(Math.min(100, Math.max(0, wait)));
+  reacc = Math.round(Math.min(100, Math.max(0, reacc)));
+
+  const actions = [
+    { name: 'Hold', val: hold, color: '#00e87a',
+      text: hold >= 60 ? 'Context relativ sănătos sau constructiv.' : 'Hold-ul nu mai are edge dominant.' },
+    { name: 'Take Partial Profit', val: partial, color: '#ffb300',
+      text: partial >= 60 ? 'Merită apărat profitul. Distribuie progresiv.' : 'Profit-taking nu domină încă.' },
+    { name: 'Wait / Confirmă', val: wait, color: '#22d3ee',
+      text: wait >= 60 ? 'Confirmarea lipsește. Răbdarea are edge.' : 'Nu e doar o fază de așteptare.' },
+    { name: 'Re-acumulează', val: reacc, color: '#a78bfa',
+      text: reacc >= 55 ? 'Apare teren pentru re-acumulare.' : 'Nu există setup bun de re-acumulare.' },
+  ];
+
+  $('action-map-'+coin.toLowerCase()).innerHTML = actions.map(a => `
+    <div style="margin-bottom:12px">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:4px">
+        <span style="font-family:'Space Mono',monospace;font-size:.6rem;color:${a.color};font-weight:700">${a.name}</span>
+        <span style="font-family:'Space Mono',monospace;font-size:.6rem;color:${a.color}">${a.val}%</span>
+      </div>
+      <div style="height:6px;background:var(--border);border-radius:3px;overflow:hidden;margin-bottom:4px">
+        <div style="height:100%;width:${a.val}%;background:${a.color};border-radius:3px;transition:width .8s"></div>
+      </div>
+      <div style="font-size:.68rem;color:#4a6080">${a.text}</div>
+    </div>
+  `).join('');
+
+  return actions;
+}
+
+// ═══════════════════════════════════════════════════════
+// ALERT BANNER — Short-term bearish signal detector
+// ═══════════════════════════════════════════════════════
+function updateAlertBanner(d, emaB, macdB, rsiB4h, ema200BTC, ethRelative) {
+  const alerts = [];
+
+  // Alert 1: price below EMA21 4H
+  if(emaB && !emaB.stackBull && emaB.e21 && d.btcPrice < emaB.e21)
+    alerts.push('BTC sub EMA21 pe 4H');
+  // Alert 2: MACD bearish
+  if(macdB && !macdB.bullish)
+    alerts.push('MACD 4H bearish');
+  // Alert 3: Taker sell dominant
+  if(d.btcBuySell < 0.92)
+    alerts.push('Taker sell domină ('+d.btcBuySell.toFixed(3)+')');
+  // Alert 4: RSI 4H falling below 45
+  if(rsiB4h && rsiB4h.rsi < 45)
+    alerts.push('RSI 4H sub 45 ('+rsiB4h.rsi.toFixed(1)+')');
+  // Alert 5: price below EMA200 daily
+  if(ema200BTC && ema200BTC.dist < 0)
+    alerts.push('BTC sub EMA200 zilnic ('+ema200BTC.dist.toFixed(1)+'%)');
+  // Alert 6: ETH Relative weakness
+  if(ethRelative && ethRelative.state === 'WEAKNESS')
+    alerts.push('ETH Relative arată slăbiciune față de BTC');
+  // Alert 7: F&G extreme fear + funding negative (potential capitulation)
+  if(d.fg < 20 && d.btcFunding < -0.01)
+    alerts.push('Extreme Fear ('+d.fg+') + Funding negativ — posibilă capitulare');
+
+  const banner = $('alert-banner');
+  if(alerts.length >= 3) {
+    banner.style.display = 'block';
+    $('alert-banner-title').textContent = '⚠ SEMNAL BEARISH MICRO ACTIV ('+alerts.length+'/7 condiții)';
+    $('alert-banner-detail').textContent = alerts.join(' · ');
+    // Escalate color based on count
+    if(alerts.length >= 5) {
+      banner.style.background = 'rgba(255,51,85,.14)';
+      banner.style.borderColor = 'rgba(255,51,85,.5)';
+    }
+  } else if(alerts.length === 0 && d.fg > 70 && d.btcFunding > 0.05) {
+    // Opposite: potential top signal
+    banner.style.display = 'block';
+    banner.style.background = 'rgba(255,179,0,.08)';
+    banner.style.borderColor = 'rgba(255,179,0,.3)';
+    $('alert-banner-title').textContent = '⚠ SEMNAL TOP POSIBIL — Euforie + Funding ridicat';
+    $('alert-banner-title').style.color = '#ffb300';
+    $('alert-banner-detail').textContent = 'F&G: '+d.fg+' · Funding BTC: '+d.btcFunding.toFixed(3)+'% · Urmărește semnale de distribuție';
+  } else {
+    banner.style.display = 'none';
+  }
+}
+
 // ═══════════════════════════════════════════
 // MAIN REFRESH — Single sync call
 // ═══════════════════════════════════════════
@@ -1380,6 +1741,19 @@ async function refresh() {
     renderFutures(d);
     show('sec-futures');
 
+    // ── MICRO: EMA200 + RSI Daily (new) ──
+    const ema200BTC = renderEMA200('btc', d.btcD, d.btcPrice);
+    const ema200ETH = renderEMA200('eth', d.ethD, d.ethPrice);
+    const rsiRawB1d = calcRSI(d.btcD, 14);
+    const rsiRawE1d = calcRSI(d.ethD, 14);
+    const rsiB1d = renderRSI('rsi-btc-1d', rsiRawB1d, '1D');
+    const rsiE1d = renderRSI('rsi-eth-1d', rsiRawE1d, '1D');
+    show('sec-ema200');
+
+    // ── MICRO: ETH Relative Engine (new) ──
+    const ethRelative = buildEthRelative(d, rsiB1d?.rsi ?? null, rsiE1d?.rsi ?? null);
+    show('sec-eth-relative');
+
     // ── MICRO: EMA 4H ──
     const emaB=renderEMA('btc',d.btc4H,d.btcPrice);
     const emaE=renderEMA('eth',d.eth4H,d.ethPrice);
@@ -1402,10 +1776,33 @@ async function refresh() {
     const liqE=renderLiqLevels('eth',d.ethPrice);
     show('sec-liq');
 
+    // ── MICRO: Action Map (new) ──
+    // shortBias: derived from RSI daily + EMA200
+    const btcShortBias = (rsiB1d?.rsi < 45 || ema200BTC?.dist < 0) ? 'Bearish' : (rsiB1d?.rsi > 55 && ema200BTC?.dist > 0 ? 'Bullish' : 'Neutral');
+    const ethShortBias = (rsiE1d?.rsi < 45 || ema200ETH?.dist < 0) ? 'Bearish' : (rsiE1d?.rsi > 55 && ema200ETH?.dist > 0 ? 'Bullish' : 'Neutral');
+    // Risk score simple (from EMA200 dist + RSI weekly + funding)
+    const btcRiskSimple = Math.min(100, Math.max(0, Math.round(
+      (rsiB1w?.rsi > 70 ? 25 : rsiB1w?.rsi > 60 ? 12 : 0) +
+      (ema200BTC?.dist > 25 ? 25 : ema200BTC?.dist > 15 ? 12 : ema200BTC?.dist < 0 ? 15 : 0) +
+      (d.btcFunding > 0.01 ? 12 : d.btcFunding < -0.01 ? -5 : 0) +
+      (rsiB1d?.rsi < rsiB1d?.prev ? 8 : 0)
+    )));
+    const ethRiskSimple = Math.min(100, Math.max(0, Math.round(
+      (rsiE1w?.rsi > 70 ? 25 : rsiE1w?.rsi > 60 ? 12 : 0) +
+      (ema200ETH?.dist > 25 ? 25 : ema200ETH?.dist > 15 ? 12 : ema200ETH?.dist < 0 ? 15 : 0) +
+      (d.ethFunding > 0.01 ? 12 : d.ethFunding < -0.01 ? -5 : 0)
+    )));
+    buildActionMap('BTC', d.btcPrice, btcRiskSimple, rsiB1d?.rsi??50, rsiB1w?.rsi??50, ema200BTC?.dist??0, btcShortBias, ethRelative.state);
+    buildActionMap('ETH', d.ethPrice, ethRiskSimple, rsiE1d?.rsi??50, rsiE1w?.rsi??50, ema200ETH?.dist??0, ethShortBias, ethRelative.state);
+    show('sec-action-map');
+
     // ── MICRO: Confluence + Verdict ──
     const confMicro=buildConfluence('micro',d,ichiB,ichiE,rsiB1w,rsiE1w,stochB,emaB,macdB,volB,liqB,rsiB4h,rsiE4h);
     buildVerdictMicro(d,confMicro,emaB,macdB,volB,liqB,rsiB4h);
     show('sec-conf-micro');show('sec-risk-micro');
+
+    // ── ALERT BANNER (new) — always last ──
+    updateAlertBanner(d, emaB, macdB, rsiB4h, ema200BTC, ethRelative);
 
     // ── CROSS-TF ──
     buildCrossTF(confMacro,confMicro,ichiRawB,trendData);
