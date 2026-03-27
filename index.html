@@ -256,7 +256,7 @@ footer{font-family:'Space Mono',monospace;font-size:.54rem;color:var(--neutral);
 <div class="btn-wrap" style="padding-top:14px">
   <button class="btn" id="btn" onclick="manualRefresh()">
     <svg id="btn-icon" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="23 4 23 10 17 10"/><path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"/></svg>
-    Actualizează Toate Datele
+    <span id="btn-text">Actualizează Toate Datele</span>
   </button>
 </div>
 <div class="loading-msg" id="loading-msg"></div>
@@ -2883,7 +2883,7 @@ function journalSaveReview() {
 async function refresh() {
   const btn=$('btn'), icon=$('btn-icon');
   btn.disabled=true; icon.classList.add('spin');
-  btn.childNodes[1].textContent=' Se sincronizează...';
+  $('btn-text').textContent=' Se sincronizează...';
   $('err-box').style.display='none';
   $('loading-msg').style.display='block';
   $('sync-badge').className='sync-badge sync-wait';
@@ -3035,7 +3035,7 @@ async function refresh() {
   }
 
   btn.disabled=false; icon.classList.remove('spin');
-  btn.childNodes[1].textContent=' Actualizează Toate Datele';
+  $('btn-text').textContent=' Actualizează Toate Datele';
 }
 
 // ═══════════════════════════════════════════════════════
