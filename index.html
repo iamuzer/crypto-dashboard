@@ -1489,23 +1489,94 @@ function buildConfluence(type,d,ichiB,ichiE,rsiB1w,rsiE1w,stochB,emaB,macdB,volB
 // ═══════════════════════════════════════════
 // CROSS-TF CONFLUENCE
 // ═══════════════════════════════════════════
-function buildCrossTF(confMacro,confMicro,ichiRawB,trendData){
-  const mSig=confMacro.sig,miSig=confMicro.sig;
-  $('cross-macro-signal').textContent=mSig;$('cross-macro-signal').style.color=confMacro.sigC;
-  $('cross-macro-detail').textContent='Confluență macro: '+confMacro.strength+'% '+(confMacro.isBull?'bullish':'bearish')+'. Ichimoku 1W '+(ichiRawB?.above?'deasupra':'sub/în')+' nor.';
-  $('cross-micro-signal').textContent=miSig;$('cross-micro-signal').style.color=confMicro.sigC;
-  $('cross-micro-detail').textContent='Confluență micro: '+confMicro.strength+'% '+(confMicro.isBull?'bullish':'bearish')+'. Trend 1D: '+(trendData?.trend1d||'N/A')+'.';
-  const macroBull=confMacro.net>=10,macroBear=confMacro.net<=-10;
-  const microBull=confMicro.net>=10,microBear=confMicro.net<=-10;
-  let action,actionC,actionDetail,narrative;
-  if(macroBull&&microBull){action='INTRĂ LONG';actionC=CC('safe');actionDetail='Macro + Micro aliniate bullish.';narrative='<strong style="color:#00e87a">Setup ideal pentru long.</strong> Ambele timeframe-uri sugerează direcția bullish. Intră aproape de EMA9 pe 4H, cu stop sub EMA50 sau Kijun pe 1W. Raport risc/recompensă minim 1:3.';}
-  else if(macroBear&&microBear){action='EVITĂ / SHORT';actionC=CC('danger');actionDetail='Macro + Micro aliniate bearish.';narrative='<strong style="color:#ff3355">Aliniere bearish completă — protejează capitalul.</strong> Aceasta este configurația în care căderile semnificative se produc. Ieși din poziții long. Nu cumpăra rally-uri fără o confirmare clară.';}
-  else if(macroBull&&microBear){action='AȘTEAPTĂ';actionC=CC('warn');actionDetail='Macro bullish, micro bearish — corecție în uptrend.';narrative='<strong style="color:#ffb300">Corecție într-un trend macro bullish.</strong> Nu cumpăra acum. Așteaptă ca EMA9 pe 4H să treacă peste EMA21 sau un cross bullish pe MACD. Kijun pe 1W este suportul macro-cheie.';}
-  else if(macroBear&&microBull){action='FII ATENT';actionC=CC('warn');actionDetail='Micro bullish dar macro bearish — posibil bounce.';narrative='<strong style="color:#ffb300">Recuperare temporară într-un downtrend macro.</strong> Aceasta este configurația de tip Dead Cat Bounce — o recuperare temporară urmată, de regulă, de continuarea căderii. Nu cumpăra recuperarea agresiv.';}
-  else{action='NEUTRU';actionC=CC('neutral');actionDetail='Semnale mixte — fără confluență clară.';narrative='<strong style="color:#4a6080">Incertitudine.</strong> Niciun timeframe nu oferă un semnal clar. A sta în cash este o poziție validă. Setează alerte la Kijun pe 1W și EMA50 pe 4H.';}
-  $('cross-action').textContent=action;$('cross-action').style.color=actionC;
-  $('cross-action-detail').textContent=actionDetail;
-  $('cross-narrative').innerHTML=narrative;
+function buildCrossTF(confMacro, confMicro, ichiRawB, trendData, d, rsiB1w, emaB, macdB, rsiB4h) {
+  const mSig  = confMacro.sig,  miSig = confMicro.sig;
+  const macroBull = confMacro.net >= 10,  macroBear = confMacro.net <= -10;
+  const microBull = confMicro.net >= 10,  microBear = confMicro.net <= -10;
+
+  // ── Card Macro ──
+  const ichiState = ichiRawB?.above ? 'deasupra norului Kumo' : ichiRawB?.below ? 'sub norul Kumo' : 'în interiorul norului Kumo';
+  const kumoTop   = ichiRawB?.cTop  ? ' ('+fmt(ichiRawB.cTop)+')' : '';
+  const kijunVal  = ichiRawB?.kijun ? ' ('+fmt(ichiRawB.kijun)+')' : '';
+  $('cross-macro-signal').textContent  = mSig;
+  $('cross-macro-signal').style.color  = confMacro.sigC;
+  $('cross-macro-detail').innerHTML =
+    'Confluență macro: '+confMacro.strength+'% '+(confMacro.isBull?'bullish':'bearish')+' — '+confMacro.bullClusters+'/'+4+' clustere bullish<br>'
+    +'<span style="font-size:.92em">→ Ichimoku 1W: prețul '+(d?'('+fmt(d.btcPrice)+') ':'')+ichiState+kumoTop+'<br>'
+    +'→ RSI 1W: '+(rsiB1w?.rsi?.toFixed(1)??'--')+(rsiB1w?.div&&rsiB1w.div!=='NICIO'?' · divergență '+rsiB1w.div.toLowerCase():'')+'<br>'
+    +'→ Fear &amp; Greed: '+(d?.fg??'--')+' · Funding BTC: '+(d?((d.btcFunding>=0?'+':'')+d.btcFunding.toFixed(3)+'%'):'--')+'</span>';
+
+  // ── Card Micro ──
+  const emaState = emaB?.stackBull ? 'bull stack complet' : emaB?.stackBear ? 'bear stack complet' : 'mixt';
+  const macdState = macdB?.bullish ? 'bullish'+(macdB.crossup?' · cross bullish ⚡':'') : 'bearish'+(macdB?.crossdown?' · cross bearish ⚡':'');
+  $('cross-micro-signal').textContent  = miSig;
+  $('cross-micro-signal').style.color  = confMicro.sigC;
+  $('cross-micro-detail').innerHTML =
+    'Confluență micro: '+confMicro.strength+'% '+(confMicro.isBull?'bullish':'bearish')+' — '+confMicro.bullClusters+'/'+4+' clustere bullish<br>'
+    +'<span style="font-size:.92em">→ EMA Stack 4H: '+emaState+(emaB?.e21?' · EMA21 ('+fmt(emaB.e21)+')':'')+' <br>'
+    +'→ MACD 4H: '+macdState+'<br>'
+    +'→ RSI 4H: '+(rsiB4h?.rsi?.toFixed(1)??'--')+(rsiB4h?.rsi<35?' — supravândut':rsiB4h?.rsi>65?' — supracumpărat':'')+'<br>'
+    +'→ Taker Buy/Sell: '+(d?.btcBuySell?.toFixed(3)??'--')+(d?.btcBuySell<0.92?' — vânzători dominanți':d?.btcBuySell>1.08?' — cumpărători dominanți':'')+'</span>';
+
+  // ── Acțiune + Narativ detaliat ──
+  let action, actionC, actionDetail, narrative;
+
+  if(macroBull && microBull) {
+    action = 'INTRĂ LONG'; actionC = CC('safe');
+    actionDetail = 'Macro + Micro aliniate bullish.';
+    narrative = '<strong style="color:#00e87a">Setup ideal — ambele timeframe-uri sunt aliniate bullish.</strong> '
+      +'Structura macro este solidă'+(ichiRawB?.above?' cu Ichimoku 1W deasupra norului':'')+' și RSI 1W în zona constructivă'+(rsiB1w?' ('+rsiB1w.rsi.toFixed(1)+')':'')+'. '
+      +'Micro-ul confirmă prin EMA Stack bullish și MACD'+(macdB?.crossup?' cross pozitiv':' pozitiv')+'. '
+      +'Zona de intrare optimă este aproape de EMA9 pe 4H'+(emaB?.e9?' ('+fmt(emaB.e9)+')':'')+', '
+      +'cu stop-loss sub EMA50 pe 4H'+(emaB?.e50?' ('+fmt(emaB.e50)+')':'')+' sau sub Kijun pe 1W'+kijunVal+'. '
+      +'Raport risc/recompensă minim 1:3 înainte de a intra.';
+  }
+  else if(macroBear && microBear) {
+    action = 'EVITĂ / SHORT'; actionC = CC('danger');
+    actionDetail = 'Macro + Micro aliniate bearish.';
+    narrative = '<strong style="color:#ff3355">Aliniere bearish completă pe toate timeframe-urile.</strong> '
+      +'Aceasta este configurația în care capitalul trebuie protejat, nu riscat. '
+      +(ichiRawB?.below?'Ichimoku 1W arată că prețul se află sub norul Kumo'+kumoTop+' — structura macro s-a deteriorat. ':'')
+      +'Pe micro, '+(emaB?.stackBear?'EMA Stack bearish':'EMA mixt')+' și MACD descendent confirmă că nu există semne de recuperare pe termen scurt. '
+      +'Nu cumpăra rally-urile fără o confirmare clară — în această configurație, recuperările temporare sunt oportunități de reducere a expunerii, nu de intrare.';
+  }
+  else if(macroBull && microBear) {
+    action = 'AȘTEAPTĂ'; actionC = CC('warn');
+    actionDetail = 'Macro bullish, micro bearish — corecție în uptrend.';
+    narrative = '<strong style="color:#ffb300">Corecție într-un trend macro bullish.</strong> '
+      +'Structura pe termen lung rămâne intactă'+(ichiRawB?.above?' — Ichimoku 1W confirmă că prețul se află deasupra norului':'')+', '
+      +'dar micro-ul pe 4H arată presiune de vânzare activă'
+      +(rsiB4h?.rsi<40?' cu RSI 4H supravândut ('+rsiB4h.rsi.toFixed(1)+')':'')+'. '
+      +'Acesta este un moment de răbdare, nu de acțiune. '
+      +'Kijun pe 1W'+kijunVal+' este suportul macro-cheie — dacă prețul îl pierde pe weekly close, contextul se schimbă. '
+      +'Până atunci, așteaptă ca EMA9 pe 4H'+(emaB?.e9?' ('+fmt(emaB.e9)+')':'')+' să treacă peste EMA21'+(emaB?.e21?' ('+fmt(emaB.e21)+')':'')+' '
+      +'sau un cross bullish pe MACD care să confirme că presiunea de vânzare s-a epuizat.';
+  }
+  else if(macroBear && microBull) {
+    action = 'FII ATENT'; actionC = CC('warn');
+    actionDetail = 'Micro bullish dar macro bearish — posibil bounce.';
+    narrative = '<strong style="color:#ffb300">Recuperare temporară într-un downtrend macro.</strong> '
+      +'Micro-ul arată semne de stabilizare pe termen scurt, dar structura macro rămâne bearish'
+      +(ichiRawB?.below?' cu Ichimoku 1W sub nor'+kumoTop:'')
+      +(rsiB1w?' și RSI 1W în scădere ('+rsiB1w.rsi.toFixed(1)+')':'')+'. '
+      +'Aceasta este configurația de tip Dead Cat Bounce — o recuperare temporară urmată, de regulă, de continuarea căderii. '
+      +'Nu cumpăra recuperarea agresiv — dacă ești deja în poziție, aceasta poate fi o oportunitate de reducere a expunerii.';
+  }
+  else {
+    action = 'NEUTRU'; actionC = CC('neutral');
+    actionDetail = 'Semnale mixte — fără confluență clară.';
+    narrative = '<strong style="color:#4a6080">Semnale mixte — piața nu oferă un avantaj direcțional clar în acest moment.</strong> '
+      +'Macro-ul și micro-ul nu sunt aliniate în nicio direcție'
+      +(rsiB1w?' (RSI 1W: '+rsiB1w.rsi.toFixed(1)+')':'')+'. '
+      +'A sta în cash sau a menține pozițiile existente cu stop-loss strâns este mai prudent decât a forța o intrare. '
+      +'Setează alerte la Kijun pe 1W'+kijunVal+' și EMA50 pe 4H'+(emaB?.e50?' ('+fmt(emaB.e50)+')':'')+' — '
+      +'o mișcare decisivă față de aceste niveluri va clarifica direcția.';
+  }
+
+  $('cross-action').textContent       = action;
+  $('cross-action').style.color       = actionC;
+  $('cross-action-detail').textContent = actionDetail;
+  $('cross-narrative').innerHTML      = narrative;
   show('cross-tf-section');
 }
 
@@ -2692,7 +2763,7 @@ async function refresh() {
     updateAlertBanner(d, emaB, macdB, rsiB4h, ema200BTC, ethRelative);
 
     // ── CROSS-TF ──
-    buildCrossTF(confMacro,confMicro,ichiRawB,trendData);
+    buildCrossTF(confMacro, confMicro, ichiRawB, trendData, d, rsiB1w, emaB, macdB, rsiB4h);
 
     // ── DECISION JOURNAL — auto snapshot ──
     const topBotResult = { signal: $('topbot-signal')?.textContent||'--', topPct: parseInt($('topbot-strength-val')?.textContent?.split(':')[1])||0, botPct: parseInt($('topbot-strength-val')?.textContent?.split('/')[1])||0 };
