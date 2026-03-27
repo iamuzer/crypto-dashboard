@@ -2876,6 +2876,168 @@ function journalSaveReview() {
 }
 
 
+
+// ═══════════════════════════════════════════
+// MAIN REFRESH — Single sync call
+// ═══════════════════════════════════════════
+async function refresh() {
+  const btn=$('btn'), icon=$('btn-icon');
+  btn.disabled=true; icon.classList.add('spin');
+  btn.childNodes[1].textContent=' Se sincronizează...';
+  $('err-box').style.display='none';
+  $('loading-msg').style.display='block';
+  $('sync-badge').className='sync-badge sync-wait';
+  $('sync-badge').textContent='⏳ SE ACTUALIZEAZĂ...';
+  $('loading-msg').textContent='⏳ Fetch simultan: Binance Spot + Futures + CoinGecko + Alternative.me...';
+
+  try {
+    const d = await fetchAllData();
+    $('loading-msg').textContent='⏳ Calculând indicatori...';
+
+    renderPriceBar(d);
+
+    // ── MACRO: Ichimoku 1W ──
+    const ichiRawB=calcIchimoku(d.btcW), ichiRawE=calcIchimoku(d.ethW);
+    const ichiB=renderIchimoku('btc',ichiRawB), ichiE=renderIchimoku('eth',ichiRawE);
+    show('sec-ichi');
+
+    // ── MACRO: RSI 1W ──
+    const rsiRawB1w=calcRSI(d.btcW,14), rsiRawE1w=calcRSI(d.ethW,14);
+    const rsiB1w=renderRSI('rsi-btc',rsiRawB1w,'1W'), rsiE1w=renderRSI('rsi-eth',rsiRawE1w,'1W');
+    const stochRaw=calcStochRSI(d.btcW,14,14);
+    const stochB=renderStochOBV(d.btcW,stochRaw);
+    show('sec-mom-macro');
+
+    // ── MACRO: Trendline (narrative) ──
+    const trendData=analyzeTrendlines(d.btcW,d,ichiRawB,rsiB1w,stochB,d.fg);
+    show('sec-trendline');
+
+    // ── MACRO: Fibonacci Engine ──
+    const rsiD_btc = calcRSI(d.btcD, 14);
+    const rsiD_eth = calcRSI(d.ethD, 14);
+    const fibBTC = renderFibonacci('BTC', d.btc4H, d.btcD, d.btcW, rsiD_btc?.arr?.at(-1)??50, rsiB1w?.rsi??50, ichiRawB?.above??false);
+    const fibETH = renderFibonacci('ETH', d.eth4H, d.ethD, d.ethW, rsiD_eth?.arr?.at(-1)??50, calcRSI(d.ethW,14)?.arr?.at(-1)??50, ichiRawE?.above??false);
+    show('sec-fib');
+
+    // ── MACRO: Trendline Detection ──
+    const btcCloses4H=d.btc4H.map(x=>x.close), btcClosesD=d.btcD.map(x=>x.close), btcClosesW=d.btcW.map(x=>x.close);
+    const ethCloses4H=d.eth4H.map(x=>x.close), ethClosesD=d.ethD.map(x=>x.close), ethClosesW=d.ethW.map(x=>x.close);
+    renderTrendlines('BTC', btcCloses4H, btcClosesD, btcClosesW, d.btcPrice, fibBTC?.fibMicro, fibBTC?.fibMedium, fibBTC?.fibMacro);
+    renderTrendlines('ETH', ethCloses4H, ethClosesD, ethClosesW, d.ethPrice, fibETH?.fibMicro, fibETH?.fibMedium, fibETH?.fibMacro);
+    show('sec-trendline-detect');
+
+    // ── MACRO: Chikou 1M + Top/Bottom ──
+    const chikouBTC=analyzeChikou1M('btc',d.btcM);
+    const chikouETH=analyzeChikou1M('eth',d.ethM);
+    buildTopBottomSignal(d,ichiRawB,ichiRawE,rsiB1w,rsiE1w,stochB,chikouBTC,chikouETH);
+    show('sec-chikou-monthly');
+
+    // ── MACRO: Pivots 1M + Risk ──
+    renderPivots('piv-btc',d.btcM); renderPivots('piv-eth',d.ethM);
+    buildRiskMacro(d,ichiB,ichiE,rsiB1w,stochB);
+    show('sec-risk-macro');
+
+    // ── MACRO: Confluence ──
+    const confMacro=buildConfluence('macro',d,ichiB,ichiE,rsiB1w,rsiE1w,stochB,null,null,null,null,null,null);
+    buildVerdictMacro(d,ichiRawB,rsiB1w,confMacro);
+    show('sec-conf-macro');
+
+    // ── MICRO: Futures ──
+    renderFutures(d);
+    show('sec-futures');
+
+    // ── MICRO: EMA200 + RSI Daily ──
+    const ema200BTC=renderEMA200('btc',d.btcD,d.btcPrice);
+    const ema200ETH=renderEMA200('eth',d.ethD,d.ethPrice);
+    const rsiRawB1d=calcRSI(d.btcD,14), rsiRawE1d=calcRSI(d.ethD,14);
+    const rsiB1d=renderRSI('rsi-btc-1d',rsiRawB1d,'1D'), rsiE1d=renderRSI('rsi-eth-1d',rsiRawE1d,'1D');
+    show('sec-ema200');
+
+    // ── MICRO: ETH Relative ──
+    const ethRelative=buildEthRelative(d, rsiB1d?.rsi??null, rsiE1d?.rsi??null);
+    show('sec-eth-relative');
+
+    // ── MICRO: EMA 4H ──
+    const emaB=renderEMA('btc',d.btc4H,d.btcPrice);
+    const emaE=renderEMA('eth',d.eth4H,d.ethPrice);
+    show('sec-ema');
+
+    // ── MICRO: RSI 1H ──
+    const rsiRawB1h=calcRSI(d.btc1H,14), rsiRawE1h=calcRSI(d.eth1H,14);
+    renderRSI('rsi-btc-1h',rsiRawB1h,'1H');
+    renderRSI('rsi-eth-1h',rsiRawE1h,'1H');
+
+    // ── MICRO: RSI 4H + MACD ──
+    const rsiRawB4h=calcRSI(d.btc4H,14), rsiRawE4h=calcRSI(d.eth4H,14);
+    const rsiB4h=renderRSI('rsi-btc-4h',rsiRawB4h,'4H'), rsiE4h=renderRSI('rsi-eth-4h',rsiRawE4h,'4H');
+    const macdRaw=calcMACD(d.btc4H,12,26,9);
+    const macdB=renderMACD(macdRaw);
+    show('sec-mom-micro');
+
+    // ── MICRO: Volume Spike 4H ──
+    const volB=renderVolumeSpike('btc',d.btc4H);
+    const volE=renderVolumeSpike('eth',d.eth4H);
+    show('sec-vol-micro');
+
+    // ── MICRO: Liq Levels ──
+    const liqB=renderLiqLevels('btc',d.btcPrice);
+    const liqE=renderLiqLevels('eth',d.ethPrice);
+    show('sec-liq');
+
+    // ── MICRO: Action Map ──
+    const btcShortBias=(rsiB1d?.rsi<45||ema200BTC?.dist<0)?'Bearish':(rsiB1d?.rsi>55&&ema200BTC?.dist>0?'Bullish':'Neutral');
+    const ethShortBias=(rsiE1d?.rsi<45||ema200ETH?.dist<0)?'Bearish':(rsiE1d?.rsi>55&&ema200ETH?.dist>0?'Bullish':'Neutral');
+    const btcRiskSimple=Math.min(100,Math.max(0,Math.round(
+      (rsiB1w?.rsi>70?25:rsiB1w?.rsi>60?12:0)+
+      (ema200BTC?.dist>25?25:ema200BTC?.dist>15?12:ema200BTC?.dist<0?15:0)+
+      (d.btcFunding>0.01?12:d.btcFunding<-0.01?-5:0)+
+      (rsiB1d?.rsi<rsiB1d?.prev?8:0)
+    )));
+    const ethRiskSimple=Math.min(100,Math.max(0,Math.round(
+      (rsiE1w?.rsi>70?25:rsiE1w?.rsi>60?12:0)+
+      (ema200ETH?.dist>25?25:ema200ETH?.dist>15?12:ema200ETH?.dist<0?15:0)+
+      (d.ethFunding>0.01?12:d.ethFunding<-0.01?-5:0)
+    )));
+    buildActionMap('BTC',d.btcPrice,btcRiskSimple,rsiB1d?.rsi??50,rsiB1w?.rsi??50,ema200BTC?.dist??0,btcShortBias,ethRelative.state);
+    buildActionMap('ETH',d.ethPrice,ethRiskSimple,rsiE1d?.rsi??50,rsiE1w?.rsi??50,ema200ETH?.dist??0,ethShortBias,ethRelative.state);
+    show('sec-action-map');
+
+    // ── MICRO: Confluence + Verdict ──
+    const confMicro=buildConfluence('micro',d,ichiB,ichiE,rsiB1w,rsiE1w,stochB,emaB,macdB,volB,liqB,rsiB4h,rsiE4h);
+    buildVerdictMicro(d,confMicro,emaB,macdB,volB,liqB,rsiB4h);
+    show('sec-conf-micro'); show('sec-risk-micro');
+
+    // ── ALERT BANNER ──
+    updateAlertBanner(d,emaB,macdB,rsiB4h,ema200BTC,ethRelative);
+
+    // ── CROSS-TF ──
+    buildCrossTF(confMacro,confMicro,ichiRawB,trendData,d,rsiB1w,emaB,macdB,rsiB4h);
+
+    // ── DECISION JOURNAL ──
+    const topBotResult={
+      signal:$('topbot-signal')?.textContent||'--',
+      topPct:parseInt($('topbot-strength-val')?.textContent?.split(':')[1])||0,
+      botPct:parseInt($('topbot-strength-val')?.textContent?.split('/')[1])||0
+    };
+    _journalLastData=[d,confMacro,confMicro,ichiRawB,rsiB1w,ema200BTC,topBotResult];
+    journalCatchupSync(d,confMacro,confMicro,ichiRawB,rsiB1w,ema200BTC,topBotResult);
+    if(document.getElementById('content-journal')?.classList.contains('active')) journalRender();
+
+    $('loading-msg').style.display='none';
+
+  } catch(e) {
+    $('err-box').style.display='block';
+    $('err-box').textContent='⚠ Eroare sync: '+e.message;
+    $('sync-badge').className='sync-badge sync-err';
+    $('sync-badge').textContent='✗ EROARE';
+    $('loading-msg').style.display='none';
+    console.error('Refresh error:', e);
+  }
+
+  btn.disabled=false; icon.classList.remove('spin');
+  btn.childNodes[1].textContent=' Actualizează Toate Datele';
+}
+
 // ═══════════════════════════════════════════════════════
 // AUTO-REFRESH — 15 minute interval + countdown
 // ═══════════════════════════════════════════════════════
