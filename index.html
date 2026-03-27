@@ -274,7 +274,8 @@ footer{font-family:'Space Mono',monospace;font-size:.54rem;color:var(--neutral);
   <!-- TABS -->
   <div class="tabs">
     <div class="tab active-macro" id="tab-macro" onclick="switchTab('macro')"><span class="tab-dot" style="background:var(--purple)"></span>MACRO — 1W / 1M</div>
-    <div class="tab" id="tab-micro" onclick="switchTab('micro')"><span class="tab-dot" style="background:var(--cyan)"></span>MICRO — 4H / 1D</div>
+    <div class="tab" id="tab-micro" onclick="switchTab('micro')"><span class="tab-dot" style="background:var(--cyan)"></span>MICRO — 4H / 1H</div>
+    <div class="tab" id="tab-journal" onclick="switchTab('journal')"><span class="tab-dot" style="background:var(--warn)"></span>DECISION JOURNAL</div>
   </div>
 </div>
 
@@ -390,6 +391,37 @@ footer{font-family:'Space Mono',monospace;font-size:.54rem;color:var(--neutral);
     <div class="g2" style="margin-bottom:10px"><div class="card-sm"><div class="sig2-title" style="color:var(--danger)">▸ BEARISH</div><div id="bear-macro"></div></div><div class="card-sm"><div class="sig2-title" style="color:var(--safe)">▸ BULLISH</div><div id="bull-macro"></div></div></div>
     <div class="rec-box" id="rec-macro">--</div>
     <div class="zones-g"><div class="zone-item"><span style="color:var(--neutral)">BTC: </span><span style="color:var(--btc)" id="zone-btc">--</span></div><div class="zone-item"><span style="color:var(--neutral)">ETH: </span><span style="color:var(--eth)" id="zone-eth">--</span></div></div>
+  </div>
+
+
+  <!-- FIBONACCI ENGINE -->
+  <div class="section" id="sec-fib" style="display:none">
+    <div class="sec-header">
+      <div class="sec-bar" style="background:var(--warn)"></div>
+      <div class="sec-title">Fibonacci Engine — 3 Perioade + Confluență</div>
+      <span class="src-tag">Binance 1D · 90 / 180 / 365 zile</span>
+    </div>
+    <!-- BTC Fibonacci -->
+    <div style="margin-bottom:16px">
+      <div style="font-family:'Space Mono',monospace;font-size:.56rem;color:var(--neutral);margin-bottom:10px">▸ BITCOIN</div>
+      <div class="g3" id="fib-btc-cards"></div>
+      <div class="card-sm" style="margin-top:10px">
+        <div style="font-family:'Space Mono',monospace;font-size:.56rem;color:var(--warn);margin-bottom:6px;letter-spacing:.1em;text-transform:uppercase">▸ CONFLUENȚĂ FIBONACCI BTC</div>
+        <div id="fib-btc-confluence" style="font-size:.76rem;color:var(--text);line-height:1.7"></div>
+      </div>
+    </div>
+    <!-- ETH Fibonacci -->
+    <div>
+      <div style="font-family:'Space Mono',monospace;font-size:.56rem;color:var(--neutral);margin-bottom:10px">▸ ETHEREUM</div>
+      <div class="g3" id="fib-eth-cards"></div>
+      <div class="card-sm" style="margin-top:10px">
+        <div style="font-family:'Space Mono',monospace;font-size:.56rem;color:var(--warn);margin-bottom:6px;letter-spacing:.1em;text-transform:uppercase">▸ CONFLUENȚĂ FIBONACCI ETH</div>
+        <div id="fib-eth-confluence" style="font-size:.76rem;color:var(--text);line-height:1.7"></div>
+      </div>
+    </div>
+    <div style="margin-top:10px;padding:10px 14px;background:rgba(0,0,0,.2);border-radius:8px;font-family:'Space Mono',monospace;font-size:.5rem;color:#4a6080;line-height:1.6">
+      ⚠ Fibonacci identifică zone de reacție probabilă — nu targeturi fixe. Un nivel devine relevant doar în confluență cu RSI și/sau Ichimoku. Fără confirmare din alt indicator, nivelul Fibonacci singur nu este semnal de acțiune.
+    </div>
   </div>
 
 </div><!-- end tab-macro -->
@@ -548,9 +580,14 @@ footer{font-family:'Space Mono',monospace;font-size:.54rem;color:var(--neutral);
     </div>
   </div>
 
-  <!-- RSI 4H + MACD 4H -->
+  <!-- RSI 1H + 4H + MACD -->
   <div class="section" id="sec-mom-micro" style="display:none">
-    <div class="sec-header"><div class="sec-bar" style="background:var(--danger)"></div><div class="sec-title">RSI Divergență + MACD</div><span class="src-tag">Binance 4H klines</span></div>
+    <div class="sec-header"><div class="sec-bar" style="background:var(--danger)"></div><div class="sec-title">RSI Divergență 1H · 4H + MACD</div><span class="src-tag">Binance 1H + 4H klines</span></div>
+    <!-- RSI 1H row -->
+    <div class="g2" style="margin-bottom:12px">
+      <div class="ind-card"><div class="ind-tf">1H — Real</div><div class="ind-name">RSI — BTC</div><div class="ind-val" id="rsi-btc-1h-val">--</div><div class="ind-sig" id="rsi-btc-1h-sta">--</div><div class="ind-detail" id="rsi-btc-1h-det">--</div><div class="ind-bar-bg"><div class="ind-bar-fill" id="rsi-btc-1h-bar"></div><div class="ind-bar-mk" id="rsi-btc-1h-mk"></div></div><div id="rsi-btc-1h-div"></div></div>
+      <div class="ind-card"><div class="ind-tf">1H — Real</div><div class="ind-name">RSI — ETH</div><div class="ind-val" id="rsi-eth-1h-val">--</div><div class="ind-sig" id="rsi-eth-1h-sta">--</div><div class="ind-detail" id="rsi-eth-1h-det">--</div><div class="ind-bar-bg"><div class="ind-bar-fill" id="rsi-eth-1h-bar"></div><div class="ind-bar-mk" id="rsi-eth-1h-mk"></div></div><div id="rsi-eth-1h-div"></div></div>
+    </div>
     <div class="g3">
       <div class="ind-card"><div class="ind-tf">4H — Real</div><div class="ind-name">RSI — BTC</div><div class="ind-val" id="rsi-btc-4h-val">--</div><div class="ind-sig" id="rsi-btc-4h-sta">--</div><div class="ind-detail" id="rsi-btc-4h-det">--</div><div class="ind-bar-bg"><div class="ind-bar-fill" id="rsi-btc-4h-bar"></div><div class="ind-bar-mk" id="rsi-btc-4h-mk"></div></div><div id="rsi-btc-4h-div"></div></div>
       <div class="ind-card"><div class="ind-tf">4H — Real</div><div class="ind-name">RSI — ETH</div><div class="ind-val" id="rsi-eth-4h-val">--</div><div class="ind-sig" id="rsi-eth-4h-sta">--</div><div class="ind-detail" id="rsi-eth-4h-det">--</div><div class="ind-bar-bg"><div class="ind-bar-fill" id="rsi-eth-4h-bar"></div><div class="ind-bar-mk" id="rsi-eth-4h-mk"></div></div><div id="rsi-eth-4h-div"></div></div>
@@ -586,6 +623,89 @@ footer{font-family:'Space Mono',monospace;font-size:.54rem;color:var(--neutral);
 
 </div><!-- end tab-micro -->
 
+<!-- ══════════════════════ TAB JOURNAL ══════════════════════ -->
+<div class="tab-content" id="content-journal">
+  <div class="section">
+    <div class="sec-header">
+      <div class="sec-bar" style="background:var(--warn)"></div>
+      <div class="sec-title">Decision Journal — Reguli</div>
+    </div>
+    <div class="card" style="font-size:.78rem;color:var(--text);line-height:1.8">
+      <strong style="color:var(--warn)">DISCIPLINA:</strong> Snapshot-urile sunt locked. Nu se alterează, nu se șterg.<br>
+      <strong style="color:var(--cyan)">FLEXIBILITATEA:</strong> Pattern-urile generează recomandări, nu schimbări automate.<br>
+      <strong style="color:var(--safe)">THINK BEFORE ACT:</strong> Observăm, recomandăm, discutăm și abia apoi adaptăm modelul.
+    </div>
+  </div>
+
+  <!-- Stats -->
+  <div class="g4" style="margin-bottom:14px">
+    <div class="card-sm" style="text-align:center"><div style="font-family:'Space Mono',monospace;font-size:.54rem;color:var(--neutral);margin-bottom:5px">TOTAL LOGS</div><div style="font-family:'Space Mono',monospace;font-size:1.8rem;font-weight:700;color:var(--white)" id="j-total">0</div></div>
+    <div class="card-sm" style="text-align:center"><div style="font-family:'Space Mono',monospace;font-size:.54rem;color:var(--safe);margin-bottom:5px">CORRECT</div><div style="font-family:'Space Mono',monospace;font-size:1.8rem;font-weight:700;color:var(--safe)" id="j-correct">0</div></div>
+    <div class="card-sm" style="text-align:center"><div style="font-family:'Space Mono',monospace;font-size:.54rem;color:var(--warn);margin-bottom:5px">PARTIAL</div><div style="font-family:'Space Mono',monospace;font-size:1.8rem;font-weight:700;color:var(--warn)" id="j-partial">0</div></div>
+    <div class="card-sm" style="text-align:center"><div style="font-family:'Space Mono',monospace;font-size:.54rem;color:var(--danger);margin-bottom:5px">WRONG</div><div style="font-family:'Space Mono',monospace;font-size:1.8rem;font-weight:700;color:var(--danger)" id="j-wrong">0</div></div>
+  </div>
+
+  <!-- Manual snapshot button -->
+  <div style="margin-bottom:14px;display:flex;gap:10px;align-items:center">
+    <button class="btn" id="j-snap-btn" onclick="journalManualSnapshot()" style="width:auto;padding:10px 20px">
+      📸 Salvează Snapshot Manual
+    </button>
+    <div style="font-family:'Space Mono',monospace;font-size:.58rem;color:var(--neutral)" id="j-snap-status">Snapshot-ul zilnic se salvează automat la refresh dacă nu există deja.</div>
+  </div>
+
+  <!-- Log table -->
+  <div class="section">
+    <div class="sec-header"><div class="sec-bar" style="background:var(--warn)"></div><div class="sec-title">Daily Logs</div></div>
+    <div class="card" style="overflow-x:auto"><div id="j-table"></div></div>
+  </div>
+
+  <!-- Review -->
+  <div class="g2">
+    <div class="card">
+      <div style="font-family:'Space Mono',monospace;font-size:.6rem;letter-spacing:.14em;text-transform:uppercase;color:var(--neutral);margin-bottom:12px">Manual Review</div>
+      <div style="font-size:.7rem;color:#4a6080;margin-bottom:10px">Snapshot-ul este locked. Review-ul este add-only.</div>
+      <div style="margin-bottom:8px">
+        <div style="font-family:'Space Mono',monospace;font-size:.54rem;color:var(--neutral);margin-bottom:4px">Selectează log</div>
+        <select id="j-select" style="width:100%;background:var(--panel);color:var(--text);border:1px solid var(--border);border-radius:6px;padding:7px;font-family:'Space Mono',monospace;font-size:.62rem" onchange="journalPick(this.value)"></select>
+      </div>
+      <div style="margin-bottom:8px">
+        <div style="font-family:'Space Mono',monospace;font-size:.54rem;color:var(--neutral);margin-bottom:4px">Factor extern?</div>
+        <select id="j-external" style="width:100%;background:var(--panel);color:var(--text);border:1px solid var(--border);border-radius:6px;padding:7px;font-family:'Space Mono',monospace;font-size:.62rem">
+          <option value="no">Nu</option><option value="yes">Da (news, macro event)</option>
+        </select>
+      </div>
+      <div style="margin-bottom:8px">
+        <div style="font-family:'Space Mono',monospace;font-size:.54rem;color:var(--neutral);margin-bottom:4px">Ce s-a întâmplat</div>
+        <textarea id="j-happened" rows="3" style="width:100%;background:var(--panel);color:var(--text);border:1px solid var(--border);border-radius:6px;padding:7px;font-family:'Space Mono',monospace;font-size:.62rem;resize:vertical" placeholder="Descrie ce s-a întâmplat cu prețul..."></textarea>
+      </div>
+      <div style="margin-bottom:8px">
+        <div style="font-family:'Space Mono',monospace;font-size:.54rem;color:var(--neutral);margin-bottom:4px">Ce am ratat</div>
+        <textarea id="j-missed" rows="2" style="width:100%;background:var(--panel);color:var(--text);border:1px solid var(--border);border-radius:6px;padding:7px;font-family:'Space Mono',monospace;font-size:.62rem;resize:vertical" placeholder="Ce semnal nu am văzut sau am ignorat..."></textarea>
+      </div>
+      <div style="margin-bottom:8px">
+        <div style="font-family:'Space Mono',monospace;font-size:.54rem;color:var(--neutral);margin-bottom:4px">Lecție</div>
+        <textarea id="j-lesson" rows="2" style="width:100%;background:var(--panel);color:var(--text);border:1px solid var(--border);border-radius:6px;padding:7px;font-family:'Space Mono',monospace;font-size:.62rem;resize:vertical" placeholder="Ce ajustăm la model..."></textarea>
+      </div>
+      <div style="margin-bottom:8px">
+        <div style="font-family:'Space Mono',monospace;font-size:.54rem;color:var(--neutral);margin-bottom:4px">Recomandare model</div>
+        <select id="j-rec-status" style="width:100%;background:var(--panel);color:var(--text);border:1px solid var(--border);border-radius:6px;padding:7px;font-family:'Space Mono',monospace;font-size:.62rem">
+          <option value="no_change">No change suggested</option>
+          <option value="review">Review suggested</option>
+          <option value="strong_review">Strong review suggested</option>
+        </select>
+      </div>
+      <button class="btn" onclick="journalSaveReview()" style="width:100%;margin-top:4px">Salvează Review</button>
+      <div style="font-family:'Space Mono',monospace;font-size:.52rem;color:var(--safe);margin-top:6px;display:none" id="j-save-ok">✓ Salvat</div>
+    </div>
+    <div class="card">
+      <div style="font-family:'Space Mono',monospace;font-size:.6rem;letter-spacing:.14em;text-transform:uppercase;color:var(--neutral);margin-bottom:12px">Log Selectat</div>
+      <div id="j-detail" style="font-family:'Space Mono',monospace;font-size:.62rem;color:var(--text);line-height:1.8;white-space:pre-wrap"></div>
+    </div>
+  </div>
+</div><!-- end tab-journal -->
+
+
+
 <footer>
   CRYPTORISK v4 · Binance Spot + Futures API · CoinGecko · Alternative.me · Sync unic<br>
   Scoring pe clustere independente (nu indicatori corelați) · RSI Wilder corect · EMA/MACD pe 4H real<br>
@@ -605,8 +725,11 @@ const show = id => { const e=$(id); if(e){e.style.display='block';e.classList.ad
 function switchTab(t){
   $('content-macro').classList.toggle('active',t==='macro');
   $('content-micro').classList.toggle('active',t==='micro');
+  const jEl=$('content-journal');if(jEl)jEl.classList.toggle('active',t==='journal');
   $('tab-macro').className='tab'+(t==='macro'?' active-macro':'');
   $('tab-micro').className='tab'+(t==='micro'?' active-micro':'');
+  const jTab=$('tab-journal');if(jTab)jTab.className='tab'+(t==='journal'?' active-macro':'');
+  if(t==='journal')journalRender();
 }
 
 // ═══════════════════════════════════════════
@@ -626,7 +749,8 @@ async function fetchAllData() {
     btcW, ethW,
     btcM, ethM,
     btc4H, eth4H,
-    btcD, ethD
+    btcD, ethD,
+    btc1H, eth1H
   ] = await Promise.all([
     fetch('https://api.binance.com/api/v3/ticker/24hr?symbol=BTCUSDT').then(r=>r.json()),
     fetch('https://api.binance.com/api/v3/ticker/24hr?symbol=ETHUSDT').then(r=>r.json()),
@@ -646,6 +770,8 @@ async function fetchAllData() {
     fetch('https://api.binance.com/api/v3/klines?symbol=ETHUSDT&interval=4h&limit=120').then(r=>r.json()),
     fetch('https://api.binance.com/api/v3/klines?symbol=BTCUSDT&interval=1d&limit=220').then(r=>r.json()),
     fetch('https://api.binance.com/api/v3/klines?symbol=ETHUSDT&interval=1d&limit=220').then(r=>r.json()),
+    fetch('https://api.binance.com/api/v3/klines?symbol=BTCUSDT&interval=1h&limit=100').then(r=>r.json()),
+    fetch('https://api.binance.com/api/v3/klines?symbol=ETHUSDT&interval=1h&limit=100').then(r=>r.json()),
   ]);
 
   const parseK = raw => raw.map(k=>({ts:k[0],open:+k[1],high:+k[2],low:+k[3],close:+k[4],vol:+k[5]}));
@@ -685,6 +811,8 @@ async function fetchAllData() {
     eth4H: parseK(eth4H),
     btcD: parseK(btcD),
     ethD: parseK(ethD),
+    btc1H: parseK(btc1H),
+    eth1H: parseK(eth1H),
   };
 }
 
@@ -1683,6 +1811,487 @@ function updateAlertBanner(d, emaB, macdB, rsiB4h, ema200BTC, ethRelative) {
   }
 }
 
+
+// ═══════════════════════════════════════════════════════
+// RSI 1H — real Binance 1H klines
+// ═══════════════════════════════════════════════════════
+// Uses same calcRSI + renderRSI already in file
+// Just needs to be called with d.btc1H
+
+// ═══════════════════════════════════════════════════════
+// FIBONACCI ENGINE — Swing Detection (correct method)
+// ═══════════════════════════════════════════════════════
+
+// ── Swing point detection ─────────────────────────────
+// A swing high is a candle that is higher than 'lookback'
+// candles on both sides — a genuine local pivot.
+function swingHigh(closes, lookback=5) {
+  for(let i=closes.length-lookback-1; i>=lookback; i--) {
+    const left  = closes.slice(i-lookback, i);
+    const right = closes.slice(i+1, i+lookback+1);
+    if(right.length < lookback) continue; // need full window on right
+    if(closes[i] > Math.max(...left) && closes[i] > Math.max(...right))
+      return { price: closes[i], idx: i, barsAgo: closes.length-1-i };
+  }
+  return null;
+}
+function swingLow(closes, lookback=5) {
+  for(let i=closes.length-lookback-1; i>=lookback; i--) {
+    const left  = closes.slice(i-lookback, i);
+    const right = closes.slice(i+1, i+lookback+1);
+    if(right.length < lookback) continue;
+    if(closes[i] < Math.min(...left) && closes[i] < Math.min(...right))
+      return { price: closes[i], idx: i, barsAgo: closes.length-1-i };
+  }
+  return null;
+}
+
+// ── Single Fibonacci calculation from swing high/low ──
+// Direction: 'down' = price retracing from high (most common)
+//            'up'   = price recovering from low
+function calcFib(swHigh, swLow, currentPrice) {
+  if(!swHigh || !swLow) return null;
+  const high  = swHigh.price;
+  const low   = swLow.price;
+  const range = high - low;
+  if(range <= 0) return null;
+
+  // Retracement levels (measured downward from high)
+  const levels = {
+    '0.236': high - range * 0.236,
+    '0.382': high - range * 0.382,
+    '0.500': high - range * 0.500,
+    '0.618': high - range * 0.618,
+    '0.786': high - range * 0.786,
+  };
+
+  // Extension levels
+  // Bullish extensions: above the swing high
+  const bullExt = {
+    '1.000': high,
+    '1.272': high + range * 0.272,
+    '1.618': high + range * 0.618,
+  };
+  // Bearish extensions: below the swing low
+  const bearExt = {
+    '1.000': low,
+    '1.272': low  - range * 0.272,
+    '1.618': low  - range * 0.618,
+  };
+
+  // Find nearest retracement level (within 2.5%)
+  let nearest = null, nearestDist = Infinity, nearestPrice = null;
+  for(const [k, v] of Object.entries(levels)) {
+    const d = Math.abs(currentPrice - v) / Math.max(v, 1);
+    if(d < nearestDist) { nearestDist = d; nearest = k; nearestPrice = v; }
+  }
+  const inZone = nearestDist < 0.025;
+
+  // Where is price relative to structure?
+  const retrPct = (high - currentPrice) / range; // 0=at high, 1=at low, >1=below low
+
+  return {
+    high, low, range, currentPrice,
+    swHighBarsAgo: swHigh.barsAgo,
+    swLowBarsAgo:  swLow.barsAgo,
+    levels, bullExt, bearExt,
+    nearest, nearestPrice, nearestDist, inZone,
+    retrPct
+  };
+}
+
+// ── Build fibonacci for one timeframe ─────────────────
+function fibForTF(closes, lookback, label) {
+  if(closes.length < lookback*3 + 5) return null;
+  const swH = swingHigh(closes, lookback);
+  const swL = swingLow(closes, lookback);
+  const fib = calcFib(swH, swL, closes[closes.length-1]);
+  if(!fib) return null;
+  return { ...fib, label, lookback };
+}
+
+// ── Confluence across 3 timeframes ────────────────────
+function fibConfluence(fibMicro, fibMedium, fibMacro, rsiD, rsiW, ichiAbove) {
+  const fibs = [fibMicro, fibMedium, fibMacro].filter(Boolean);
+  if(fibs.length === 0) return { signal:'NEUTRU', color:'#4a6080', text:'Date insuficiente.', bullish:[], bearish:[] };
+
+  const bullish = [], bearish = [];
+  const SUPPORT_LEVELS  = ['0.382','0.500','0.618','0.786'];
+  const RESIST_LEVELS   = ['0.236','0.382','0.500'];
+
+  // Check same level on multiple timeframes
+  const levelCounts = {};
+  for(const f of fibs) {
+    if(f.inZone) {
+      levelCounts[f.nearest] = (levelCounts[f.nearest]||0) + 1;
+    }
+  }
+  for(const [lvl, cnt] of Object.entries(levelCounts)) {
+    if(cnt >= 2) {
+      const isSupport = ['0.618','0.786'].includes(lvl);
+      const isResist  = ['0.236','0.382','0.500'].includes(lvl);
+      if(isSupport) bullish.push(`Nivel ${lvl} apare pe ${cnt}/3 TF-uri — suport multi-timeframe`);
+      if(isResist)  bearish.push(`Nivel ${lvl} apare pe ${cnt}/3 TF-uri — rezistență multi-timeframe`);
+    }
+  }
+
+  // Single TF confluence with RSI / Ichimoku
+  for(const f of fibs) {
+    if(!f.inZone) continue;
+    const isSup = ['0.618','0.786'].includes(f.nearest);
+    const isRes = ['0.236','0.382'].includes(f.nearest);
+
+    if(isSup && rsiD < 40)
+      bullish.push(`${f.label}: preț la suport ${f.nearest} + RSI daily supravândut (${rsiD.toFixed(1)})`);
+    if(isSup && rsiW < 40)
+      bullish.push(`${f.label}: preț la suport ${f.nearest} + RSI weekly scăzut (${rsiW.toFixed(1)})`);
+    if(isSup && !ichiAbove)
+      bearish.push(`${f.label}: nivel ${f.nearest} este suport DAR prețul e sub norul Ichimoku — suportul poate ceda`);
+    if(isRes && rsiD > 60)
+      bearish.push(`${f.label}: preț la rezistență ${f.nearest} + RSI daily ridicat (${rsiD.toFixed(1)})`);
+    if(isRes && ichiAbove && rsiD > 55)
+      bullish.push(`${f.label}: preț la ${f.nearest} dar deasupra norului Ichimoku — posibil breakout în sus`);
+  }
+
+  // Price below all fib levels = capitulation / oversold zone
+  const allBelow = fibs.every(f => f.retrPct > 1.0);
+  if(allBelow) bullish.push('Prețul a depășit în jos toate nivelele de retracement — zonă de supravânzare extremă');
+
+  // Price above all fib levels = extended / distribution zone
+  const allAbove = fibs.every(f => f.retrPct < 0);
+  if(allAbove) bearish.push('Prețul este deasupra tuturor nivelelor — zona de extensie, distribuție posibilă');
+
+  let signal, color, text;
+  if(bullish.length >= 2)      { signal='SUPORT CONFLUENT';       color='#00e87a'; text=bullish.slice(0,3).join('. ')+'.'; }
+  else if(bearish.length >= 2) { signal='REZISTENȚĂ CONFLUENTĂ';  color='#ff3355'; text=bearish.slice(0,3).join('. ')+'.'; }
+  else if(bullish.length === 1){ signal='SUPORT POSIBIL';         color='#55e8a0'; text=bullish[0]+'. Semnal single-TF — confirmă.'; }
+  else if(bearish.length === 1){ signal='REZISTENȚĂ POSIBILĂ';    color='#ff8c55'; text=bearish[0]+'. Semnal single-TF — confirmă.'; }
+  else                         { signal='NEUTRU';                  color='#4a6080'; text='Prețul nu se află în zone Fibonacci semnificative cu confluență multi-timeframe.'; }
+
+  return { signal, color, text, bullish, bearish };
+}
+
+// ── Render one fib card ────────────────────────────────
+function renderFibCard(fib) {
+  if(!fib) return `<div class="ind-card"><div style="font-family:'Space Mono',monospace;font-size:.6rem;color:#4a6080">Date insuficiente pentru acest timeframe.</div></div>`;
+
+  const rows = Object.entries(fib.levels).map(([k, v]) => {
+    const dist = ((fib.currentPrice - v) / v * 100);
+    const isNearest = fib.nearest === k;
+    const isSupport = ['0.618','0.786'].includes(k);
+    const color = isSupport ? '#00e87a' : ['0.236','0.382'].includes(k) ? '#ff3355' : '#ffb300';
+    return `<div style="display:flex;justify-content:space-between;align-items:center;padding:3px 0;border-bottom:1px solid var(--border);font-family:'Space Mono',monospace;font-size:.58rem">
+      <span style="color:${color};font-weight:${isNearest?'700':'400'}">${k}${isNearest?' ◄':''}</span>
+      <span style="color:var(--white)">${fmt(v)}</span>
+      <span style="color:${dist>=0?'#4a6080':'#ff3355'};font-size:.54rem">${dist>=0?'+':''}${dist.toFixed(1)}%</span>
+    </div>`;
+  }).join('');
+
+  const bullRows = Object.entries(fib.bullExt).map(([k,v])=>
+    `<div style="font-family:'Space Mono',monospace;font-size:.54rem;color:#00e87a;margin-bottom:2px">${k} → ${fmt(v)}</div>`).join('');
+  const bearRows = Object.entries(fib.bearExt).map(([k,v])=>
+    `<div style="font-family:'Space Mono',monospace;font-size:.54rem;color:#ff3355;margin-bottom:2px">${k} → ${fmt(v)}</div>`).join('');
+
+  const retrLabel = fib.retrPct < 0 ? 'Deasupra high' : fib.retrPct > 1 ? 'Sub low' : (fib.retrPct*100).toFixed(0)+'% retracement';
+
+  return `<div class="ind-card">
+    <div style="font-family:'Space Mono',monospace;font-size:.56rem;color:var(--neutral);margin-bottom:8px;letter-spacing:.06em">
+      ${fib.label}<br>
+      <span style="color:#627eea">Swing H: ${fmt(fib.high)}</span> <span style="color:#4a6080">(${fib.swHighBarsAgo}z)</span> ·
+      <span style="color:#00e87a">Swing L: ${fmt(fib.low)}</span> <span style="color:#4a6080">(${fib.swLowBarsAgo}z)</span><br>
+      <span style="color:var(--warn)">${retrLabel}</span>
+    </div>
+    <div style="margin-bottom:10px">${rows}</div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;border-top:1px solid var(--border);padding-top:8px">
+      <div><div style="font-family:'Space Mono',monospace;font-size:.5rem;color:#00e87a;margin-bottom:3px">BULL EXT</div>${bullRows}</div>
+      <div><div style="font-family:'Space Mono',monospace;font-size:.5rem;color:#ff3355;margin-bottom:3px">BEAR EXT</div>${bearRows}</div>
+    </div>
+  </div>`;
+}
+
+// ── Main render function ───────────────────────────────
+function renderFibonacci(coin, btc4H, btcD, btcW, rsiD, rsiW, ichiAbove) {
+  // Extract close arrays
+  const closes4H  = btc4H.map(c=>c.close);
+  const closesD   = btcD.map(c=>c.close);
+  const closesW   = btcW.map(c=>c.close);
+
+  // 3 timeframes with appropriate lookback
+  // Micro (4H, lookback=5): detects swings over ~20 4H candles = ~3-4 days
+  //   → catches drops of 5-15% over 2-10 days
+  // Medium (Daily, lookback=10): detects swings over 20 daily candles = ~3-4 weeks
+  //   → catches drops of 15-30% over weeks
+  // Macro (Weekly, lookback=5): detects swings over 10 weekly candles = ~2-3 months
+  //   → catches cycle drops 30-60%
+  const fibMicro  = fibForTF(closes4H, 5,  'Micro 4H  (swings ~3 zile)');
+  const fibMedium = fibForTF(closesD,  10, 'Mediu 1D  (swings ~3 săpt)');
+  const fibMacro  = fibForTF(closesW,  5,  'Macro 1W  (swings ~2-3 luni)');
+
+  const conf = fibConfluence(fibMicro, fibMedium, fibMacro, rsiD, rsiW, ichiAbove);
+  const coinLow = coin.toLowerCase();
+
+  $('fib-'+coinLow+'-cards').innerHTML = [fibMicro, fibMedium, fibMacro].map(f => renderFibCard(f)).join('');
+  $('fib-'+coinLow+'-confluence').innerHTML =
+    `<span style="font-family:'Space Mono',monospace;font-size:.72rem;font-weight:700;color:${conf.color}">${conf.signal}</span><br><br>${conf.text}` +
+    (conf.bullish.length || conf.bearish.length ? `<br><br>
+    ${conf.bullish.length ? '<span style="font-family:\'Space Mono\',monospace;font-size:.54rem;color:#00e87a">BULLISH:</span> '+conf.bullish.map(x=>'→ '+x).join('<br>')+'<br>' : ''}
+    ${conf.bearish.length ? '<span style="font-family:\'Space Mono\',monospace;font-size:.54rem;color:#ff3355">BEARISH:</span> '+conf.bearish.map(x=>'→ '+x).join('<br>') : ''}` : '');
+
+  return { fibMicro, fibMedium, fibMacro, conf };
+}
+
+// ═══════════════════════════════════════════════════════
+// DECISION JOURNAL
+// ═══════════════════════════════════════════════════════
+const JOURNAL_KEY = 'cryptorisk_v4_journal';
+
+function journalLoad() {
+  try { return JSON.parse(localStorage.getItem(JOURNAL_KEY)) || []; } catch { return []; }
+}
+function journalSave(logs) {
+  try { localStorage.setItem(JOURNAL_KEY, JSON.stringify(logs)); } catch(e) { console.warn('Journal save failed:', e); }
+}
+function journalDayKey() {
+  const d = new Date();
+  return d.toISOString().slice(0, 10);
+}
+function journalPrevDayKey() {
+  const d = new Date(); d.setUTCDate(d.getUTCDate() - 1);
+  return d.toISOString().slice(0, 10);
+}
+
+function journalClassifyOutcome(pct) {
+  if(pct <= -3) return pct <= -7 ? 'bearish_strong' : 'bearish_moderate';
+  if(pct >= 3)  return pct >= 7  ? 'bullish_strong'  : 'bullish_moderate';
+  return 'neutral';
+}
+
+function journalAutoEval(action, outcome) {
+  const isBearAction = action.toLowerCase().includes('evit') || action.toLowerCase().includes('reduce') || action.toLowerCase().includes('vinde') || action.toLowerCase().includes('short') || action.toLowerCase().includes('atenție');
+  const isBullAction = action.toLowerCase().includes('long') || action.toLowerCase().includes('cumpăr') || action.toLowerCase().includes('acumul') || action.toLowerCase().includes('favorabil');
+  if(isBearAction) {
+    if(outcome.includes('bearish')) return 'correct';
+    if(outcome === 'neutral') return 'partially_correct';
+    return 'wrong';
+  }
+  if(isBullAction) {
+    if(outcome.includes('bullish')) return 'correct';
+    if(outcome === 'neutral') return 'partially_correct';
+    return 'wrong';
+  }
+  return 'neutral';
+}
+
+function journalCreateSnapshot(d, confMacro, confMicro, ichiRawB, rsiB1w, ema200BTC, topBotSignal, forced=false) {
+  if(!d || !d.btcPrice) return null;
+  const key = journalDayKey();
+  const logs = journalLoad();
+  const exists = logs.find(x => x.id === 'day-' + key);
+  if(exists && !forced) return null; // already logged today
+
+  const btcPrev = d.btcD && d.btcD.length >= 2 ? d.btcD[d.btcD.length - 2].close : d.btcPrice;
+  const ethPrev = d.ethD && d.ethD.length >= 2 ? d.ethD[d.ethD.length - 2].close : d.ethPrice;
+
+  const snapshot = {
+    locked: true,
+    day_key: key,
+    created_at: new Date().toISOString(),
+    forced: forced,
+    // Prices
+    btc_price: d.btcPrice,
+    eth_price: d.ethPrice,
+    btc_chg_24h: d.btcChg,
+    eth_chg_24h: d.ethChg,
+    // Macro signals
+    btc_rsi_1w: rsiB1w?.rsi?.toFixed(1) ?? '--',
+    btc_rsi_div: rsiB1w?.div ?? '--',
+    ichi_btc: ichiRawB ? (ichiRawB.above ? 'deasupra' : ichiRawB.below ? 'sub' : 'în') + ' nor · TK ' + (ichiRawB.tkBull?'bull':'bear') : '--',
+    ema200_btc_dist: ema200BTC?.dist?.toFixed(2) ?? '--',
+    fg: d.fg,
+    btc_funding: d.btcFunding?.toFixed(4) ?? '--',
+    btc_ls: d.btcLS?.toFixed(3) ?? '--',
+    dom: d.dom?.toFixed(1) ?? '--',
+    // Confluence
+    conf_macro_sig: confMacro?.sigRaw ?? confMacro?.sig ?? '--',
+    conf_macro_str: confMacro?.strength ?? '--',
+    conf_micro_sig: confMicro?.sigRaw ?? confMicro?.sig ?? '--',
+    conf_micro_str: confMicro?.strength ?? '--',
+    // Top/Bottom
+    topbot_signal: topBotSignal?.signal ?? '--',
+    topbot_top_pct: topBotSignal?.topPct ?? '--',
+    topbot_bot_pct: topBotSignal?.botPct ?? '--',
+    // Regime
+    regime: (function(){
+      const mn = confMacro?.net ?? 0, mi = confMicro?.net ?? 0;
+      if(mn >= 10 && mi >= 10) return 'Macro+Micro Bullish';
+      if(mn <= -10 && mi <= -10) return 'Macro+Micro Bearish';
+      if(mn >= 10 && mi <= -10) return 'Macro Bull / Micro Correction';
+      if(mn <= -10 && mi >= 10) return 'Macro Bear / Micro Bounce';
+      return 'Neutru / Mixt';
+    })(),
+  };
+
+  const entry = {
+    id: 'day-' + key,
+    snapshot,
+    outcome: {
+      btc_pct_1d: null,
+      eth_pct_1d: null,
+      outcome_direction: null,
+      external_factor: false,
+    },
+    evaluation: {
+      auto_result: null,
+      what_happened: '',
+      what_we_missed: '',
+      lesson_learned: '',
+    },
+    recommendation: {
+      status: 'no_change',
+      text: '',
+    }
+  };
+
+  // Try to auto-fill outcome for previous day's log
+  const prevKey = journalPrevDayKey();
+  const prevIdx = logs.findIndex(x => x.id === 'day-' + prevKey);
+  if(prevIdx >= 0 && logs[prevIdx].outcome.btc_pct_1d === null) {
+    const btcPct = ((d.btcPrice - btcPrev) / btcPrev * 100);
+    const ethPct = ((d.ethPrice - ethPrev) / ethPrev * 100);
+    const avgPct = (btcPct + ethPct) / 2;
+    logs[prevIdx].outcome.btc_pct_1d = btcPct.toFixed(2);
+    logs[prevIdx].outcome.eth_pct_1d = ethPct.toFixed(2);
+    logs[prevIdx].outcome.outcome_direction = journalClassifyOutcome(avgPct);
+    logs[prevIdx].evaluation.auto_result = journalAutoEval(
+      logs[prevIdx].snapshot.conf_macro_sig || '',
+      logs[prevIdx].outcome.outcome_direction
+    );
+  }
+
+  if(exists && forced) {
+    const idx = logs.findIndex(x => x.id === 'day-' + key);
+    logs[idx].snapshot = snapshot; // update snapshot only, keep review
+  } else {
+    logs.unshift(entry);
+  }
+  journalSave(logs);
+  return entry;
+}
+
+function journalManualSnapshot() {
+  // Trigger snapshot with current model data — forced
+  if(!window._journalLastArgs) {
+    $('j-snap-status').textContent = 'Eroare: datele nu sunt încărcate încă. Fă mai întâi un refresh.';
+    return;
+  }
+  const [d, confMacro, confMicro, ichiRawB, rsiB1w, ema200BTC, topBotSignal] = window._journalLastArgs;
+  const entry = journalCreateSnapshot(d, confMacro, confMicro, ichiRawB, rsiB1w, ema200BTC, topBotSignal, true);
+  $('j-snap-status').textContent = entry ? '✓ Snapshot salvat la ' + new Date().toLocaleTimeString('ro-RO') : 'Snapshot deja existent pentru azi (override efectuat).';
+  journalRender();
+}
+
+function journalRender() {
+  const logs = journalLoad();
+  $('j-total').textContent = logs.length;
+  $('j-correct').textContent = logs.filter(x => x.evaluation.auto_result === 'correct').length;
+  $('j-partial').textContent = logs.filter(x => x.evaluation.auto_result === 'partially_correct').length;
+  $('j-wrong').textContent = logs.filter(x => x.evaluation.auto_result === 'wrong').length;
+
+  if(!logs.length) {
+    $('j-table').innerHTML = '<div style="font-family:\'Space Mono\',monospace;font-size:.64rem;color:var(--neutral);padding:16px">Niciun log. Fă un refresh pentru a genera primul snapshot zilnic.</div>';
+    return;
+  }
+
+  const evalColor = r => r === 'correct' ? '#00e87a' : r === 'partially_correct' ? '#ffb300' : r === 'wrong' ? '#ff3355' : '#4a6080';
+
+  $('j-table').innerHTML = `<table style="width:100%;border-collapse:collapse;font-family:'Space Mono',monospace;font-size:.6rem">
+    <thead><tr style="color:#4a6080;border-bottom:1px solid var(--border)">
+      <th style="padding:6px 8px;text-align:left">Data</th>
+      <th style="padding:6px 8px">BTC</th>
+      <th style="padding:6px 8px">Macro</th>
+      <th style="padding:6px 8px">Micro</th>
+      <th style="padding:6px 8px">Top/Bot</th>
+      <th style="padding:6px 8px">Outcome Δ</th>
+      <th style="padding:6px 8px">Eval</th>
+    </tr></thead>
+    <tbody>${logs.map(x => `<tr onclick="journalPick('${x.id}')" style="cursor:pointer;border-bottom:1px solid var(--border)">
+      <td style="padding:5px 8px">${x.snapshot.day_key}${x.snapshot.forced?' 📸':''}</td>
+      <td style="padding:5px 8px;color:var(--btc)">${x.snapshot.btc_price ? '$'+Math.round(x.snapshot.btc_price).toLocaleString() : '--'}</td>
+      <td style="padding:5px 8px">${x.snapshot.conf_macro_sig}</td>
+      <td style="padding:5px 8px">${x.snapshot.conf_micro_sig}</td>
+      <td style="padding:5px 8px">${x.snapshot.topbot_signal}</td>
+      <td style="padding:5px 8px;color:${x.outcome.btc_pct_1d!==null?(parseFloat(x.outcome.btc_pct_1d)>=0?'#00e87a':'#ff3355'):'#4a6080'}">${x.outcome.btc_pct_1d !== null ? (x.outcome.btc_pct_1d >= 0 ? '+' : '') + x.outcome.btc_pct_1d + '%' : '⏳'}</td>
+      <td style="padding:5px 8px;color:${evalColor(x.evaluation.auto_result)}">${x.evaluation.auto_result || '⏳'}</td>
+    </tr>`).join('')}</tbody>
+  </table>`;
+
+  const sel = $('j-select');
+  sel.innerHTML = logs.map(x => `<option value="${x.id}">${x.snapshot.day_key} · ${x.snapshot.conf_macro_sig} · BTC ${x.snapshot.btc_price ? '$'+Math.round(x.snapshot.btc_price).toLocaleString() : '--'}</option>`).join('');
+  if(logs.length) journalPick(sel.value);
+}
+
+function journalPick(id) {
+  const logs = journalLoad();
+  const x = logs.find(z => z.id === id);
+  if(!x) return;
+  $('j-select').value = id;
+  $('j-external').value = x.outcome.external_factor ? 'yes' : 'no';
+  $('j-happened').value = x.evaluation.what_happened || '';
+  $('j-missed').value = x.evaluation.what_we_missed || '';
+  $('j-lesson').value = x.evaluation.lesson_learned || '';
+  $('j-rec-status').value = x.recommendation.status || 'no_change';
+
+  const s = x.snapshot;
+  $('j-detail').textContent = [
+    '═══ SNAPSHOT ' + s.day_key + (s.forced?' [MANUAL]':'') + ' ═══',
+    'BTC: $' + (s.btc_price ? Math.round(s.btc_price).toLocaleString() : '--') + ' (' + s.btc_chg_24h?.toFixed(2) + '%)',
+    'ETH: $' + (s.eth_price ? Math.round(s.eth_price).toLocaleString() : '--') + ' (' + s.eth_chg_24h?.toFixed(2) + '%)',
+    '',
+    'RSI 1W BTC: ' + s.btc_rsi_1w + ' · Div: ' + s.btc_rsi_div,
+    'Ichimoku BTC: ' + s.ichi_btc,
+    'EMA200 dist: ' + s.ema200_btc_dist + '%',
+    'Fear&Greed: ' + s.fg,
+    'Funding BTC: ' + s.btc_funding + '%',
+    'L/S Ratio: ' + s.btc_ls,
+    'BTC Dom: ' + s.dom + '%',
+    '',
+    'Macro: ' + s.conf_macro_sig + ' (' + s.conf_macro_str + '%)',
+    'Micro: ' + s.conf_micro_sig + ' (' + s.conf_micro_str + '%)',
+    'Top/Bot: ' + s.topbot_signal + ' (Top:' + s.topbot_top_pct + '% / Bot:' + s.topbot_bot_pct + '%)',
+    'Regim: ' + s.regime,
+    '',
+    '═══ OUTCOME ═══',
+    'BTC Δ 1D: ' + (x.outcome.btc_pct_1d !== null ? (x.outcome.btc_pct_1d >= 0 ? '+' : '') + x.outcome.btc_pct_1d + '%' : '⏳ necompletat'),
+    'ETH Δ 1D: ' + (x.outcome.eth_pct_1d !== null ? (x.outcome.eth_pct_1d >= 0 ? '+' : '') + x.outcome.eth_pct_1d + '%' : '⏳ necompletat'),
+    'Direcție: ' + (x.outcome.outcome_direction || '⏳'),
+    'Auto eval: ' + (x.evaluation.auto_result || '⏳'),
+    '',
+    '═══ REVIEW MANUAL ═══',
+    'Ce s-a întâmplat: ' + (x.evaluation.what_happened || '—'),
+    'Ce am ratat: ' + (x.evaluation.what_we_missed || '—'),
+    'Lecție: ' + (x.evaluation.lesson_learned || '—'),
+    'Recomandare: ' + x.recommendation.status,
+  ].join('\n');
+}
+
+function journalSaveReview() {
+  const id = $('j-select').value;
+  if(!id) return;
+  const logs = journalLoad();
+  const idx = logs.findIndex(x => x.id === id);
+  if(idx < 0) return;
+  logs[idx].outcome.external_factor = $('j-external').value === 'yes';
+  logs[idx].evaluation.what_happened = $('j-happened').value.trim();
+  logs[idx].evaluation.what_we_missed = $('j-missed').value.trim();
+  logs[idx].evaluation.lesson_learned = $('j-lesson').value.trim();
+  logs[idx].recommendation.status = $('j-rec-status').value;
+  journalSave(logs);
+  $('j-save-ok').style.display = 'block';
+  setTimeout(() => { $('j-save-ok').style.display = 'none'; }, 2000);
+  journalRender();
+  journalPick(id);
+}
+
 // ═══════════════════════════════════════════
 // MAIN REFRESH — Single sync call
 // ═══════════════════════════════════════════
@@ -1721,6 +2330,13 @@ async function refresh() {
     const trendData=analyzeTrendlines(d.btcW,d,ichiRawB,rsiB1w,stochB,d.fg);
     show('sec-trendline');
 
+    // ── MACRO: Fibonacci Engine (swing detection) ──
+    const rsiD_btc = calcRSI(d.btcD, 14);
+    const rsiD_eth = calcRSI(d.ethD, 14);
+    const fibBTC = renderFibonacci('BTC', d.btc4H, d.btcD, d.btcW, rsiD_btc?.arr?.at(-1)??50, rsiB1w?.rsi??50, ichiRawB?.above??false);
+    const fibETH = renderFibonacci('ETH', d.eth4H, d.ethD, d.ethW, rsiD_eth?.arr?.at(-1)??50, calcRSI(d.ethW,14)?.arr?.at(-1)??50, ichiRawE?.above??false);
+    show('sec-fib');
+
     // ── MACRO: Chikou 1M + Top/Bottom ──
     const chikouBTC=analyzeChikou1M('btc',d.btcM);
     const chikouETH=analyzeChikou1M('eth',d.ethM);
@@ -1758,6 +2374,11 @@ async function refresh() {
     const emaB=renderEMA('btc',d.btc4H,d.btcPrice);
     const emaE=renderEMA('eth',d.eth4H,d.ethPrice);
     show('sec-ema');
+
+    // ── MICRO: RSI 1H (real klines) ──
+    const rsiRawB1h=calcRSI(d.btc1H,14),rsiRawE1h=calcRSI(d.eth1H,14);
+    renderRSI('rsi-btc-1h',rsiRawB1h,'1H');
+    renderRSI('rsi-eth-1h',rsiRawE1h,'1H');
 
     // ── MICRO: RSI 4H (real klines) ──
     const rsiRawB4h=calcRSI(d.btc4H,14),rsiRawE4h=calcRSI(d.eth4H,14);
@@ -1806,6 +2427,12 @@ async function refresh() {
 
     // ── CROSS-TF ──
     buildCrossTF(confMacro,confMicro,ichiRawB,trendData);
+
+    // ── DECISION JOURNAL — auto snapshot ──
+    const topBotResult = { signal: $('topbot-signal')?.textContent||'--', topPct: parseInt($('topbot-strength-val')?.textContent?.split(':')[1])||0, botPct: parseInt($('topbot-strength-val')?.textContent?.split('/')[1])||0 };
+    window._journalLastArgs = [d, confMacro, confMicro, ichiRawB, rsiB1w, ema200BTC, topBotResult];
+    journalCreateSnapshot(d, confMacro, confMicro, ichiRawB, rsiB1w, ema200BTC, topBotResult, false);
+    $('j-snap-status').textContent = 'Snapshot zilnic automat OK · ' + new Date().toLocaleTimeString('ro-RO');
 
     $('loading-msg').style.display='none';
 
