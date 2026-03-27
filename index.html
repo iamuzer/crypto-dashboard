@@ -290,7 +290,7 @@ footer{font-family:'Space Mono',monospace;font-size:.54rem;color:var(--neutral);
     <div class="sec-header"><div class="sec-bar" style="background:var(--purple)"></div><div class="sec-title">Scor Confluență Macro</div><div class="sec-note" id="conf-macro-badge"></div></div>
     <div class="conf-wrap"><div class="conf-grid"><div><div class="conf-score" id="conf-macro-score">--</div><div class="conf-label" id="conf-macro-label">--</div></div><div class="conf-bars" id="conf-macro-bars"></div><div class="conf-signal-wrap"><div style="font-family:'Space Mono',monospace;font-size:.52rem;color:var(--neutral);margin-bottom:7px;letter-spacing:.1em;text-transform:uppercase">Semnal Macro</div><div class="conf-signal" id="conf-macro-signal">--</div><div class="conf-signal-sub" id="conf-macro-sub">--</div></div></div>
     <div style="margin-top:10px;padding-top:10px;border-top:1px solid var(--border);font-family:'Space Mono',monospace;font-size:.5rem;color:#4a6080;line-height:1.6">
-      ⚠ Scor heuristic bazat pe <strong style="color:#4a6080">4 clustere independente</strong> — nu pe indicatori corelați numărați separat. Nu reprezintă probabilități statistice validate. Util ca instrument de context, nu de decizie automată.
+      ⚠ Scor heuristic bazat pe <strong style="color:#4a6080">4 clustere ierarhice</strong> — Trend Structural · Extension · Confirmation · Fuel — nu pe indicatori corelați numărați separat. Nu reprezintă probabilități statistice validate. Util ca instrument de context, nu de decizie automată.
     </div></div>
   </div>
 
@@ -458,7 +458,7 @@ footer{font-family:'Space Mono',monospace;font-size:.54rem;color:var(--neutral);
     <div class="sec-header"><div class="sec-bar" style="background:var(--cyan)"></div><div class="sec-title">Scor Confluență Micro — Protecție Capital</div><div class="sec-note" id="conf-micro-badge"></div></div>
     <div class="conf-wrap"><div class="conf-grid"><div><div class="conf-score" id="conf-micro-score">--</div><div class="conf-label" id="conf-micro-label">--</div></div><div class="conf-bars" id="conf-micro-bars"></div><div class="conf-signal-wrap"><div style="font-family:'Space Mono',monospace;font-size:.52rem;color:var(--neutral);margin-bottom:7px;letter-spacing:.1em;text-transform:uppercase">Semnal Micro</div><div class="conf-signal" id="conf-micro-signal">--</div><div class="conf-signal-sub" id="conf-micro-sub">--</div></div></div>
     <div style="margin-top:10px;padding-top:10px;border-top:1px solid var(--border);font-family:'Space Mono',monospace;font-size:.5rem;color:#4a6080;line-height:1.6">
-      ⚠ Scor heuristic bazat pe <strong style="color:#4a6080">4 clustere independente</strong> — Trend (EMA+MACD) / Momentum (RSI 4H) / Presiune (Taker+L/S) / Volum. Nu reprezintă probabilități validate.
+      ⚠ Scor heuristic bazat pe <strong style="color:#4a6080">4 clustere independente</strong> — Trend micro (EMA+MACD) · Momentum (RSI 4H) · Presiune (Taker+L/S) · Volum. Micro nu folosește ierarhie — clustere sunt independente. Nu reprezintă probabilități validate.
     </div></div>
   </div>
 
@@ -673,7 +673,7 @@ footer{font-family:'Space Mono',monospace;font-size:.54rem;color:var(--neutral);
       <div style="color:var(--safe)">+ Action Map — Hold / Take Profit / Wait / Re-accumulate cu bare vizuale</div>
       <div style="color:var(--safe)">+ Fibonacci swing detection — pivot points reali pe 4H / 1D / 1W (nu perioade fixe)</div>
       <div style="color:var(--safe)">+ Trendline Detection — 3 TF-uri · validare structurală · confluență Fibonacci · compresie detectată</div>
-      <div style="color:var(--safe)">+ Alert Banner — semnal bearish micro activ când 3+ condiții simultane</div>
+      <div style="color:var(--safe)">+ Alert Banner — 3 stări ierarhice: Bias bearish / Setup în formare / Semnal activ (Context + Confirmation + Trigger + Fuel)</div>
       <div style="color:var(--safe)">+ Auto-refresh 15 minute cu countdown vizibil</div>
       <div style="color:var(--safe)">+ Decision Journal complet — Weekly / Daily / Decizie manuală · BTC + ETH · catch-up sync</div>
       <div style="color:var(--safe)">+ Cross-TF narativ detaliat — date reale cu prețuri în paranteză per context</div>
@@ -1445,127 +1445,169 @@ function analyzeTrendlines(btcW,prices,ichiRawB,rsiB,stochB,fg){
 // ═══════════════════════════════════════════
 // CONFLUENCE SCORES
 // ═══════════════════════════════════════════
-function buildConfluence(type,d,ichiB,ichiE,rsiB1w,rsiE1w,stochB,emaB,macdB,volB,liqB,rsiB4h,rsiE4h){
-  // Cluster-based scoring — indicatorii corelați sunt grupați în clustere
-  // Un singur semnal reprezentativ per cluster → evită inflația artificială
-  const fg=d.fg,funding=d.btcFunding,dom=d.dom,ls=d.btcLS,taker=d.btcBuySell;
+function buildConfluence(type, d, ichiB, ichiE, rsiB1w, rsiE1w, stochB, emaB, macdB, volB, liqB, rsiB4h, rsiE4h, trendlineData, ema200BTC, chikouBTC, ethRelative) {
+  const fg = d.fg, funding = d.btcFunding, dom = d.dom, ls = d.btcLS, taker = d.btcBuySell;
 
-  let clusters;
-  if(type==='macro'){
-    // 5 clustere independente pentru macro
-    clusters=[
-      {
-        name:'Trend Macro (Ichimoku 1W)',
-        note:'Reprezentant: bullCount BTC + ETH combinat',
-        // Bull: ambele >2/4 | Bear: ambele <2/4
-        bull: (ichiB?.bullCount||0)>=3 && (ichiE?.bullCount||0)>=2,
-        bear: (ichiB?.bullCount||0)<=1 && (ichiE?.bullCount||0)<=2,
-        detail: 'BTC '+(ichiB?.bullCount||0)+'/4 · ETH '+(ichiE?.bullCount||0)+'/4',
-        w:30
-      },
-      {
-        name:'Momentum (RSI 1W)',
-        note:'Reprezentant: RSI BTC — Stoch RSI este derivat din RSI, nu se numără separat',
-        // Bull: RSI scăzut + divergență bullish | Bear: RSI ridicat + divergență bearish
-        bull: (rsiB1w?.rsi||50)<40 || rsiB1w?.div==='BULLISH',
-        bear: (rsiB1w?.rsi||50)>65 || rsiB1w?.div==='BEARISH',
-        detail: 'RSI BTC: '+(rsiB1w?.rsi||'N/A')?.toFixed?.(1)+' · Div: '+(rsiB1w?.div||'NICIO'),
-        w:25
-      },
-      {
-        name:'Sentiment Piață (F&G + Funding)',
-        note:'Ambii sunt independenți — unul măsoară retail, altul futures',
-        bull: fg<30 && funding<0,
-        bear: fg>70 && funding>0.05,
-        // Parțial: unul bull, altul neutral
-        partial_bull: fg<35 || funding<-0.01,
-        partial_bear: fg>65 || funding>0.03,
-        detail: 'F&G: '+fg+' · Funding BTC: '+funding.toFixed(3)+'%',
-        w:25
-      },
-      {
-        name:'OBV + Flux Capital',
-        note:'OBV independent de RSI — măsoară volumul, nu prețul',
-        bull: stochB?.obvBull===true && dom>58,
-        bear: stochB?.obvBull===false && dom<52,
-        detail: 'OBV: '+(stochB?.obvBull?'UP':'DOWN')+' · BTC Dom: '+dom.toFixed(1)+'%',
-        w:20
-      },
-    ];
-  }else{
-    // 4 clustere independente pentru micro
-    clusters=[
-      {
-        name:'Trend Micro (EMA Stack 4H)',
-        note:'Reprezentant: EMA stack — MACD confirmă dar este corelat cu EMA',
-        bull: emaB?.stackBull && macdB?.bullish,
-        bear: emaB?.stackBear && !macdB?.bullish,
-        partial_bull: emaB?.stackBull || (macdB?.bullish && macdB?.crossup),
-        partial_bear: emaB?.stackBear || (macdB?.crossdown),
-        detail: 'EMA: '+(emaB?.stackBull?'BULL STACK':emaB?.stackBear?'BEAR STACK':'MIXT')+' · MACD: '+(macdB?.bullish?'BULL':'BEAR')+(macdB?.crossup?' ⚡CROSS':''),
-        w:30
-      },
-      {
-        name:'Momentum Micro (RSI 4H)',
-        note:'RSI 4H independent de EMA — măsoară puterea mișcării, nu direcția',
-        bull: (rsiB4h?.rsi||50)<40 || rsiB4h?.div==='BULLISH',
-        bear: (rsiB4h?.rsi||50)>65 || rsiB4h?.div==='BEARISH',
-        detail: 'RSI BTC 4H: '+(rsiB4h?.rsi?.toFixed(1)||'N/A')+' · Div: '+(rsiB4h?.div||'NICIO'),
-        w:25
-      },
-      {
-        name:'Presiune Piață (Taker + L/S)',
-        note:'Ambii sunt independenți — Taker = execuții reale, L/S = poziții deschise',
-        bull: taker>1.1 && ls<0.9,
-        bear: taker<0.9 && ls>1.1,
-        partial_bull: taker>1.05 || ls<0.85,
-        partial_bear: taker<0.95 || ls>1.15,
-        detail: 'Taker B/S: '+taker.toFixed(3)+' · L/S: '+ls.toFixed(3),
-        w:25
-      },
-      {
-        name:'Volum (Spike 4H)',
-        note:'Independent — confirmă sau infirmă direcția prin volum',
-        bull: volB?.bullSpike===true,
-        bear: volB?.bearSpike===true,
-        detail: volB?.spike?'SPIKE DETECTAT':'Volum normal',
-        w:20
-      },
-    ];
+  // ─────────────────────────────────────────────────────
+  // MACRO CLUSTERS — 4 clustere independente
+  // ─────────────────────────────────────────────────────
+  if(type === 'macro') {
+
+    // Cluster 1 — Trend Structural (Ichimoku 1W + Trendline 1W)
+    const ichiAbove  = ichiB?.bullCount >= 3;
+    const ichiBelow  = ichiB?.bullCount <= 1;
+    const tlDesc1W   = trendlineData?.tl1W_desc;
+    const tlAsc1W    = trendlineData?.tl1W_asc;
+    // Trendline adds +1 signal to trend direction
+    const tlBearish  = tlDesc1W?.valid && !tlDesc1W?.isBreak; // active descending
+    const tlBullish  = tlAsc1W?.valid  && !tlAsc1W?.isBreak;  // active ascending
+    const trendBull  = ichiAbove && !tlBearish;
+    const trendBear  = ichiBelow || (tlBearish && !ichiAbove);
+    const cl1 = {
+      name: 'Trend Structural (Ichimoku + Trendline 1W)',
+      bull: trendBull, bear: trendBear,
+      detail: 'Ichimoku '+(ichiB?.bullCount||0)+'/4 · Trendline 1W: '+(tlBearish?'descendent activ':tlBullish?'ascendent activ':'absent/neutru'),
+      w: 30
+    };
+
+    // Cluster 2 — Extension / Valuation (EMA200 + Chikou drawdown ATH)
+    const ema200Dist   = ema200BTC?.dist ?? 0;
+    const chikou_dd    = chikouBTC?.drawdownPct ?? 0; // negative = below ATH
+    // Overextended bullish: EMA200 > +20% AND drawdown < -15%
+    // Undervalued bearish: EMA200 < 0% OR drawdown < -40%
+    const extBear = ema200Dist < 0 || chikou_dd < -40;
+    const extBull = ema200Dist > 0 && ema200Dist <= 20 && chikou_dd > -20;
+    const extWarn = ema200Dist > 20; // overextended = risk regardless of direction
+    const cl2 = {
+      name: 'Extension / Valuation (EMA200 + Ciclu ATH)',
+      bull: extBull, bear: extBear,
+      warn: extWarn,
+      detail: 'EMA200: '+(ema200Dist>=0?'+':'')+ema200Dist.toFixed(1)+'% · Drawdown ATH: '+chikou_dd.toFixed(1)+'%',
+      w: 20
+    };
+
+    // Cluster 3 — Confirmation Layer (RSI 1W + ETH Relative state + Chikou cycle)
+    // eth_state = WEAKNESS / NEUTRAL / STRENGTH (confirmation role)
+    const eth_state    = ethRelative?.state ?? 'NEUTRU';
+    // chikou_cycle = position in cycle (from chikou 1M analysis)
+    const chikou_cycle = chikouBTC?.cycleLabel ?? '';
+    const rsiConf      = rsiB1w?.rsi ?? 50;
+    const rsiDiv       = rsiB1w?.div ?? 'NICIO';
+    const confBull = (rsiConf < 45 || rsiDiv === 'BULLISH') && eth_state !== 'WEAKNESS';
+    const confBear = (rsiConf > 60 || rsiDiv === 'BEARISH') || eth_state === 'WEAKNESS';
+    const cl3 = {
+      name: 'Confirmation (RSI 1W + ETH Relative + Ciclu)',
+      bull: confBull, bear: confBear,
+      detail: 'RSI 1W: '+rsiConf.toFixed(1)+' · ETH: '+eth_state+' · Ciclu: '+(chikou_cycle||'--'),
+      w: 25
+    };
+
+    // Cluster 4 — Fuel Macro (F&G + Funding + Dominance)
+    // Fuel nu generează semnal — spune viteza/amplitudinea mișcării
+    // Dominance > 58%: capital concentrat în BTC = risc altcoin, bearish pentru ETH
+    // Dominance < 50%: rotație spre altcoins = risk-on, bullish sentiment
+    const domBear = dom > 58;
+    const domBull = dom < 50;
+    const fuelBear = (fg > 70 ? 1 : 0) + (funding > 0.05 ? 1 : 0) + (domBear ? 1 : 0) >= 1;
+    const fuelBull = (fg < 25 ? 1 : 0) + (funding < -0.01 ? 1 : 0) + (domBull ? 1 : 0) >= 1;
+    const fuelDetail = [
+      'F&G: '+fg+(fg>70?' 🔴':fg<25?' 🟢':''),
+      'Funding: '+(funding>=0?'+':'')+funding.toFixed(3)+'%'+(funding>0.05?' 🔴':funding<-0.01?' 🟢':''),
+      'Dom: '+dom.toFixed(1)+'%'+(domBear?' 🔴':domBull?' 🟢':'')
+    ].join(' · ');
+    const cl4 = {
+      name: 'Fuel Macro (F&G + Funding + Dominance)',
+      bull: fuelBull, bear: fuelBear,
+      detail: fuelDetail,
+      w: 25
+    };
+
+    const clusters = [cl1, cl2, cl3, cl4];
+    return _renderConfluence('macro', clusters, d);
   }
 
-  // Scoring per cluster (nu per indicator)
-  // ⚠ Scor heuristic — nu probabilistic. Grupare pe clustere independente reduce corelația.
-  let bScore=0,beScore=0,total=0;const rows=[];
-  for(const cl of clusters){
-    total+=cl.w;
-    if(cl.bull){
-      bScore+=cl.w;
-      rows.push({name:cl.name,dir:'bull',w:cl.w,detail:cl.detail,note:cl.note});
-    } else if(cl.bear){
-      beScore+=cl.w;
-      rows.push({name:cl.name,dir:'bear',w:cl.w,detail:cl.detail,note:cl.note});
-    } else if(cl.partial_bull){
-      bScore+=cl.w*0.5;
-      rows.push({name:cl.name,dir:'partial_bull',w:cl.w,detail:cl.detail,note:cl.note});
-    } else if(cl.partial_bear){
-      beScore+=cl.w*0.5;
-      rows.push({name:cl.name,dir:'partial_bear',w:cl.w,detail:cl.detail,note:cl.note});
-    } else {
-      rows.push({name:cl.name,dir:'neutral',w:cl.w,detail:cl.detail,note:cl.note});
-    }
+  // ─────────────────────────────────────────────────────
+  // MICRO CLUSTERS — 4 clustere independente
+  // ─────────────────────────────────────────────────────
+  else {
+    // Cluster 1 — Trend Micro (EMA Stack + MACD)
+    const stackBull = emaB?.stackBull, stackBear = emaB?.stackBear;
+    const macdBull  = macdB?.bullish && macdB?.crossup;
+    const macdBear  = !macdB?.bullish && macdB?.crossdown;
+    const cl1 = {
+      name: 'Trend Micro (EMA Stack + MACD)',
+      bull: stackBull && (macdB?.bullish ?? false),
+      bear: stackBear && !(macdB?.bullish ?? true),
+      partial_bull: stackBull || macdBull,
+      partial_bear: stackBear || macdBear,
+      detail: 'EMA: '+(stackBull?'BULL STACK':stackBear?'BEAR STACK':'MIXT')+' · MACD: '+(macdB?.bullish?'bull':'bear')+(macdB?.crossup?' ⚡':macdB?.crossdown?' ⚡':''),
+      w: 30
+    };
+
+    // Cluster 2 — Momentum (RSI 4H)
+    const rsi4h = rsiB4h?.rsi ?? 50;
+    const div4h = rsiB4h?.div ?? 'NICIO';
+    const cl2 = {
+      name: 'Momentum (RSI 4H)',
+      bull: rsi4h < 40 || div4h === 'BULLISH',
+      bear: rsi4h > 65 || div4h === 'BEARISH',
+      detail: 'RSI 4H: '+rsi4h.toFixed(1)+' · Div: '+div4h,
+      w: 25
+    };
+
+    // Cluster 3 — Pressure (Taker + L/S)
+    const cl3 = {
+      name: 'Presiune Piață (Taker + L/S)',
+      bull: taker > 1.1 && ls < 0.9,
+      bear: taker < 0.9 && ls > 1.1,
+      partial_bull: taker > 1.05 || ls < 0.85,
+      partial_bear: taker < 0.95 || ls > 1.15,
+      detail: 'Taker: '+taker.toFixed(3)+' · L/S: '+ls.toFixed(3),
+      w: 25
+    };
+
+    // Cluster 4 — Volume (spike — confirmare intensitate, nu trigger)
+    const cl4 = {
+      name: 'Volum (Spike — intensitate)',
+      bull: volB?.bullSpike === true,
+      bear: volB?.bearSpike === true,
+      detail: volB?.spike ? 'SPIKE DETECTAT' : 'Volum normal',
+      w: 20
+    };
+
+    const clusters = [cl1, cl2, cl3, cl4];
+    return _renderConfluence('micro', clusters, d);
+  }
+}
+
+// ─────────────────────────────────────────────────────
+// Render helper — shared by macro and micro
+// ─────────────────────────────────────────────────────
+function _renderConfluence(type, clusters, d) {
+  let bScore = 0, beScore = 0, total = 0;
+  const rows = [];
+
+  for(const cl of clusters) {
+    total += cl.w;
+    if(cl.bull)         { bScore  += cl.w;       rows.push({...cl, dir:'bull'}); }
+    else if(cl.bear)    { beScore += cl.w;        rows.push({...cl, dir:'bear'}); }
+    else if(cl.partial_bull) { bScore  += cl.w*0.5; rows.push({...cl, dir:'partial_bull'}); }
+    else if(cl.partial_bear) { beScore += cl.w*0.5; rows.push({...cl, dir:'partial_bear'}); }
+    else                { rows.push({...cl, dir:'neutral'}); }
   }
 
-  const net=bScore-beScore,isBull=net>0;
-  const strength=Math.round(Math.abs(net)/total*100);
-  const pfx=type==='macro'?'macro':'micro';
-  const bullClusters=rows.filter(r=>r.dir==='bull'||r.dir==='partial_bull').length;
-  const bearClusters=rows.filter(r=>r.dir==='bear'||r.dir==='partial_bear').length;
+  const net      = bScore - beScore;
+  const isBull   = net > 0;
+  const strength = Math.round(Math.abs(net) / total * 100);
+  const pfx      = type;
 
-  $('conf-'+pfx+'-bars').innerHTML=rows.map(r=>{
-    const c=r.dir==='bull'?'#00e87a':r.dir==='bear'?'#ff3355':r.dir==='partial_bull'?'#55e8a0':r.dir==='partial_bear'?'#ff8c55':'#4a6080';
-    const p=r.dir==='neutral'?4:Math.min(100,r.w/30*100);
-    return`<div class="conf-row">
+  const bullClusters = rows.filter(r=>r.dir==='bull'||r.dir==='partial_bull').length;
+  const bearClusters = rows.filter(r=>r.dir==='bear'||r.dir==='partial_bear').length;
+
+  $('conf-'+pfx+'-bars').innerHTML = rows.map(r => {
+    const c = r.dir==='bull'?'#00e87a':r.dir==='bear'?'#ff3355':r.dir==='partial_bull'?'#55e8a0':r.dir==='partial_bear'?'#ff8c55':'#4a6080';
+    const p = r.dir==='neutral'?4:Math.min(100,r.w/30*100);
+    return `<div class="conf-row">
       <div style="flex:1;min-width:0">
         <div style="display:flex;align-items:center;gap:6px;margin-bottom:2px">
           <span class="conf-name" style="width:auto">${r.name}</span>
@@ -1577,23 +1619,28 @@ function buildConfluence(type,d,ichiB,ichiE,rsiB1w,rsiE1w,stochB,emaB,macdB,volB
     </div>`;
   }).join('');
 
-  let sig,sigC,sigSub;
-  if(bullClusters>=3&&strength>=40){sig='BULLISH';sigC=CC('safe');sigSub=bullClusters+'/'+clusters.length+' clustere bullish';}
-  else if(bullClusters>=2&&strength>=20){sig='POSIBIL BULL';sigC=CC('safe');sigSub=bullClusters+'/'+clusters.length+' clustere bullish — confirmă';}
-  else if(bearClusters>=3&&strength>=40){sig='BEARISH';sigC=CC('danger');sigSub=bearClusters+'/'+clusters.length+' clustere bearish';}
-  else if(bearClusters>=2&&strength>=20){sig='POSIBIL BEAR';sigC=CC('danger');sigSub=bearClusters+'/'+clusters.length+' clustere bearish — confirmă';}
-  else{sig='NEUTRU';sigC=CC('warn');sigSub='Semnale mixte între clustere';}
+  let sig, sigC, sigSub;
+  if(bullClusters>=3&&strength>=40)      { sig='BULLISH';      sigC=CC('safe');    sigSub=bullClusters+'/'+clusters.length+' clustere bullish'; }
+  else if(bullClusters>=2&&strength>=20) { sig='POSIBIL BULL'; sigC=CC('safe');    sigSub=bullClusters+'/'+clusters.length+' clustere bullish — confirmă'; }
+  else if(bearClusters>=3&&strength>=40) { sig='BEARISH';      sigC=CC('danger');  sigSub=bearClusters+'/'+clusters.length+' clustere bearish'; }
+  else if(bearClusters>=2&&strength>=20) { sig='POSIBIL BEAR'; sigC=CC('danger');  sigSub=bearClusters+'/'+clusters.length+' clustere bearish — confirmă'; }
+  else                                   { sig='NEUTRU';        sigC=CC('warn');    sigSub='Semnale mixte între clustere'; }
 
-  $('conf-'+pfx+'-score').textContent=strength+'%';$('conf-'+pfx+'-score').style.color=sigC;
-  $('conf-'+pfx+'-label').textContent=isBull?'DIRECȚIE BULL':'DIRECȚIE BEAR';$('conf-'+pfx+'-label').style.color=sigC;
-  $('conf-'+pfx+'-signal').textContent=sig;$('conf-'+pfx+'-signal').style.color=sigC;
-  $('conf-'+pfx+'-sub').textContent=sigSub;
-  $('conf-'+pfx+'-badge').textContent=bullClusters+' bull / '+bearClusters+' bear ('+clusters.length+' clustere)';
+  $('conf-'+pfx+'-score').textContent = strength+'%';
+  $('conf-'+pfx+'-score').style.color = sigC;
+  $('conf-'+pfx+'-label').textContent = isBull?'DIRECȚIE BULL':'DIRECȚIE BEAR';
+  $('conf-'+pfx+'-label').style.color = sigC;
+  $('conf-'+pfx+'-signal').textContent = sig;
+  $('conf-'+pfx+'-signal').style.color = sigC;
+  $('conf-'+pfx+'-sub').textContent    = sigSub;
+  $('conf-'+pfx+'-badge').textContent  = bullClusters+' bull / '+bearClusters+' bear ('+clusters.length+' clustere)';
 
-  // Return cu sig tradus pentru compatibilitate cu restul codului
   const sigCompat = sig==='BULLISH'?'LONG':sig==='POSIBIL BULL'?'LONG?':sig==='BEARISH'?'EVITĂ':sig==='POSIBIL BEAR'?'ATENȚIE':'WAIT';
-  return{net,isBull,sig:sigCompat,sigRaw:sig,strength,sigC,bullClusters,bearClusters};
+  return { net, isBull, sig:sigCompat, sigRaw:sig, strength, sigC, bullClusters, bearClusters,
+    // expose cluster states for Alert Banner
+    _clusters: rows };
 }
+
 
 // ═══════════════════════════════════════════
 // CROSS-TF CONFLUENCE
@@ -1964,53 +2011,148 @@ function buildActionMap(coin, price, riskScore, rsiDaily, rsiWeekly, ema200Dist,
 // ═══════════════════════════════════════════════════════
 // ALERT BANNER — Short-term bearish signal detector
 // ═══════════════════════════════════════════════════════
-function updateAlertBanner(d, emaB, macdB, rsiB4h, ema200BTC, ethRelative) {
-  const alerts = [];
-
-  // Alert 1: price below EMA21 4H
-  if(emaB && !emaB.stackBull && emaB.e21 && d.btcPrice < emaB.e21)
-    alerts.push('BTC sub EMA21 pe 4H');
-  // Alert 2: MACD bearish
-  if(macdB && !macdB.bullish)
-    alerts.push('MACD 4H bearish');
-  // Alert 3: Taker sell dominant
-  if(d.btcBuySell < 0.92)
-    alerts.push('Taker sell domină ('+d.btcBuySell.toFixed(3)+')');
-  // Alert 4: RSI 4H falling below 45
-  if(rsiB4h && rsiB4h.rsi < 45)
-    alerts.push('RSI 4H sub 45 ('+rsiB4h.rsi.toFixed(1)+')');
-  // Alert 5: price below EMA200 daily
-  if(ema200BTC && ema200BTC.dist < 0)
-    alerts.push('BTC sub EMA200 zilnic ('+ema200BTC.dist.toFixed(1)+'%)');
-  // Alert 6: ETH Relative weakness
-  if(ethRelative && ethRelative.state === 'WEAKNESS')
-    alerts.push('ETH Relative arată slăbiciune față de BTC');
-  // Alert 7: F&G extreme fear + funding negative (potential capitulation)
-  if(d.fg < 20 && d.btcFunding < -0.01)
-    alerts.push('Extreme Fear ('+d.fg+') + Funding negativ — posibilă capitulare');
-
+function updateAlertBanner(d, emaB, macdB, rsiB4h, ema200BTC, ethRelative, confMacro, confMicro, trendlineData) {
   const banner = $('alert-banner');
-  if(alerts.length >= 3) {
-    banner.style.display = 'block';
-    $('alert-banner-title').textContent = '⚠ SEMNAL BEARISH MICRO ACTIV ('+alerts.length+'/7 condiții)';
-    $('alert-banner-detail').textContent = alerts.join(' · ');
-    // Escalate color based on count
-    if(alerts.length >= 5) {
-      banner.style.background = 'rgba(255,51,85,.14)';
-      banner.style.borderColor = 'rgba(255,51,85,.5)';
+  if(!banner) return;
+
+  // ─────────────────────────────────────────────────────
+  // NIVEL 1 — CONTEXT (Bias structural)
+  // Necesar pentru orice alertă
+  // ─────────────────────────────────────────────────────
+  const ichiCluster  = confMacro?._clusters?.find(cl=>cl.name.includes('Trend Structural'));
+  const extCluster   = confMacro?._clusters?.find(cl=>cl.name.includes('Extension'));
+  const contextBear  = ichiCluster?.dir === 'bear' || extCluster?.dir === 'bear';
+  const contextBull  = ichiCluster?.dir === 'bull';
+
+  // ─────────────────────────────────────────────────────
+  // NIVEL 2 — CONFIRMATION (validare sau contradicție)
+  // Dacă Contradicting → blochează trigger
+  // Dacă Mixed → trigger permis fără fuel
+  // Dacă Aligned → trigger complet valid
+  // ─────────────────────────────────────────────────────
+  const confCluster  = confMacro?._clusters?.find(cl=>cl.name.includes('Confirmation'));
+  // Confirmation state relative to BEARISH bias
+  // Aligned = confirmation confirms bearish bias
+  // Contradicting = confirmation opposes bearish bias → block trigger
+  // Mixed = partial confirmation → allow trigger but no fuel
+  const confState = (dir => {
+    if(dir === 'bear' || dir === 'partial_bear') return 'Aligned';
+    if(dir === 'bull') return 'Contradicting';
+    if(dir === 'partial_bull') return 'Mixed';
+    return 'Neutral';
+  })(confCluster?.dir);
+
+  // Confirmation state relative to BULLISH bias (symmetric)
+  const confStateBull = (dir => {
+    if(dir === 'bull' || dir === 'partial_bull') return 'Aligned';
+    if(dir === 'bear') return 'Contradicting';
+    if(dir === 'partial_bear') return 'Mixed';
+    return 'Neutral';
+  })(confCluster?.dir);
+
+  // ─────────────────────────────────────────────────────
+  // NIVEL 3 — TRIGGER (micro — timing)
+  // Valid DOAR dacă Context + Confirmation permit
+  // ─────────────────────────────────────────────────────
+  const triggerBearSignals = [];
+  const triggerBullSignals = [];
+
+  if(emaB?.stackBear)                           triggerBearSignals.push('EMA Stack 4H bearish');
+  if(macdB && !macdB.bullish)                   triggerBearSignals.push('MACD 4H bearish'+(macdB.crossdown?' ⚡ cross':''));
+  if(rsiB4h?.rsi < 45)                          triggerBearSignals.push('RSI 4H sub 45 ('+rsiB4h.rsi.toFixed(1)+')');
+  if(d.btcBuySell < 0.92)                       triggerBearSignals.push('Taker sell domină ('+d.btcBuySell.toFixed(3)+')');
+
+  if(emaB?.stackBull)                           triggerBullSignals.push('EMA Stack 4H bullish');
+  if(macdB?.bullish)                            triggerBullSignals.push('MACD 4H bullish'+(macdB.crossup?' ⚡ cross':''));
+  if(rsiB4h?.rsi > 55)                          triggerBullSignals.push('RSI 4H peste 55 ('+rsiB4h.rsi.toFixed(1)+')');
+  if(d.btcBuySell > 1.08)                       triggerBullSignals.push('Taker buy domină ('+d.btcBuySell.toFixed(3)+')');
+
+  const triggerBear = triggerBearSignals.length >= 2;
+  const triggerBull = triggerBullSignals.length >= 2;
+
+  // ─────────────────────────────────────────────────────
+  // NIVEL 4 — FUEL (amplitudine — nu generează semnal)
+  // eth_fuel_flag = boolean (separat de eth_state din confirmare)
+  // ─────────────────────────────────────────────────────
+  const eth_fuel_flag_bear = ethRelative?.state === 'WEAKNESS';
+  const eth_fuel_flag_bull = ethRelative?.state === 'STRENGTH';
+  const fuelBearSignals = [];
+  const fuelBullSignals = [];
+
+  if(d.fg < 25)          fuelBullSignals.push('Fear & Greed: Extreme Fear ('+d.fg+')');
+  if(d.btcFunding < -0.01) fuelBullSignals.push('Funding negativ ('+d.btcFunding.toFixed(3)+'%)');
+  if(eth_fuel_flag_bull) fuelBullSignals.push('ETH Relative: Strength — rotație risk-on');
+
+  if(d.fg > 70)          fuelBearSignals.push('Fear & Greed: Euforie ('+d.fg+')');
+  if(d.btcFunding > 0.05) fuelBearSignals.push('Funding ridicat ('+d.btcFunding.toFixed(3)+'%) — long-uri supraîncărcate');
+  if(eth_fuel_flag_bear) fuelBearSignals.push('ETH Relative: Weakness — avertisment risk-off');
+
+  const fuelBear = fuelBearSignals.length >= 1;
+  const fuelBull = fuelBullSignals.length >= 1;
+
+  // ─────────────────────────────────────────────────────
+  // ALERT LOGIC — 3 stări per direcție
+  // ─────────────────────────────────────────────────────
+  let alertTitle = '', alertDetail = '', alertColor = '', showBanner = false;
+
+  // ── BEARISH ──
+  if(contextBear) {
+    if(confState === 'Contradicting') {
+      // Context bearish dar confirmation contrazice — nu alertă, doar notă
+      showBanner = true; alertColor = '#4a6080';
+      alertTitle = 'BIAS BEARISH — Confirmare contradicție';
+      alertDetail = 'Structura macro sugerează bearish DAR Confirmation Layer contrazice. Semnalul este neclar — nu acționa.';
     }
-  } else if(alerts.length === 0 && d.fg > 70 && d.btcFunding > 0.05) {
-    // Opposite: potential top signal
+    else if(triggerBear && (confState === 'Aligned' || confState === 'Mixed')) {
+      if(fuelBear && confState === 'Aligned') {
+        // SEMNAL COMPLET: Context + Trigger + Fuel + Aligned
+        showBanner = true; alertColor = '#ff3355';
+        alertTitle = '🔴 SEMNAL BEARISH ACTIV — Context + Trigger + Fuel';
+        alertDetail = [
+          'Context: '+( ichiCluster?.detail || '--'),
+          'Trigger: '+triggerBearSignals.join(' · '),
+          'Fuel: '+fuelBearSignals.join(' · ')
+        ].join(' | ');
+      } else if(confState === 'Mixed' || !fuelBear) {
+        // SETUP ÎN FORMARE: Context + Trigger, fără fuel sau confirmation mixed
+        showBanner = true; alertColor = '#ff8c55';
+        alertTitle = '⚠ SETUP BEARISH ÎN FORMARE — Context + Trigger';
+        alertDetail = [
+          'Trigger: '+triggerBearSignals.join(' · '),
+          !fuelBear ? 'Fuel: absent — mișcare posibil lentă' : 'Fuel: '+fuelBearSignals.join(' · ')
+        ].join(' | ');
+      }
+    } else if(!triggerBear) {
+      // Doar context — bias
+      showBanner = true; alertColor = '#ffb300';
+      alertTitle = '◈ BIAS BEARISH — Structura macro';
+      alertDetail = 'Context structural bearish activ. Trigger micro absent — urmărește EMA Stack și MACD 4H pentru confirmare.';
+    }
+  }
+
+  // ── BULLISH (oportunitate) ──
+  else if(contextBull && triggerBull && fuelBull && confStateBull === 'Aligned') {
+    showBanner = true; alertColor = '#00e87a';
+    alertTitle = '🟢 SETUP BULLISH — Context + Trigger + Fuel';
+    alertDetail = [
+      'Trigger: '+triggerBullSignals.join(' · '),
+      'Fuel: '+fuelBullSignals.join(' · ')
+    ].join(' | ');
+  }
+
+  // ── Render ──
+  if(showBanner) {
     banner.style.display = 'block';
-    banner.style.background = 'rgba(255,179,0,.08)';
-    banner.style.borderColor = 'rgba(255,179,0,.3)';
-    $('alert-banner-title').textContent = '⚠ SEMNAL TOP POSIBIL — Euforie + Funding ridicat';
-    $('alert-banner-title').style.color = '#ffb300';
-    $('alert-banner-detail').textContent = 'F&G: '+d.fg+' · Funding BTC: '+d.btcFunding.toFixed(3)+'% · Urmărește semnale de distribuție';
+    banner.style.background = alertColor+'11';
+    banner.style.borderColor = alertColor+'44';
+    $('alert-banner-title').textContent = alertTitle;
+    $('alert-banner-title').style.color = alertColor;
+    $('alert-banner-detail').textContent = alertDetail;
   } else {
     banner.style.display = 'none';
   }
 }
+
 
 
 // ═══════════════════════════════════════════════════════
@@ -2922,7 +3064,7 @@ async function refresh() {
     // ── MACRO: Trendline Detection ──
     const btcCloses4H=d.btc4H.map(x=>x.close), btcClosesD=d.btcD.map(x=>x.close), btcClosesW=d.btcW.map(x=>x.close);
     const ethCloses4H=d.eth4H.map(x=>x.close), ethClosesD=d.ethD.map(x=>x.close), ethClosesW=d.ethW.map(x=>x.close);
-    renderTrendlines('BTC', btcCloses4H, btcClosesD, btcClosesW, d.btcPrice, fibBTC?.fibMicro, fibBTC?.fibMedium, fibBTC?.fibMacro);
+    const tlDataBTC = renderTrendlines('BTC', btcCloses4H, btcClosesD, btcClosesW, d.btcPrice, fibBTC?.fibMicro, fibBTC?.fibMedium, fibBTC?.fibMacro);
     renderTrendlines('ETH', ethCloses4H, ethClosesD, ethClosesW, d.ethPrice, fibETH?.fibMicro, fibETH?.fibMedium, fibETH?.fibMacro);
     show('sec-trendline-detect');
 
@@ -2938,7 +3080,7 @@ async function refresh() {
     show('sec-risk-macro');
 
     // ── MACRO: Confluence ──
-    const confMacro=buildConfluence('macro',d,ichiB,ichiE,rsiB1w,rsiE1w,stochB,null,null,null,null,null,null);
+    const confMacro=buildConfluence('macro',d,ichiB,ichiE,rsiB1w,rsiE1w,stochB,null,null,null,null,null,null,tlDataBTC,ema200BTC,chikouBTC,ethRelative);
     buildVerdictMacro(d,ichiRawB,rsiB1w,confMacro);
     show('sec-conf-macro');
 
@@ -3003,12 +3145,12 @@ async function refresh() {
     show('sec-action-map');
 
     // ── MICRO: Confluence + Verdict ──
-    const confMicro=buildConfluence('micro',d,ichiB,ichiE,rsiB1w,rsiE1w,stochB,emaB,macdB,volB,liqB,rsiB4h,rsiE4h);
+    const confMicro=buildConfluence('micro',d,ichiB,ichiE,rsiB1w,rsiE1w,stochB,emaB,macdB,volB,liqB,rsiB4h,rsiE4h,null,null,null,null);
     buildVerdictMicro(d,confMicro,emaB,macdB,volB,liqB,rsiB4h);
     show('sec-conf-micro'); show('sec-risk-micro');
 
     // ── ALERT BANNER ──
-    updateAlertBanner(d,emaB,macdB,rsiB4h,ema200BTC,ethRelative);
+    updateAlertBanner(d,emaB,macdB,rsiB4h,ema200BTC,ethRelative,confMacro,confMicro,null);
 
     // ── CROSS-TF ──
     buildCrossTF(confMacro,confMicro,ichiRawB,trendData,d,rsiB1w,emaB,macdB,rsiB4h);
