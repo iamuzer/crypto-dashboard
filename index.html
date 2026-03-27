@@ -335,6 +335,27 @@ footer{font-family:'Space Mono',monospace;font-size:.54rem;color:var(--neutral);
     <div class="card"><div style="font-family:'Space Mono',monospace;font-size:.56rem;letter-spacing:.14em;text-transform:uppercase;color:var(--purple);margin-bottom:10px">▸ COMENTARIU NARATIV</div><div id="tl-narrative" style="font-size:.8rem;color:var(--text);line-height:1.85"></div><div style="margin-top:12px;padding-top:10px;border-top:1px solid var(--border);display:grid;grid-template-columns:1fr 1fr;gap:10px"><div><div style="font-family:'Space Mono',monospace;font-size:.52rem;color:var(--neutral);margin-bottom:4px">SCENARIU PRINCIPAL</div><div id="tl-main" style="font-size:.74rem;color:var(--text);line-height:1.6"></div></div><div><div style="font-family:'Space Mono',monospace;font-size:.52rem;color:var(--neutral);margin-bottom:4px">SCENARIU ALTERNATIV</div><div id="tl-alt" style="font-size:.74rem;color:var(--text);line-height:1.6"></div></div></div><div style="margin-top:10px;padding-top:10px;border-top:1px solid var(--border)"><div style="font-family:'Space Mono',monospace;font-size:.52rem;color:var(--neutral);margin-bottom:4px">CE SĂ URMĂREȘTI</div><div id="tl-watch" style="font-size:.74rem;color:var(--text);line-height:1.8"></div></div></div>
   </div>
 
+
+  <!-- TRENDLINE DETECTION -->
+  <div class="section" id="sec-trendline-detect" style="display:none">
+    <div class="sec-header">
+      <div class="sec-bar" style="background:var(--cyan)"></div>
+      <div class="sec-title">Trendline Detection — 1W · 1D · 4H</div>
+      <span class="src-tag">Swing points reali · Validare structurală</span>
+    </div>
+    <div style="margin-bottom:16px">
+      <div style="font-family:'Space Mono',monospace;font-size:.56rem;color:var(--neutral);margin-bottom:10px">▸ BITCOIN</div>
+      <div id="tl-btc-content"></div>
+    </div>
+    <div>
+      <div style="font-family:'Space Mono',monospace;font-size:.56rem;color:var(--neutral);margin-bottom:10px">▸ ETHEREUM</div>
+      <div id="tl-eth-content"></div>
+    </div>
+    <div style="margin-top:10px;padding:10px 14px;background:rgba(0,0,0,.2);border-radius:8px;font-family:'Space Mono',monospace;font-size:.5rem;color:#4a6080;line-height:1.6">
+      ⚠ Trendline-urile sunt detectate automat din pivot points validate (min. 3 puncte, fără break structural). Break confirmat = daily/weekly close deasupra sau sub linie — nu intraday.
+    </div>
+  </div>
+
   <!-- Chikou 1M + Top/Bottom -->
   <div class="section" id="sec-chikou-monthly" style="display:none">
     <div class="sec-header"><div class="sec-bar" style="background:var(--purple)"></div><div class="sec-title">Chikou Span 1M — Proiecție + Semnal Top/Bottom</div><span class="src-tag">Binance 1M klines</span></div>
@@ -2040,6 +2061,240 @@ function renderFibonacci(coin, btc4H, btcD, btcW, rsiD, rsiW, ichiAbove) {
   return { fibMicro, fibMedium, fibMacro, conf };
 }
 
+
+// ═══════════════════════════════════════════════════════
+// TRENDLINE DETECTION ENGINE
+// ═══════════════════════════════════════════════════════
+
+// ── Find all swing highs/lows in a series ─────────────
+function findAllSwings(closes, lookback) {
+  const highs = [], lows = [];
+  for(let i=lookback; i<closes.length-lookback; i++) {
+    const left  = closes.slice(i-lookback, i);
+    const right = closes.slice(i+1, i+lookback+1);
+    if(right.length < lookback) continue;
+    if(closes[i] > Math.max(...left) && closes[i] > Math.max(...right))
+      highs.push({ price: closes[i], idx: i, barsAgo: closes.length-1-i });
+    if(closes[i] < Math.min(...left) && closes[i] < Math.min(...right))
+      lows.push({ price: closes[i], idx: i, barsAgo: closes.length-1-i });
+  }
+  // Return most recent first
+  return {
+    highs: highs.sort((a,b) => b.idx - a.idx),
+    lows:  lows.sort((a,b)  => b.idx - a.idx)
+  };
+}
+
+// ── Validate trendline: no candle breaks the line by >1% ─
+function validateTrendline(closes, p1, p2) {
+  if(p1.idx === p2.idx) return false;
+  const i1 = Math.min(p1.idx, p2.idx);
+  const i2 = Math.max(p1.idx, p2.idx);
+  const slope = (closes[i2] - closes[i1]) / (i2 - i1);
+  for(let i=i1+1; i<i2; i++) {
+    const lineVal = closes[i1] + slope * (i - i1);
+    // For descending trendline: check no close went ABOVE line by >1%
+    // For ascending trendline: check no close went BELOW line by >1%
+    const pctDev = (closes[i] - lineVal) / lineVal;
+    if(p1.price > p2.price && pctDev > 0.01) return false;  // descending: broken upward
+    if(p1.price < p2.price && pctDev < -0.01) return false; // ascending: broken downward
+  }
+  return true;
+}
+
+// ── Project trendline value at current candle ──────────
+function projectTrendline(closes, p1, p2) {
+  const slope = (p2.price - p1.price) / (p2.idx - p1.idx);
+  const currentIdx = closes.length - 1;
+  return p1.price + slope * (currentIdx - p1.idx);
+}
+
+// ── Build one trendline from array of swing points ─────
+function buildTrendline(closes, points, type) {
+  // Try to find 3 valid pivot points with no structural break between them
+  // points are sorted most-recent first
+  for(let i=0; i<points.length-1; i++) {
+    for(let j=i+1; j<points.length; j++) {
+      const p1 = points[j]; // older
+      const p2 = points[i]; // more recent
+      // Direction check
+      if(type === 'descending' && p1.price <= p2.price) continue;
+      if(type === 'ascending'  && p1.price >= p2.price) continue;
+      // Validate no break between them
+      if(!validateTrendline(closes, p1, p2)) continue;
+      // Check if a 3rd point also touches the line (within 1.5%)
+      const slope = (p2.price - p1.price) / (p2.idx - p1.idx);
+      const touchingPoints = [p1, p2];
+      for(let k=0; k<points.length; k++) {
+        if(k===i||k===j) continue;
+        const pk = points[k];
+        const lineAtK = p1.price + slope * (pk.idx - p1.idx);
+        const dev = Math.abs(pk.price - lineAtK) / lineAtK;
+        if(dev < 0.015) touchingPoints.push(pk);
+      }
+      if(touchingPoints.length < 3) continue; // need min 3 touches
+      const projectedNow = projectTrendline(closes, p1, p2);
+      const currentPrice = closes[closes.length-1];
+      const distPct = (currentPrice - projectedNow) / projectedNow * 100;
+      return {
+        type, valid: true,
+        p1, p2,
+        touchCount: touchingPoints.length,
+        touches: touchingPoints.sort((a,b)=>a.idx-b.idx),
+        slope: slope / p1.price * 100, // slope as % per candle
+        projectedNow,
+        distPct,
+        // Status
+        isTest: Math.abs(distPct) < 1.5,
+        isBreak: type==='ascending'  ? distPct < -1.5 :
+                 type==='descending' ? distPct >  1.5 : false,
+        isApproaching: Math.abs(distPct) < 4 && Math.abs(distPct) >= 1.5,
+      };
+    }
+  }
+  return null;
+}
+
+// ── Check Fibonacci confluence ─────────────────────────
+function checkFibConflWithTrendline(tl, fibMicro, fibMedium, fibMacro) {
+  if(!tl || !tl.valid) return null;
+  const tlPrice = tl.projectedNow;
+  const fibs = [fibMicro, fibMedium, fibMacro].filter(Boolean);
+  let closest = null, closestDist = Infinity;
+  for(const fib of fibs) {
+    for(const [lvl, price] of Object.entries(fib.levels)) {
+      const dist = Math.abs(tlPrice - price) / tlPrice;
+      if(dist < closestDist) {
+        closestDist = dist; closest = { lvl, price, dist, label: fib.label };
+      }
+    }
+  }
+  if(closest && closestDist < 0.02) return closest; // within 2%
+  return null;
+}
+
+// ── Format trendline status text ──────────────────────
+function trendlineStatusText(tl, currentPrice, tf) {
+  if(!tl || !tl.valid) return null;
+  const dir  = tl.type === 'ascending' ? 'ascendent' : 'descendent';
+  const sign = tl.distPct >= 0 ? '+' : '';
+  const lines = [];
+
+  // Pivot points
+  const pivotStr = tl.touches.map(p =>
+    `${fmt(p.price)} (acum ${p.barsAgo} ${tf==='1W'?'săpt':tf==='1D'?'zile':'candle'})`
+  ).join(' · ');
+  lines.push(`Pivot points (${tl.touchCount}): ${pivotStr}`);
+
+  // Current projected value
+  lines.push(`Trendline ${dir} proiectat azi: ${fmt(tl.projectedNow)}`);
+
+  // Distance + status
+  if(tl.isBreak) {
+    const breakDir = tl.type==='ascending' ? 'sub' : 'deasupra';
+    lines.push(`Prețul (${fmt(currentPrice)}) a închis ${breakDir} trendline-ul ${dir} (${fmt(tl.projectedNow)}) — distanță ${sign}${tl.distPct.toFixed(1)}%`);
+  } else if(tl.isTest) {
+    lines.push(`Prețul (${fmt(currentPrice)}) testează trendline-ul ${dir} (${fmt(tl.projectedNow)}) — distanță ${sign}${tl.distPct.toFixed(1)}%`);
+  } else if(tl.isApproaching) {
+    lines.push(`Prețul (${fmt(currentPrice)}) se apropie de trendline-ul ${dir} (${fmt(tl.projectedNow)}) — distanță ${sign}${tl.distPct.toFixed(1)}%`);
+  } else {
+    lines.push(`Prețul (${fmt(currentPrice)}) față de trendline-ul ${dir} (${fmt(tl.projectedNow)}): ${sign}${tl.distPct.toFixed(1)}%`);
+  }
+
+  return lines;
+}
+
+// ── Render one timeframe block ─────────────────────────
+function renderTFBlock(label, tlDesc, tlAsc, currentPrice, fibMicro, fibMedium, fibMacro, tf) {
+  const blocks = [];
+
+  const renderTL = (tl) => {
+    if(!tl) return null;
+    const dir   = tl.type === 'ascending' ? 'ascendent' : 'descendent';
+    const color = tl.type === 'ascending' ? '#00e87a' : '#ff3355';
+    const statusColor = tl.isBreak ? (tl.type==='ascending'?'#ff3355':'#00e87a') :
+                        tl.isTest  ? '#ffb300' : '#4a6080';
+    const statusLabel = tl.isBreak       ? (tl.type==='ascending'?'BREAK BEARISH':'BREAK BULLISH') :
+                        tl.isTest        ? 'TEST ACTIV' :
+                        tl.isApproaching ? 'SE APROPIE' : 'ACTIV';
+
+    const lines = trendlineStatusText(tl, currentPrice, tf) || [];
+    const fibConfl = checkFibConflWithTrendline(tl, fibMicro, fibMedium, fibMacro);
+    if(fibConfl) {
+      lines.push(`Trendline ${dir} (${fmt(tl.projectedNow)}) coincide cu Fibonacci ${fibConfl.lvl} (${fmt(fibConfl.price)}) — distanță ${(fibConfl.dist*100).toFixed(1)}%`);
+    } else {
+      lines.push(`Nicio confluență Fibonacci la nivelul trendline-ului ${dir}`);
+    }
+
+    return `<div style="background:var(--panel);border:1px solid var(--border);border-left:3px solid ${color};border-radius:8px;padding:13px 15px;margin-bottom:8px">
+      <div style="display:flex;align-items:center;gap:10px;margin-bottom:8px">
+        <span style="font-family:'Space Mono',monospace;font-size:.64rem;font-weight:700;color:${color}">TRENDLINE ${dir.toUpperCase()}</span>
+        <span style="font-family:'Space Mono',monospace;font-size:.54rem;padding:2px 8px;border-radius:3px;background:${statusColor}22;color:${statusColor};border:1px solid ${statusColor}44">${statusLabel}</span>
+        <span style="font-family:'Space Mono',monospace;font-size:.52rem;color:#4a6080">${tl.touchCount} pivot points · ${label}</span>
+      </div>
+      ${lines.map(l=>`<div style="font-size:.74rem;color:var(--text);line-height:1.7;margin-bottom:2px">→ ${l}</div>`).join('')}
+    </div>`;
+  };
+
+  const descHTML = renderTL(tlDesc);
+  const ascHTML  = renderTL(tlAsc);
+
+  if(descHTML && ascHTML) {
+    // Both active — compression
+    const compressRange = Math.abs(tlDesc.projectedNow - tlAsc.projectedNow);
+    const compressPct   = (compressRange / currentPrice * 100).toFixed(1);
+    blocks.push(descHTML);
+    blocks.push(ascHTML);
+    blocks.push(`<div style="background:rgba(167,139,250,.06);border:1px solid rgba(167,139,250,.2);border-radius:8px;padding:11px 14px">
+      <div style="font-family:'Space Mono',monospace;font-size:.62rem;font-weight:700;color:#a78bfa;margin-bottom:6px">STRUCTURĂ: Compresie — ${label}</div>
+      <div style="font-size:.74rem;color:var(--text);line-height:1.7">→ Prețul între trendline descendent (${fmt(tlDesc.projectedNow)}) și ascendent (${fmt(tlAsc.projectedNow)})<br>
+      → Interval de compresie: ${fmt(compressRange)} (${compressPct}%)<br>
+      → Așteptăm invalidare: închidere ${tf==='1W'?'weekly':tf==='1D'?'daily':'4H'} deasupra ${fmt(tlDesc.projectedNow)} sau sub ${fmt(tlAsc.projectedNow)}</div>
+    </div>`);
+  } else if(descHTML) {
+    blocks.push(descHTML);
+  } else if(ascHTML) {
+    blocks.push(ascHTML);
+  } else {
+    blocks.push(`<div style="font-family:'Space Mono',monospace;font-size:.6rem;color:#4a6080;padding:10px">Niciun trendline valid detectat pe ${label} (necesită minimum 3 pivot points fără break structural)</div>`);
+  }
+
+  return `<div style="margin-bottom:12px">
+    <div style="font-family:'Space Mono',monospace;font-size:.58rem;color:var(--neutral);margin-bottom:8px;letter-spacing:.08em">${label}</div>
+    ${blocks.join('')}
+  </div>`;
+}
+
+// ── Main render function ───────────────────────────────
+function renderTrendlines(coin, closes4H, closesD, closesW, currentPrice, fibMicro, fibMedium, fibMacro) {
+  const coinLow = coin.toLowerCase();
+  const el = $('tl-'+coinLow+'-content');
+  if(!el) return;
+
+  // Detect swings per timeframe with appropriate lookback
+  // 1W (lookback=4): pivot over 8 weekly candles = ~2 months
+  // 1D (lookback=8): pivot over 16 daily candles = ~3 weeks
+  // 4H (lookback=5): pivot over 10 4H candles = ~2 days
+  const sw1W = findAllSwings(closesW, 4);
+  const sw1D = findAllSwings(closesD, 8);
+  const sw4H = findAllSwings(closes4H, 5);
+
+  // Build trendlines per timeframe
+  const tl1W_desc = buildTrendline(closesW, sw1W.highs, 'descending');
+  const tl1W_asc  = buildTrendline(closesW, sw1W.lows,  'ascending');
+  const tl1D_desc = buildTrendline(closesD, sw1D.highs, 'descending');
+  const tl1D_asc  = buildTrendline(closesD, sw1D.lows,  'ascending');
+  const tl4H_desc = buildTrendline(closes4H, sw4H.highs, 'descending');
+  const tl4H_asc  = buildTrendline(closes4H, sw4H.lows,  'ascending');
+
+  el.innerHTML =
+    renderTFBlock('1W — Macro', tl1W_desc, tl1W_asc, currentPrice, fibMicro, fibMedium, fibMacro, '1W') +
+    renderTFBlock('1D — Mediu', tl1D_desc, tl1D_asc, currentPrice, fibMicro, fibMedium, fibMacro, '1D') +
+    renderTFBlock('4H — Micro', tl4H_desc, tl4H_asc, currentPrice, fibMicro, fibMedium, fibMacro, '4H');
+
+  return { tl1W_desc, tl1W_asc, tl1D_desc, tl1D_asc, tl4H_desc, tl4H_asc };
+}
+
 // ═══════════════════════════════════════════════════════
 // DECISION JOURNAL
 // ═══════════════════════════════════════════════════════
@@ -2336,6 +2591,17 @@ async function refresh() {
     const fibBTC = renderFibonacci('BTC', d.btc4H, d.btcD, d.btcW, rsiD_btc?.arr?.at(-1)??50, rsiB1w?.rsi??50, ichiRawB?.above??false);
     const fibETH = renderFibonacci('ETH', d.eth4H, d.ethD, d.ethW, rsiD_eth?.arr?.at(-1)??50, calcRSI(d.ethW,14)?.arr?.at(-1)??50, ichiRawE?.above??false);
     show('sec-fib');
+
+    // ── MACRO: Trendline Detection ──
+    const btcCloses4H = d.btc4H.map(x=>x.close);
+    const btcClosesD  = d.btcD.map(x=>x.close);
+    const btcClosesW  = d.btcW.map(x=>x.close);
+    const ethCloses4H = d.eth4H.map(x=>x.close);
+    const ethClosesD  = d.ethD.map(x=>x.close);
+    const ethClosesW  = d.ethW.map(x=>x.close);
+    renderTrendlines('BTC', btcCloses4H, btcClosesD, btcClosesW, d.btcPrice, fibBTC?.fibMicro, fibBTC?.fibMedium, fibBTC?.fibMacro);
+    renderTrendlines('ETH', ethCloses4H, ethClosesD, ethClosesW, d.ethPrice, fibETH?.fibMicro, fibETH?.fibMedium, fibETH?.fibMacro);
+    show('sec-trendline-detect');
 
     // ── MACRO: Chikou 1M + Top/Bottom ──
     const chikouBTC=analyzeChikou1M('btc',d.btcM);
