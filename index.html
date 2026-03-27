@@ -344,14 +344,14 @@ footer{font-family:'Space Mono',monospace;font-size:.54rem;color:var(--neutral);
       <span class="src-tag">Swing points reali · Validare structurală</span>
     </div>
     <div style="margin-bottom:16px">
-      <div style="font-family:'Space Mono',monospace;font-size:.56rem;color:var(--neutral);margin-bottom:10px">▸ BITCOIN</div>
+      <div style="font-family:'Space Mono',monospace;font-size:.62rem;color:var(--white);font-weight:700;margin-bottom:10px;letter-spacing:.1em">▸ BITCOIN</div>
       <div id="tl-btc-content"></div>
     </div>
     <div>
-      <div style="font-family:'Space Mono',monospace;font-size:.56rem;color:var(--neutral);margin-bottom:10px">▸ ETHEREUM</div>
+      <div style="font-family:'Space Mono',monospace;font-size:.62rem;color:var(--white);font-weight:700;margin-bottom:10px;letter-spacing:.1em">▸ ETHEREUM</div>
       <div id="tl-eth-content"></div>
     </div>
-    <div style="margin-top:10px;padding:10px 14px;background:rgba(0,0,0,.2);border-radius:8px;font-family:'Space Mono',monospace;font-size:.5rem;color:#4a6080;line-height:1.6">
+    <div style="margin-top:10px;padding:10px 14px;background:rgba(0,0,0,.2);border-radius:8px;font-family:'Space Mono',monospace;font-size:.52rem;color:#6a8090;line-height:1.6">
       ⚠ Trendline-urile sunt detectate automat din pivot points validate (min. 3 puncte, fără break structural). Break confirmat = daily/weekly close deasupra sau sub linie — nu intraday.
     </div>
   </div>
@@ -2226,13 +2226,13 @@ function renderTFBlock(label, tlDesc, tlAsc, currentPrice, fibMicro, fibMedium, 
       lines.push(`Nicio confluență Fibonacci la nivelul trendline-ului ${dir}`);
     }
 
-    return `<div style="background:var(--panel);border:1px solid var(--border);border-left:3px solid ${color};border-radius:8px;padding:13px 15px;margin-bottom:8px">
-      <div style="display:flex;align-items:center;gap:10px;margin-bottom:8px">
-        <span style="font-family:'Space Mono',monospace;font-size:.64rem;font-weight:700;color:${color}">TRENDLINE ${dir.toUpperCase()}</span>
-        <span style="font-family:'Space Mono',monospace;font-size:.54rem;padding:2px 8px;border-radius:3px;background:${statusColor}22;color:${statusColor};border:1px solid ${statusColor}44">${statusLabel}</span>
-        <span style="font-family:'Space Mono',monospace;font-size:.52rem;color:#4a6080">${tl.touchCount} pivot points · ${label}</span>
+    return `<div style="background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.08);border-left:3px solid ${color};border-radius:8px;padding:15px 17px;margin-bottom:10px">
+      <div style="display:flex;align-items:center;gap:10px;margin-bottom:10px;flex-wrap:wrap">
+        <span style="font-family:'Space Mono',monospace;font-size:.72rem;font-weight:700;color:${color};letter-spacing:.08em">TRENDLINE ${dir.toUpperCase()}</span>
+        <span style="font-family:'Space Mono',monospace;font-size:.62rem;font-weight:700;padding:3px 10px;border-radius:4px;background:${statusColor}22;color:${statusColor};border:1px solid ${statusColor}55">${statusLabel}</span>
+        <span style="font-family:'Space Mono',monospace;font-size:.58rem;color:#7a96b0">${tl.touchCount} pivot points · ${label}</span>
       </div>
-      ${lines.map(l=>`<div style="font-size:.74rem;color:var(--text);line-height:1.7;margin-bottom:2px">→ ${l}</div>`).join('')}
+      ${lines.map(l=>`<div style="font-size:.76rem;color:#d0e4f0;line-height:1.8;margin-bottom:3px">→ ${l}</div>`).join('')}
     </div>`;
   };
 
@@ -2246,8 +2246,8 @@ function renderTFBlock(label, tlDesc, tlAsc, currentPrice, fibMicro, fibMedium, 
     blocks.push(descHTML);
     blocks.push(ascHTML);
     blocks.push(`<div style="background:rgba(167,139,250,.06);border:1px solid rgba(167,139,250,.2);border-radius:8px;padding:11px 14px">
-      <div style="font-family:'Space Mono',monospace;font-size:.62rem;font-weight:700;color:#a78bfa;margin-bottom:6px">STRUCTURĂ: Compresie — ${label}</div>
-      <div style="font-size:.74rem;color:var(--text);line-height:1.7">→ Prețul între trendline descendent (${fmt(tlDesc.projectedNow)}) și ascendent (${fmt(tlAsc.projectedNow)})<br>
+      <div style="font-family:'Space Mono',monospace;font-size:.7rem;font-weight:700;color:#a78bfa;margin-bottom:8px;letter-spacing:.06em">⚡ STRUCTURĂ: Compresie — ${label}</div>
+      <div style="font-size:.76rem;color:#d0e4f0;line-height:1.8">→ Prețul între trendline descendent (${fmt(tlDesc.projectedNow)}) și ascendent (${fmt(tlAsc.projectedNow)})<br>
       → Interval de compresie: ${fmt(compressRange)} (${compressPct}%)<br>
       → Așteptăm invalidare: închidere ${tf==='1W'?'weekly':tf==='1D'?'daily':'4H'} deasupra ${fmt(tlDesc.projectedNow)} sau sub ${fmt(tlAsc.projectedNow)}</div>
     </div>`);
@@ -2256,11 +2256,11 @@ function renderTFBlock(label, tlDesc, tlAsc, currentPrice, fibMicro, fibMedium, 
   } else if(ascHTML) {
     blocks.push(ascHTML);
   } else {
-    blocks.push(`<div style="font-family:'Space Mono',monospace;font-size:.6rem;color:#4a6080;padding:10px">Niciun trendline valid detectat pe ${label} (necesită minimum 3 pivot points fără break structural)</div>`);
+    blocks.push(`<div style="font-family:'Space Mono',monospace;font-size:.62rem;color:#6a8090;padding:10px 12px;background:rgba(255,255,255,.02);border-radius:6px;border:1px solid var(--border)">Niciun trendline valid detectat pe ${label}<br><span style="font-size:.56rem;color:#4a6080">Necesită minimum 3 pivot points fără break structural între ele</span></div>`);
   }
 
-  return `<div style="margin-bottom:12px">
-    <div style="font-family:'Space Mono',monospace;font-size:.58rem;color:var(--neutral);margin-bottom:8px;letter-spacing:.08em">${label}</div>
+  return `<div style="margin-bottom:16px">
+    <div style="font-family:'Space Mono',monospace;font-size:.64rem;color:var(--cyan);font-weight:700;margin-bottom:8px;letter-spacing:.1em;padding:5px 0;border-bottom:1px solid var(--border)">${label}</div>
     ${blocks.join('')}
   </div>`;
 }
