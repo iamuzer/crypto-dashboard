@@ -3322,6 +3322,14 @@ async function refresh() {
     buildRiskMacro(d,ichiB,ichiE,rsiB1w,stochB);
     show('sec-risk-macro');
 
+    // ── Pre-calculate EMA200 + ETH Relative needed by confMacro ──
+    const ema200BTC=renderEMA200('btc',d.btcD,d.btcPrice);
+    const ema200ETH=renderEMA200('eth',d.ethD,d.ethPrice);
+    const rsiRawB1d=calcRSI(d.btcD,14), rsiRawE1d=calcRSI(d.ethD,14);
+    const rsiB1d=renderRSI('rsi-btc-1d',rsiRawB1d,'1D'), rsiE1d=renderRSI('rsi-eth-1d',rsiRawE1d,'1D');
+    const ethRelative=buildEthRelative(d, rsiB1d?.rsi??null, rsiE1d?.rsi??null);
+    show('sec-ema200'); show('sec-eth-relative');
+
     // ── MACRO: Confluence ──
     const confMacro=buildConfluence('macro',d,ichiB,ichiE,rsiB1w,rsiE1w,stochB,null,null,null,null,null,null,tlDataBTC,ema200BTC,chikouBTC,ethRelative);
     buildVerdictMacro(d,ichiRawB,rsiB1w,confMacro);
@@ -3331,16 +3339,8 @@ async function refresh() {
     renderFutures(d);
     show('sec-futures');
 
-    // ── MICRO: EMA200 + RSI Daily ──
-    const ema200BTC=renderEMA200('btc',d.btcD,d.btcPrice);
-    const ema200ETH=renderEMA200('eth',d.ethD,d.ethPrice);
-    const rsiRawB1d=calcRSI(d.btcD,14), rsiRawE1d=calcRSI(d.ethD,14);
-    const rsiB1d=renderRSI('rsi-btc-1d',rsiRawB1d,'1D'), rsiE1d=renderRSI('rsi-eth-1d',rsiRawE1d,'1D');
-    show('sec-ema200');
-
-    // ── MICRO: ETH Relative ──
-    const ethRelative=buildEthRelative(d, rsiB1d?.rsi??null, rsiE1d?.rsi??null);
-    show('sec-eth-relative');
+    // ── MICRO: EMA200 + RSI Daily — already calculated above, just ensure sections visible ──
+    // (ema200BTC, ema200ETH, rsiB1d, rsiE1d, ethRelative calculated before confMacro)
 
     // ── MICRO: EMA 4H ──
     const emaB=renderEMA('btc',d.btc4H,d.btcPrice);
