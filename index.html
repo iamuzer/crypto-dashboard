@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>CryptoRisk v4 — Macro · Micro</title>
+<title>CryptoRisk v5 — Macro · Micro · Journal</title>
 <link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=Syne:wght@400;700;800&display=swap" rel="stylesheet">
 <style>
 *{margin:0;padding:0;box-sizing:border-box}
@@ -211,11 +211,14 @@ footer{font-family:'Space Mono',monospace;font-size:.54rem;color:var(--neutral);
 <!-- HEADER -->
 <div class="header">
   <div class="header-inner">
-    <div class="logo">CRYPTO<span>RISK</span><sub>v4</sub></div>
+    <div class="logo">CRYPTO<span>RISK</span><sub>v5</sub></div>
     <div id="sync-badge" class="sync-badge sync-wait">⏳ NEACTUALIZAT</div>
     <div class="hinfo">
       <div class="hdate" id="hdate"></div>
       <div class="hts" id="hts">—</div>
+      <div style="font-family:'Space Mono',monospace;font-size:.5rem;color:#1e3040;margin-top:2px">
+        Auto-refresh: <span id="countdown" style="color:#4a6080">15:00</span>
+      </div>
     </div>
   </div>
 </div>
@@ -251,7 +254,7 @@ footer{font-family:'Space Mono',monospace;font-size:.54rem;color:var(--neutral);
 
 <!-- BUTTON -->
 <div class="btn-wrap" style="padding-top:14px">
-  <button class="btn" id="btn" onclick="refresh()">
+  <button class="btn" id="btn" onclick="manualRefresh()">
     <svg id="btn-icon" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="23 4 23 10 17 10"/><path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"/></svg>
     Actualizează Toate Datele
   </button>
@@ -646,90 +649,196 @@ footer{font-family:'Space Mono',monospace;font-size:.54rem;color:var(--neutral);
 
 <!-- ══════════════════════ TAB JOURNAL ══════════════════════ -->
 <div class="tab-content" id="content-journal">
+
+  <!-- Rules -->
   <div class="section">
-    <div class="sec-header">
-      <div class="sec-bar" style="background:var(--warn)"></div>
-      <div class="sec-title">Decision Journal — Reguli</div>
-    </div>
-    <div class="card" style="font-size:.78rem;color:var(--text);line-height:1.8">
+    <div class="sec-header"><div class="sec-bar" style="background:var(--warn)"></div><div class="sec-title">Reguli</div></div>
+    <div class="card" style="font-size:.78rem;color:var(--text);line-height:1.9">
       <strong style="color:var(--warn)">DISCIPLINA:</strong> Snapshot-urile sunt locked. Nu se alterează, nu se șterg.<br>
       <strong style="color:var(--cyan)">FLEXIBILITATEA:</strong> Pattern-urile generează recomandări, nu schimbări automate.<br>
       <strong style="color:var(--safe)">THINK BEFORE ACT:</strong> Observăm, recomandăm, discutăm și abia apoi adaptăm modelul.
     </div>
   </div>
 
-  <!-- Stats -->
-  <div class="g4" style="margin-bottom:14px">
-    <div class="card-sm" style="text-align:center"><div style="font-family:'Space Mono',monospace;font-size:.54rem;color:var(--neutral);margin-bottom:5px">TOTAL LOGS</div><div style="font-family:'Space Mono',monospace;font-size:1.8rem;font-weight:700;color:var(--white)" id="j-total">0</div></div>
-    <div class="card-sm" style="text-align:center"><div style="font-family:'Space Mono',monospace;font-size:.54rem;color:var(--safe);margin-bottom:5px">CORRECT</div><div style="font-family:'Space Mono',monospace;font-size:1.8rem;font-weight:700;color:var(--safe)" id="j-correct">0</div></div>
-    <div class="card-sm" style="text-align:center"><div style="font-family:'Space Mono',monospace;font-size:.54rem;color:var(--warn);margin-bottom:5px">PARTIAL</div><div style="font-family:'Space Mono',monospace;font-size:1.8rem;font-weight:700;color:var(--warn)" id="j-partial">0</div></div>
-    <div class="card-sm" style="text-align:center"><div style="font-family:'Space Mono',monospace;font-size:.54rem;color:var(--danger);margin-bottom:5px">WRONG</div><div style="font-family:'Space Mono',monospace;font-size:1.8rem;font-weight:700;color:var(--danger)" id="j-wrong">0</div></div>
+  <!-- Changelog -->
+  <div class="section">
+    <div class="sec-header"><div class="sec-bar" style="background:var(--purple)"></div><div class="sec-title">Changelog</div></div>
+    <div class="card" style="font-family:'Space Mono',monospace;font-size:.6rem;line-height:2;color:var(--text)">
+
+      <div style="color:var(--white);font-weight:700;font-size:.68rem;margin-bottom:6px">v5 — Martie 2026</div>
+      <div style="color:var(--safe)">+ RSI 1H real din Binance klines</div>
+      <div style="color:var(--safe)">+ RSI Daily BTC + ETH</div>
+      <div style="color:var(--safe)">+ EMA200 distanță daily (BTC + ETH) — 5 zone: supraextins / sănătos / testează / sub / capitulare</div>
+      <div style="color:var(--safe)">+ ETH Relative Engine — ETH/BTC ratio · RSI relativ · performanță 24h · dominance</div>
+      <div style="color:var(--safe)">+ Action Map — Hold / Take Profit / Wait / Re-accumulate cu bare vizuale</div>
+      <div style="color:var(--safe)">+ Fibonacci swing detection — pivot points reali pe 4H / 1D / 1W (nu perioade fixe)</div>
+      <div style="color:var(--safe)">+ Trendline Detection — 3 TF-uri · validare structurală · confluență Fibonacci · compresie detectată</div>
+      <div style="color:var(--safe)">+ Alert Banner — semnal bearish micro activ când 3+ condiții simultane</div>
+      <div style="color:var(--safe)">+ Auto-refresh 15 minute cu countdown vizibil</div>
+      <div style="color:var(--safe)">+ Decision Journal complet — Weekly / Daily / Decizie manuală · BTC + ETH · catch-up sync</div>
+      <div style="color:var(--safe)">+ Cross-TF narativ detaliat — date reale cu prețuri în paranteză per context</div>
+      <div style="color:var(--warn)">~ RSI edge case corectat: lA===0→100, gA===0→0 (era inversat parțial)</div>
+      <div style="color:var(--warn)">~ Confluence cluster-based (4 clustere independente) — nu sumă liniară de indicatori corelați</div>
+      <div style="color:var(--warn)">~ Probabilități false eliminate — înlocuite cu descriptori factuale</div>
+      <div style="color:var(--warn)">~ Chikou 1M cu context de ciclu — drawdown ATH + MA6/MA12 + concluzie integrată</div>
+      <div style="color:var(--warn)">~ Pivoți Camarilla pe 1M (nu 1W) — mai relevanți pentru mișcări 15-30%</div>
+      <div style="color:var(--warn)">~ Limbaj descriptiv cu prețuri în paranteză în tot dashboardul</div>
+
+      <div style="color:var(--white);font-weight:700;font-size:.68rem;margin-top:16px;margin-bottom:6px">v4 — Bază</div>
+      <div style="color:#4a6080">Ichimoku 1W real din OHLC · RSI Wilder 1W + 4H · EMA 9/21/50 pe 4H · MACD 4H</div>
+      <div style="color:#4a6080">Funding Rate real Binance Futures · Long/Short Ratio · Taker Buy/Sell · Open Interest</div>
+      <div style="color:#4a6080">Chikou Span 1M · Pivoți Camarilla · Top/Bottom Signal · Stoch RSI + OBV</div>
+      <div style="color:#4a6080">Sync unic timestamp · surse verificate · fără proxy sau date simulate</div>
+
+      <div style="margin-top:14px;padding-top:10px;border-top:1px solid var(--border);font-size:.54rem;color:#4a6080">
+        Surse date: Binance Spot + Futures API · CoinGecko · Alternative.me<br>
+        Metodă: RSI Wilder · EMA exponențială · Ichimoku OHLC · Fibonacci swing detection · Trendline pivot validation<br>
+        ⚠ Scorurile de confluență sunt euristice bazate pe 4 clustere independente — nu probabilități statistice validate prin backtesting.
+      </div>
+    </div>
   </div>
 
-  <!-- Manual snapshot button -->
-  <div style="margin-bottom:14px;display:flex;gap:10px;align-items:center">
-    <button class="btn" id="j-snap-btn" onclick="journalManualSnapshot()" style="width:auto;padding:10px 20px">
-      📸 Salvează Snapshot Manual
+  <!-- Stats -->
+  <div class="g4" style="margin-bottom:14px">
+    <div class="card-sm" style="text-align:center"><div style="font-family:'Space Mono',monospace;font-size:.52rem;color:var(--neutral);margin-bottom:5px">TOTAL LOGS</div><div style="font-family:'Space Mono',monospace;font-size:1.8rem;font-weight:700;color:var(--white)" id="j-total">0</div></div>
+    <div class="card-sm" style="text-align:center"><div style="font-family:'Space Mono',monospace;font-size:.52rem;color:var(--safe);margin-bottom:5px">CORRECT</div><div style="font-family:'Space Mono',monospace;font-size:1.8rem;font-weight:700;color:var(--safe)" id="j-correct">0</div></div>
+    <div class="card-sm" style="text-align:center"><div style="font-family:'Space Mono',monospace;font-size:.52rem;color:var(--warn);margin-bottom:5px">PARTIAL</div><div style="font-family:'Space Mono',monospace;font-size:1.8rem;font-weight:700;color:var(--warn)" id="j-partial">0</div></div>
+    <div class="card-sm" style="text-align:center"><div style="font-family:'Space Mono',monospace;font-size:.52rem;color:var(--danger);margin-bottom:5px">WRONG</div><div style="font-family:'Space Mono',monospace;font-size:1.8rem;font-weight:700;color:var(--danger)" id="j-wrong">0</div></div>
+  </div>
+
+  <!-- Type stats -->
+  <div class="g3" style="margin-bottom:14px">
+    <div class="card-sm" style="text-align:center"><div style="font-family:'Space Mono',monospace;font-size:.52rem;color:#ffb300;margin-bottom:4px">📅 WEEKLY</div><div style="font-family:'Space Mono',monospace;font-size:1.2rem;font-weight:700;color:var(--white)" id="j-count-weekly">0</div></div>
+    <div class="card-sm" style="text-align:center"><div style="font-family:'Space Mono',monospace;font-size:.52rem;color:var(--cyan);margin-bottom:4px">📆 DAILY</div><div style="font-family:'Space Mono',monospace;font-size:1.2rem;font-weight:700;color:var(--white)" id="j-count-daily">0</div></div>
+    <div class="card-sm" style="text-align:center"><div style="font-family:'Space Mono',monospace;font-size:.52rem;color:var(--purple);margin-bottom:4px">🎯 DECIZII</div><div style="font-family:'Space Mono',monospace;font-size:1.2rem;font-weight:700;color:var(--white)" id="j-count-decision">0</div></div>
+  </div>
+
+  <!-- Action buttons -->
+  <div style="display:flex;gap:10px;flex-wrap:wrap;margin-bottom:14px;align-items:center">
+    <button class="btn" onclick="journalManualSnapshot()" style="width:auto;padding:9px 18px;font-size:.64rem">
+      📸 Snapshot Manual
     </button>
-    <div style="font-family:'Space Mono',monospace;font-size:.58rem;color:var(--neutral)" id="j-snap-status">Snapshot-ul zilnic se salvează automat la refresh dacă nu există deja.</div>
+    <button class="btn" onclick="journalOpenDecision()" style="width:auto;padding:9px 18px;font-size:.64rem;border-color:rgba(167,139,250,.4);color:var(--purple)">
+      🎯 Loghează Decizie
+    </button>
+    <!-- Filter -->
+    <div style="margin-left:auto;display:flex;gap:6px">
+      <button onclick="journalSetFilter('all')"     id="jf-all"      style="padding:6px 12px;font-size:.58rem;border-color:rgba(0,232,122,.4);color:var(--safe)">Toate</button>
+      <button onclick="journalSetFilter('weekly')"  id="jf-weekly"   style="padding:6px 12px;font-size:.58rem">📅 Weekly</button>
+      <button onclick="journalSetFilter('daily')"   id="jf-daily"    style="padding:6px 12px;font-size:.58rem">📆 Daily</button>
+      <button onclick="journalSetFilter('decision')" id="jf-decision" style="padding:6px 12px;font-size:.58rem">🎯 Decizii</button>
+    </div>
+  </div>
+  <div style="font-family:'Space Mono',monospace;font-size:.54rem;color:var(--neutral);margin-bottom:12px" id="j-snap-status">
+    Snapshot-urile zilnice și weekly se generează automat la refresh.
+  </div>
+
+  <!-- Decision Modal -->
+  <div id="j-decision-modal" style="display:none;background:linear-gradient(135deg,rgba(167,139,250,.08),rgba(34,211,238,.04));border:1px solid rgba(167,139,250,.3);border-radius:12px;padding:20px 24px;margin-bottom:16px">
+    <div style="font-family:'Space Mono',monospace;font-size:.66rem;font-weight:700;color:var(--purple);margin-bottom:14px;letter-spacing:.1em">🎯 LOGHEAZĂ DECIZIE — Date capturate la momentul actual</div>
+    <div class="g2" style="margin-bottom:12px;gap:12px">
+      <div>
+        <div style="font-family:'Space Mono',monospace;font-size:.52rem;color:var(--neutral);margin-bottom:4px">Ce am decis</div>
+        <select id="jd-action" style="width:100%;background:var(--panel);color:var(--text);border:1px solid var(--border);border-radius:6px;padding:7px;font-family:'Space Mono',monospace;font-size:.62rem">
+          <option value="buy">Cumpăr</option>
+          <option value="sell">Vând</option>
+          <option value="reduce">Reduc expunerea</option>
+          <option value="increase">Măresc expunerea</option>
+          <option value="hold">Hold — mențin</option>
+          <option value="wait">Aștept confirmare</option>
+        </select>
+      </div>
+      <div>
+        <div style="font-family:'Space Mono',monospace;font-size:.52rem;color:var(--neutral);margin-bottom:4px">Asset</div>
+        <select id="jd-asset" style="width:100%;background:var(--panel);color:var(--text);border:1px solid var(--border);border-radius:6px;padding:7px;font-family:'Space Mono',monospace;font-size:.62rem">
+          <option value="BTC">BTC</option>
+          <option value="ETH">ETH</option>
+          <option value="BTC+ETH">BTC + ETH</option>
+        </select>
+      </div>
+    </div>
+    <div class="g3" style="margin-bottom:12px;gap:12px">
+      <div>
+        <div style="font-family:'Space Mono',monospace;font-size:.52rem;color:var(--neutral);margin-bottom:4px">Entry ($)</div>
+        <input type="number" id="jd-entry" placeholder="ex: 65200" style="width:100%;background:var(--panel);color:var(--text);border:1px solid var(--border);border-radius:6px;padding:7px;font-family:'Space Mono',monospace;font-size:.62rem">
+      </div>
+      <div>
+        <div style="font-family:'Space Mono',monospace;font-size:.52rem;color:var(--neutral);margin-bottom:4px">Stop-loss ($)</div>
+        <input type="number" id="jd-stop" placeholder="ex: 63800" style="width:100%;background:var(--panel);color:var(--text);border:1px solid var(--border);border-radius:6px;padding:7px;font-family:'Space Mono',monospace;font-size:.62rem">
+      </div>
+      <div>
+        <div style="font-family:'Space Mono',monospace;font-size:.52rem;color:var(--neutral);margin-bottom:4px">Target ($)</div>
+        <input type="number" id="jd-target" placeholder="ex: 71000" style="width:100%;background:var(--panel);color:var(--text);border:1px solid var(--border);border-radius:6px;padding:7px;font-family:'Space Mono',monospace;font-size:.62rem">
+      </div>
+    </div>
+    <div style="margin-bottom:12px">
+      <div style="font-family:'Space Mono',monospace;font-size:.52rem;color:var(--neutral);margin-bottom:4px">Motivul deciziei</div>
+      <textarea id="jd-reason" rows="2" placeholder="De ce iau această decizie acum..." style="width:100%;background:var(--panel);color:var(--text);border:1px solid var(--border);border-radius:6px;padding:7px;font-family:'Space Mono',monospace;font-size:.62rem;resize:vertical"></textarea>
+    </div>
+    <div style="display:flex;gap:10px">
+      <button class="btn" onclick="journalSaveDecision()" style="width:auto;padding:9px 18px;font-size:.64rem;border-color:rgba(167,139,250,.4);color:var(--purple)">Salvează Decizia</button>
+      <button onclick="journalCloseDecision()" style="padding:9px 18px;font-size:.62rem">Anulează</button>
+    </div>
   </div>
 
   <!-- Log table -->
   <div class="section">
-    <div class="sec-header"><div class="sec-bar" style="background:var(--warn)"></div><div class="sec-title">Daily Logs</div></div>
-    <div class="card" style="overflow-x:auto"><div id="j-table"></div></div>
+    <div class="sec-header"><div class="sec-bar" style="background:var(--warn)"></div><div class="sec-title">Loguri</div></div>
+    <div class="card" style="overflow-x:auto;padding:12px"><div id="j-table"></div></div>
   </div>
 
-  <!-- Review -->
+  <!-- Review + Detail -->
   <div class="g2">
     <div class="card">
       <div style="font-family:'Space Mono',monospace;font-size:.6rem;letter-spacing:.14em;text-transform:uppercase;color:var(--neutral);margin-bottom:12px">Manual Review</div>
       <div style="font-size:.7rem;color:#4a6080;margin-bottom:10px">Snapshot-ul este locked. Review-ul este add-only.</div>
       <div style="margin-bottom:8px">
-        <div style="font-family:'Space Mono',monospace;font-size:.54rem;color:var(--neutral);margin-bottom:4px">Selectează log</div>
-        <select id="j-select" style="width:100%;background:var(--panel);color:var(--text);border:1px solid var(--border);border-radius:6px;padding:7px;font-family:'Space Mono',monospace;font-size:.62rem" onchange="journalPick(this.value)"></select>
+        <div style="font-family:'Space Mono',monospace;font-size:.52rem;color:var(--neutral);margin-bottom:4px">Selectează log</div>
+        <select id="j-select" style="width:100%;background:var(--panel);color:var(--text);border:1px solid var(--border);border-radius:6px;padding:7px;font-family:'Space Mono',monospace;font-size:.6rem" onchange="journalPick(this.value)"></select>
       </div>
       <div style="margin-bottom:8px">
-        <div style="font-family:'Space Mono',monospace;font-size:.54rem;color:var(--neutral);margin-bottom:4px">Factor extern?</div>
-        <select id="j-external" style="width:100%;background:var(--panel);color:var(--text);border:1px solid var(--border);border-radius:6px;padding:7px;font-family:'Space Mono',monospace;font-size:.62rem">
-          <option value="no">Nu</option><option value="yes">Da (news, macro event)</option>
+        <div style="font-family:'Space Mono',monospace;font-size:.52rem;color:var(--neutral);margin-bottom:4px">Factor extern?</div>
+        <select id="j-external" style="width:100%;background:var(--panel);color:var(--text);border:1px solid var(--border);border-radius:6px;padding:7px;font-family:'Space Mono',monospace;font-size:.6rem">
+          <option value="no">Nu</option><option value="yes">Da (news, macro event, etc.)</option>
         </select>
       </div>
       <div style="margin-bottom:8px">
-        <div style="font-family:'Space Mono',monospace;font-size:.54rem;color:var(--neutral);margin-bottom:4px">Ce s-a întâmplat</div>
-        <textarea id="j-happened" rows="3" style="width:100%;background:var(--panel);color:var(--text);border:1px solid var(--border);border-radius:6px;padding:7px;font-family:'Space Mono',monospace;font-size:.62rem;resize:vertical" placeholder="Descrie ce s-a întâmplat cu prețul..."></textarea>
+        <div style="font-family:'Space Mono',monospace;font-size:.52rem;color:var(--neutral);margin-bottom:4px">Ce s-a întâmplat</div>
+        <textarea id="j-happened" rows="2" style="width:100%;background:var(--panel);color:var(--text);border:1px solid var(--border);border-radius:6px;padding:7px;font-family:'Space Mono',monospace;font-size:.6rem;resize:vertical" placeholder="Descrie ce s-a întâmplat cu prețul..."></textarea>
       </div>
       <div style="margin-bottom:8px">
-        <div style="font-family:'Space Mono',monospace;font-size:.54rem;color:var(--neutral);margin-bottom:4px">Ce am ratat</div>
-        <textarea id="j-missed" rows="2" style="width:100%;background:var(--panel);color:var(--text);border:1px solid var(--border);border-radius:6px;padding:7px;font-family:'Space Mono',monospace;font-size:.62rem;resize:vertical" placeholder="Ce semnal nu am văzut sau am ignorat..."></textarea>
+        <div style="font-family:'Space Mono',monospace;font-size:.52rem;color:var(--neutral);margin-bottom:4px">Ce am ratat</div>
+        <textarea id="j-missed" rows="2" style="width:100%;background:var(--panel);color:var(--text);border:1px solid var(--border);border-radius:6px;padding:7px;font-family:'Space Mono',monospace;font-size:.6rem;resize:vertical" placeholder="Ce semnal nu am văzut sau am ignorat..."></textarea>
       </div>
       <div style="margin-bottom:8px">
-        <div style="font-family:'Space Mono',monospace;font-size:.54rem;color:var(--neutral);margin-bottom:4px">Lecție</div>
-        <textarea id="j-lesson" rows="2" style="width:100%;background:var(--panel);color:var(--text);border:1px solid var(--border);border-radius:6px;padding:7px;font-family:'Space Mono',monospace;font-size:.62rem;resize:vertical" placeholder="Ce ajustăm la model..."></textarea>
+        <div style="font-family:'Space Mono',monospace;font-size:.52rem;color:var(--neutral);margin-bottom:4px">Lecție</div>
+        <textarea id="j-lesson" rows="2" style="width:100%;background:var(--panel);color:var(--text);border:1px solid var(--border);border-radius:6px;padding:7px;font-family:'Space Mono',monospace;font-size:.6rem;resize:vertical" placeholder="Ce ajustăm la model..."></textarea>
       </div>
       <div style="margin-bottom:8px">
-        <div style="font-family:'Space Mono',monospace;font-size:.54rem;color:var(--neutral);margin-bottom:4px">Recomandare model</div>
-        <select id="j-rec-status" style="width:100%;background:var(--panel);color:var(--text);border:1px solid var(--border);border-radius:6px;padding:7px;font-family:'Space Mono',monospace;font-size:.62rem">
+        <div style="font-family:'Space Mono',monospace;font-size:.52rem;color:var(--neutral);margin-bottom:4px">Recomandare model</div>
+        <select id="j-rec-status" style="width:100%;background:var(--panel);color:var(--text);border:1px solid var(--border);border-radius:6px;padding:7px;font-family:'Space Mono',monospace;font-size:.6rem">
           <option value="no_change">No change suggested</option>
           <option value="review">Review suggested</option>
           <option value="strong_review">Strong review suggested</option>
         </select>
       </div>
-      <button class="btn" onclick="journalSaveReview()" style="width:100%;margin-top:4px">Salvează Review</button>
+      <button class="btn" onclick="journalSaveReview()" style="width:100%;margin-top:4px;font-size:.64rem">Salvează Review</button>
       <div style="font-family:'Space Mono',monospace;font-size:.52rem;color:var(--safe);margin-top:6px;display:none" id="j-save-ok">✓ Salvat</div>
     </div>
     <div class="card">
       <div style="font-family:'Space Mono',monospace;font-size:.6rem;letter-spacing:.14em;text-transform:uppercase;color:var(--neutral);margin-bottom:12px">Log Selectat</div>
-      <div id="j-detail" style="font-family:'Space Mono',monospace;font-size:.62rem;color:var(--text);line-height:1.8;white-space:pre-wrap"></div>
+      <div id="j-detail" style="font-family:'Space Mono',monospace;font-size:.6rem;color:var(--text);line-height:1.85;white-space:pre-wrap"></div>
     </div>
   </div>
+
 </div><!-- end tab-journal -->
 
 
 
+
 <footer>
-  CRYPTORISK v4 · Binance Spot + Futures API · CoinGecko · Alternative.me · Sync unic<br>
-  Scoring pe clustere independente (nu indicatori corelați) · RSI Wilder corect · EMA/MACD pe 4H real<br>
+  CRYPTORISK v5 · Binance Spot + Futures API · CoinGecko · Alternative.me · Sync unic · Auto-refresh 15min<br>
+  RSI 1H/4H/1D/1W real · Fibonacci swing detection · Trendline validation · Decision Journal<br>
   ⚠ Tool de vizualizare și context. Scorurile sunt euristice, nu probabilistice. Nu constituie consiliere financiară.
 </footer>
 
@@ -2367,9 +2476,11 @@ function renderTrendlines(coin, closes4H, closesD, closesW, currentPrice, fibMic
 }
 
 // ═══════════════════════════════════════════════════════
-// DECISION JOURNAL
+// DECISION JOURNAL — Weekly + Daily + Decision
 // ═══════════════════════════════════════════════════════
-const JOURNAL_KEY = 'cryptorisk_v4_journal';
+const JOURNAL_KEY = 'cryptorisk_v4_journal_v2';
+let _journalFilter = 'all';
+let _journalLastData = null; // stores last refresh data for snapshots
 
 function journalLoad() {
   try { return JSON.parse(localStorage.getItem(JOURNAL_KEY)) || []; } catch { return []; }
@@ -2377,416 +2488,470 @@ function journalLoad() {
 function journalSave(logs) {
   try { localStorage.setItem(JOURNAL_KEY, JSON.stringify(logs)); } catch(e) { console.warn('Journal save failed:', e); }
 }
-function journalDayKey() {
-  const d = new Date();
-  return d.toISOString().slice(0, 10);
-}
-function journalPrevDayKey() {
-  const d = new Date(); d.setUTCDate(d.getUTCDate() - 1);
-  return d.toISOString().slice(0, 10);
-}
 
-function journalClassifyOutcome(pct) {
-  if(pct <= -3) return pct <= -7 ? 'bearish_strong' : 'bearish_moderate';
-  if(pct >= 3)  return pct >= 7  ? 'bullish_strong'  : 'bullish_moderate';
-  return 'neutral';
+// ── Date helpers ──────────────────────────────────────
+function journalDayKey(date) {
+  const d = date || new Date();
+  return d.toISOString().slice(0,10);
 }
-
-function journalAutoEval(action, outcome) {
-  const isBearAction = action.toLowerCase().includes('evit') || action.toLowerCase().includes('reduce') || action.toLowerCase().includes('vinde') || action.toLowerCase().includes('short') || action.toLowerCase().includes('atenție');
-  const isBullAction = action.toLowerCase().includes('long') || action.toLowerCase().includes('cumpăr') || action.toLowerCase().includes('acumul') || action.toLowerCase().includes('favorabil');
-  if(isBearAction) {
-    if(outcome.includes('bearish')) return 'correct';
-    if(outcome === 'neutral') return 'partially_correct';
-    return 'wrong';
-  }
-  if(isBullAction) {
-    if(outcome.includes('bullish')) return 'correct';
-    if(outcome === 'neutral') return 'partially_correct';
-    return 'wrong';
-  }
-  return 'neutral';
+function journalWeekKey(date) {
+  // Returns the Sunday (weekly close) of the week
+  const d = date || new Date();
+  const day = d.getUTCDay(); // 0=Sun
+  const sunday = new Date(d);
+  sunday.setUTCDate(d.getUTCDate() - day);
+  return 'W-' + sunday.toISOString().slice(0,10);
+}
+function lastSundayDate() {
+  const now = new Date();
+  const daysBack = now.getUTCDay(); // 0=Sun, so 0 means today is Sunday
+  const sun = new Date(now);
+  sun.setUTCDate(now.getUTCDate() - (daysBack === 0 ? 7 : daysBack));
+  sun.setUTCHours(0,0,0,0);
+  return sun;
+}
+function isAfterWeeklyClose() {
+  // Weekly close = Sunday 00:00 UTC
+  // Returns true if current time is after the most recent Sunday 00:00 UTC
+  const now = new Date();
+  return now.getUTCDay() !== 0 || now.getUTCHours() >= 1;
 }
 
-function journalCreateSnapshot(d, confMacro, confMicro, ichiRawB, rsiB1w, ema200BTC, topBotSignal, forced=false) {
-  if(!d || !d.btcPrice) return null;
-  const key = journalDayKey();
-  const logs = journalLoad();
-  const exists = logs.find(x => x.id === 'day-' + key);
-  if(exists && !forced) return null; // already logged today
+// ── Build snapshot data ───────────────────────────────
+function journalBuildSnapshot(d, confMacro, confMicro, ichiRawB, rsiB1w, ema200BTC, topBotResult, type, isRetro) {
+  if(!d) return null;
+  const rsiD_btc = calcRSI(d.btcD, 14);
+  const rsiD_eth = calcRSI(d.ethD, 14);
+  const ema200E  = calcEMA200(d.ethD);
+  const ema200DistETH = ema200E ? ((d.ethPrice - ema200E) / ema200E * 100) : null;
+  const weeklyPartial = type !== 'weekly'; // daily snapshots have partial 1W data
 
-  const btcPrev = d.btcD && d.btcD.length >= 2 ? d.btcD[d.btcD.length - 2].close : d.btcPrice;
-  const ethPrev = d.ethD && d.ethD.length >= 2 ? d.ethD[d.ethD.length - 2].close : d.ethPrice;
-
-  const snapshot = {
+  return {
     locked: true,
-    day_key: key,
+    type,
+    isRetro: !!isRetro,
     created_at: new Date().toISOString(),
-    forced: forced,
-    // Prices
-    btc_price: d.btcPrice,
-    eth_price: d.ethPrice,
-    btc_chg_24h: d.btcChg,
-    eth_chg_24h: d.ethChg,
-    // Macro signals
-    btc_rsi_1w: rsiB1w?.rsi?.toFixed(1) ?? '--',
-    btc_rsi_div: rsiB1w?.div ?? '--',
-    ichi_btc: ichiRawB ? (ichiRawB.above ? 'deasupra' : ichiRawB.below ? 'sub' : 'în') + ' nor · TK ' + (ichiRawB.tkBull?'bull':'bear') : '--',
-    ema200_btc_dist: ema200BTC?.dist?.toFixed(2) ?? '--',
-    fg: d.fg,
-    btc_funding: d.btcFunding?.toFixed(4) ?? '--',
-    btc_ls: d.btcLS?.toFixed(3) ?? '--',
-    dom: d.dom?.toFixed(1) ?? '--',
-    // Confluence
-    conf_macro_sig: confMacro?.sigRaw ?? confMacro?.sig ?? '--',
+    weeklyPartial,
+    // BTC
+    btc_price:    d.btcPrice,
+    btc_chg_24h:  d.btcChg,
+    btc_rsi_1w:   rsiB1w?.rsi?.toFixed(1) ?? '--',
+    btc_rsi_1d:   rsiD_btc?.arr?.at(-1)?.toFixed(1) ?? '--',
+    btc_rsi_div:  rsiB1w?.div ?? '--',
+    btc_ichi:     ichiRawB ? (ichiRawB.above?'deasupra':ichiRawB.below?'sub':'în')+' nor · TK '+(ichiRawB.tkBull?'bull':'bear') : '--',
+    btc_ema200:   ema200BTC?.dist?.toFixed(2) ?? '--',
+    btc_funding:  d.btcFunding?.toFixed(4) ?? '--',
+    btc_ls:       d.btcLS?.toFixed(3) ?? '--',
+    btc_taker:    d.btcBuySell?.toFixed(3) ?? '--',
+    // ETH
+    eth_price:    d.ethPrice,
+    eth_chg_24h:  d.ethChg,
+    eth_rsi_1d:   rsiD_eth?.arr?.at(-1)?.toFixed(1) ?? '--',
+    eth_funding:  d.ethFunding?.toFixed(4) ?? '--',
+    eth_ema200:   ema200DistETH?.toFixed(2) ?? '--',
+    // Market
+    fg:           d.fg,
+    fg_label:     d.fgLabel,
+    dom:          d.dom?.toFixed(1) ?? '--',
+    // Signals
+    conf_macro:   confMacro?.sigRaw ?? confMacro?.sig ?? '--',
     conf_macro_str: confMacro?.strength ?? '--',
-    conf_micro_sig: confMicro?.sigRaw ?? confMicro?.sig ?? '--',
+    conf_micro:   confMicro?.sigRaw ?? confMicro?.sig ?? '--',
     conf_micro_str: confMicro?.strength ?? '--',
-    // Top/Bottom
-    topbot_signal: topBotSignal?.signal ?? '--',
-    topbot_top_pct: topBotSignal?.topPct ?? '--',
-    topbot_bot_pct: topBotSignal?.botPct ?? '--',
-    // Regime
-    regime: (function(){
-      const mn = confMacro?.net ?? 0, mi = confMicro?.net ?? 0;
-      if(mn >= 10 && mi >= 10) return 'Macro+Micro Bullish';
-      if(mn <= -10 && mi <= -10) return 'Macro+Micro Bearish';
-      if(mn >= 10 && mi <= -10) return 'Macro Bull / Micro Correction';
-      if(mn <= -10 && mi >= 10) return 'Macro Bear / Micro Bounce';
+    topbot:       topBotResult?.signal ?? '--',
+    topbot_top:   topBotResult?.topPct ?? '--',
+    topbot_bot:   topBotResult?.botPct ?? '--',
+    regime:       (()=>{
+      const mn=confMacro?.net??0, mi=confMicro?.net??0;
+      if(mn>=10&&mi>=10)  return 'Macro+Micro Bullish';
+      if(mn<=-10&&mi<=-10)return 'Macro+Micro Bearish';
+      if(mn>=10&&mi<=-10) return 'Macro Bull / Micro Corecție';
+      if(mn<=-10&&mi>=10) return 'Macro Bear / Micro Bounce';
       return 'Neutru / Mixt';
     })(),
   };
-
-  const entry = {
-    id: 'day-' + key,
-    snapshot,
-    outcome: {
-      btc_pct_1d: null,
-      eth_pct_1d: null,
-      outcome_direction: null,
-      external_factor: false,
-    },
-    evaluation: {
-      auto_result: null,
-      what_happened: '',
-      what_we_missed: '',
-      lesson_learned: '',
-    },
-    recommendation: {
-      status: 'no_change',
-      text: '',
-    }
-  };
-
-  // Try to auto-fill outcome for previous day's log
-  const prevKey = journalPrevDayKey();
-  const prevIdx = logs.findIndex(x => x.id === 'day-' + prevKey);
-  if(prevIdx >= 0 && logs[prevIdx].outcome.btc_pct_1d === null) {
-    const btcPct = ((d.btcPrice - btcPrev) / btcPrev * 100);
-    const ethPct = ((d.ethPrice - ethPrev) / ethPrev * 100);
-    const avgPct = (btcPct + ethPct) / 2;
-    logs[prevIdx].outcome.btc_pct_1d = btcPct.toFixed(2);
-    logs[prevIdx].outcome.eth_pct_1d = ethPct.toFixed(2);
-    logs[prevIdx].outcome.outcome_direction = journalClassifyOutcome(avgPct);
-    logs[prevIdx].evaluation.auto_result = journalAutoEval(
-      logs[prevIdx].snapshot.conf_macro_sig || '',
-      logs[prevIdx].outcome.outcome_direction
-    );
-  }
-
-  if(exists && forced) {
-    const idx = logs.findIndex(x => x.id === 'day-' + key);
-    logs[idx].snapshot = snapshot; // update snapshot only, keep review
-  } else {
-    logs.unshift(entry);
-  }
-  journalSave(logs);
-  return entry;
 }
 
+// ── Auto outcome fill ────────────────────────────────
+function journalFillOutcomes(logs, d) {
+  if(!d) return logs;
+  const now = Date.now();
+  for(const log of logs) {
+    if(!log.outcome) log.outcome = {};
+    const created = new Date(log.snapshot.created_at).getTime();
+    const age1d = (now - created) / (1000*60*60*24);
+
+    // Fill 1D outcome
+    if(log.outcome.btc_1d === undefined && age1d >= 1) {
+      log.outcome.btc_1d = d.btcChg?.toFixed(2) ?? null;
+      log.outcome.eth_1d = d.ethChg?.toFixed(2) ?? null;
+    }
+    // 3D and 7D would need historical price fetch — mark as pending for now
+    if(log.outcome.btc_3d === undefined && age1d >= 3) log.outcome.btc_3d = '⏳';
+    if(log.outcome.btc_7d === undefined && age1d >= 7) log.outcome.btc_7d = '⏳';
+  }
+  return logs;
+}
+
+// ── Auto eval ────────────────────────────────────────
+function journalAutoEval(confSig, outcome1d) {
+  if(!outcome1d || outcome1d === '⏳') return null;
+  const pct = parseFloat(outcome1d);
+  const isBear = confSig?.includes('BEAR') || confSig?.includes('EVITĂ') || confSig?.includes('ATENȚIE');
+  const isBull = confSig?.includes('BULL') || confSig?.includes('LONG');
+  if(isBear) return pct <= -2 ? 'correct' : pct >= 2 ? 'wrong' : 'partially_correct';
+  if(isBull) return pct >= 2  ? 'correct' : pct <= -2 ? 'wrong' : 'partially_correct';
+  return 'neutral';
+}
+
+// ── Catch-up sync ─────────────────────────────────────
+function journalCatchupSync(d, confMacro, confMicro, ichiRawB, rsiB1w, ema200BTC, topBotResult) {
+  const logs = journalLoad();
+  const todayKey   = journalDayKey();
+  const weekKey    = journalWeekKey();
+  let changed = false;
+
+  // 1. Daily snapshot — one per day
+  const hasTodayDaily = logs.some(x => x.id === 'daily-'+todayKey);
+  if(!hasTodayDaily) {
+    const snap = journalBuildSnapshot(d, confMacro, confMicro, ichiRawB, rsiB1w, ema200BTC, topBotResult, 'daily', false);
+    if(snap) {
+      logs.unshift({
+        id: 'daily-'+todayKey,
+        snapshot: { ...snap, day_key: todayKey },
+        outcome: {}, evaluation: {}, recommendation: { status: 'no_change', text: '' }
+      });
+      changed = true;
+    }
+  }
+
+  // 2. Weekly snapshot — after Sunday close, one per week
+  const lastSunday = lastSundayDate();
+  const lastSundayKey = journalWeekKey(lastSunday);
+  const hasThisWeekly = logs.some(x => x.id === 'weekly-'+lastSundayKey);
+  if(!hasThisWeekly && isAfterWeeklyClose()) {
+    const snap = journalBuildSnapshot(d, confMacro, confMicro, ichiRawB, rsiB1w, ema200BTC, topBotResult, 'weekly', false);
+    if(snap) {
+      snap.weeklyPartial = false; // weekly close = complete data
+      logs.unshift({
+        id: 'weekly-'+lastSundayKey,
+        snapshot: { ...snap, day_key: lastSundayKey.replace('W-','') + ' (weekly close)' },
+        outcome: {}, evaluation: {}, recommendation: { status: 'no_change', text: '' }
+      });
+      changed = true;
+    }
+  }
+
+  // 3. Fill outcomes for past entries
+  const updated = journalFillOutcomes(logs, d);
+
+  // 4. Auto-eval
+  for(const log of updated) {
+    if(!log.evaluation) log.evaluation = {};
+    if(!log.evaluation.auto_result && log.outcome?.btc_1d && log.outcome.btc_1d !== '⏳') {
+      log.evaluation.auto_result = journalAutoEval(log.snapshot.conf_macro, log.outcome.btc_1d);
+    }
+  }
+
+  if(changed || updated !== logs) journalSave(updated);
+  return updated;
+}
+
+// ── Manual snapshot ───────────────────────────────────
 function journalManualSnapshot() {
-  // Trigger snapshot with current model data — forced
-  if(!window._journalLastArgs) {
-    $('j-snap-status').textContent = 'Eroare: datele nu sunt încărcate încă. Fă mai întâi un refresh.';
+  if(!_journalLastData) {
+    $('j-snap-status').textContent = 'Eroare: datele nu sunt încărcate. Fă un refresh mai întâi.';
     return;
   }
-  const [d, confMacro, confMicro, ichiRawB, rsiB1w, ema200BTC, topBotSignal] = window._journalLastArgs;
-  const entry = journalCreateSnapshot(d, confMacro, confMicro, ichiRawB, rsiB1w, ema200BTC, topBotSignal, true);
-  $('j-snap-status').textContent = entry ? '✓ Snapshot salvat la ' + new Date().toLocaleTimeString('ro-RO') : 'Snapshot deja existent pentru azi (override efectuat).';
+  const [d, confMacro, confMicro, ichiRawB, rsiB1w, ema200BTC, topBotResult] = _journalLastData;
+  const todayKey = journalDayKey();
+  const logs = journalLoad();
+  const snap = journalBuildSnapshot(d, confMacro, confMicro, ichiRawB, rsiB1w, ema200BTC, topBotResult, 'daily', false);
+  if(!snap) return;
+  snap.forced = true;
+  const idx = logs.findIndex(x => x.id === 'daily-'+todayKey);
+  if(idx >= 0) logs[idx].snapshot = { ...snap, day_key: todayKey };
+  else logs.unshift({ id:'daily-'+todayKey, snapshot:{...snap,day_key:todayKey}, outcome:{}, evaluation:{}, recommendation:{status:'no_change',text:''} });
+  journalSave(logs);
+  $('j-snap-status').textContent = '✓ Snapshot manual salvat la ' + new Date().toLocaleTimeString('ro-RO');
   journalRender();
 }
 
-function journalRender() {
+// ── Decision modal ────────────────────────────────────
+function journalOpenDecision() {
+  $('j-decision-modal').style.display = 'block';
+  $('j-decision-modal').scrollIntoView({ behavior:'smooth', block:'start' });
+}
+function journalCloseDecision() {
+  $('j-decision-modal').style.display = 'none';
+}
+function journalSaveDecision() {
+  if(!_journalLastData) { alert('Datele nu sunt încărcate.'); return; }
+  const [d, confMacro, confMicro, ichiRawB, rsiB1w, ema200BTC, topBotResult] = _journalLastData;
+  const now = new Date();
+  const key = journalDayKey() + 'T' + now.toTimeString().slice(0,5).replace(':','');
+  const snap = journalBuildSnapshot(d, confMacro, confMicro, ichiRawB, rsiB1w, ema200BTC, topBotResult, 'decision', false);
+  if(!snap) return;
+  snap.decision_action = $('jd-action').value;
+  snap.decision_asset  = $('jd-asset').value;
+  snap.decision_entry  = parseFloat($('jd-entry').value) || null;
+  snap.decision_stop   = parseFloat($('jd-stop').value)  || null;
+  snap.decision_target = parseFloat($('jd-target').value)|| null;
+  snap.decision_reason = $('jd-reason').value.trim();
+  snap.decision_time   = now.toISOString();
+
   const logs = journalLoad();
-  $('j-total').textContent = logs.length;
-  $('j-correct').textContent = logs.filter(x => x.evaluation.auto_result === 'correct').length;
-  $('j-partial').textContent = logs.filter(x => x.evaluation.auto_result === 'partially_correct').length;
-  $('j-wrong').textContent = logs.filter(x => x.evaluation.auto_result === 'wrong').length;
+  logs.unshift({
+    id: 'decision-'+key,
+    snapshot: { ...snap, day_key: journalDayKey() + ' ' + now.toLocaleTimeString('ro-RO') },
+    outcome: {}, evaluation: {}, recommendation: {status:'no_change',text:''}
+  });
+  journalSave(logs);
+  journalCloseDecision();
+  // Clear fields
+  ['jd-entry','jd-stop','jd-target','jd-reason'].forEach(id => { const el=$(id); if(el) el.value=''; });
+  $('j-snap-status').textContent = '✓ Decizie salvată la ' + now.toLocaleTimeString('ro-RO');
+  journalRender();
+}
+
+// ── Filter ───────────────────────────────────────────
+function journalSetFilter(f) {
+  _journalFilter = f;
+  ['all','weekly','daily','decision'].forEach(x => {
+    const el = $('jf-'+x);
+    if(el) el.style.borderColor = x===f?'rgba(0,232,122,.5)':'var(--border)';
+    if(el) el.style.color       = x===f?'var(--safe)':'var(--text)';
+  });
+  journalRender();
+}
+
+// ── Render ───────────────────────────────────────────
+function journalRender() {
+  const allLogs = journalLoad();
+
+  // Stats
+  $('j-total').textContent   = allLogs.length;
+  $('j-correct').textContent = allLogs.filter(x=>x.evaluation?.auto_result==='correct').length;
+  $('j-partial').textContent = allLogs.filter(x=>x.evaluation?.auto_result==='partially_correct').length;
+  $('j-wrong').textContent   = allLogs.filter(x=>x.evaluation?.auto_result==='wrong').length;
+  $('j-count-weekly').textContent   = allLogs.filter(x=>x.snapshot?.type==='weekly').length;
+  $('j-count-daily').textContent    = allLogs.filter(x=>x.snapshot?.type==='daily').length;
+  $('j-count-decision').textContent = allLogs.filter(x=>x.snapshot?.type==='decision').length;
+
+  // Filter
+  const logs = _journalFilter === 'all' ? allLogs : allLogs.filter(x => x.snapshot?.type === _journalFilter);
 
   if(!logs.length) {
-    $('j-table').innerHTML = '<div style="font-family:\'Space Mono\',monospace;font-size:.64rem;color:var(--neutral);padding:16px">Niciun log. Fă un refresh pentru a genera primul snapshot zilnic.</div>';
+    $('j-table').innerHTML = '<div style="font-family:\'Space Mono\',monospace;font-size:.62rem;color:var(--neutral);padding:16px">Niciun log. Datele se generează automat la refresh.</div>';
     return;
   }
 
-  const evalColor = r => r === 'correct' ? '#00e87a' : r === 'partially_correct' ? '#ffb300' : r === 'wrong' ? '#ff3355' : '#4a6080';
+  const typeIcon = t => t==='weekly'?'📅':t==='daily'?'📆':t==='decision'?'🎯':'📌';
+  const evalColor = r => r==='correct'?'#00e87a':r==='partially_correct'?'#ffb300':r==='wrong'?'#ff3355':'#4a6080';
+  const outcomeTxt = (v, asset) => {
+    if(!v || v==='⏳') return '<span style="color:#4a6080">⏳</span>';
+    const pct = parseFloat(v);
+    const col = pct>=0?'#00e87a':'#ff3355';
+    return `<span style="color:${col}">${pct>=0?'+':''}${v}%</span>`;
+  };
 
-  $('j-table').innerHTML = `<table style="width:100%;border-collapse:collapse;font-family:'Space Mono',monospace;font-size:.6rem">
+  $('j-table').innerHTML = `<table style="width:100%;border-collapse:collapse;font-family:'Space Mono',monospace;font-size:.58rem">
     <thead><tr style="color:#4a6080;border-bottom:1px solid var(--border)">
-      <th style="padding:6px 8px;text-align:left">Data</th>
-      <th style="padding:6px 8px">BTC</th>
-      <th style="padding:6px 8px">Macro</th>
-      <th style="padding:6px 8px">Micro</th>
-      <th style="padding:6px 8px">Top/Bot</th>
-      <th style="padding:6px 8px">Outcome Δ</th>
-      <th style="padding:6px 8px">Eval</th>
+      <th style="padding:7px 8px;text-align:left;white-space:nowrap">Data</th>
+      <th style="padding:7px 8px">Tip</th>
+      <th style="padding:7px 8px">BTC</th>
+      <th style="padding:7px 8px">ETH</th>
+      <th style="padding:7px 8px">Macro</th>
+      <th style="padding:7px 8px">Micro</th>
+      <th style="padding:7px 8px">Top/Bot</th>
+      <th style="padding:7px 8px">BTC Δ1D</th>
+      <th style="padding:7px 8px">ETH Δ1D</th>
+      <th style="padding:7px 8px">Eval</th>
     </tr></thead>
-    <tbody>${logs.map(x => `<tr onclick="journalPick('${x.id}')" style="cursor:pointer;border-bottom:1px solid var(--border)">
-      <td style="padding:5px 8px">${x.snapshot.day_key}${x.snapshot.forced?' 📸':''}</td>
-      <td style="padding:5px 8px;color:var(--btc)">${x.snapshot.btc_price ? '$'+Math.round(x.snapshot.btc_price).toLocaleString() : '--'}</td>
-      <td style="padding:5px 8px">${x.snapshot.conf_macro_sig}</td>
-      <td style="padding:5px 8px">${x.snapshot.conf_micro_sig}</td>
-      <td style="padding:5px 8px">${x.snapshot.topbot_signal}</td>
-      <td style="padding:5px 8px;color:${x.outcome.btc_pct_1d!==null?(parseFloat(x.outcome.btc_pct_1d)>=0?'#00e87a':'#ff3355'):'#4a6080'}">${x.outcome.btc_pct_1d !== null ? (x.outcome.btc_pct_1d >= 0 ? '+' : '') + x.outcome.btc_pct_1d + '%' : '⏳'}</td>
-      <td style="padding:5px 8px;color:${evalColor(x.evaluation.auto_result)}">${x.evaluation.auto_result || '⏳'}</td>
-    </tr>`).join('')}</tbody>
+    <tbody>${logs.map(x => {
+      const s = x.snapshot;
+      const retro = s.isRetro ? ' <span style="color:#4a6080;font-size:.5rem">[R]</span>' : '';
+      const partial = s.weeklyPartial && s.type!=='decision' ? ' <span style="color:#ffb300;font-size:.5rem">~1W</span>' : '';
+      const decisionInfo = s.type==='decision' ? ` <span style="color:#a78bfa">${s.decision_action?.toUpperCase()} ${s.decision_asset}</span>` : '';
+      return `<tr onclick="journalPick('${x.id}')" style="cursor:pointer;border-bottom:1px solid rgba(255,255,255,.04)" onmouseover="this.style.background='rgba(255,255,255,.02)'" onmouseout="this.style.background=''">
+        <td style="padding:6px 8px;white-space:nowrap">${s.day_key}${retro}</td>
+        <td style="padding:6px 8px;white-space:nowrap">${typeIcon(s.type)}${partial}${decisionInfo}</td>
+        <td style="padding:6px 8px;color:var(--btc)">${s.btc_price?'$'+Math.round(s.btc_price).toLocaleString():'--'}</td>
+        <td style="padding:6px 8px;color:var(--eth)">${s.eth_price?'$'+Math.round(s.eth_price).toLocaleString():'--'}</td>
+        <td style="padding:6px 8px">${s.conf_macro}</td>
+        <td style="padding:6px 8px">${s.conf_micro}</td>
+        <td style="padding:6px 8px">${s.topbot}</td>
+        <td style="padding:6px 8px">${outcomeTxt(x.outcome?.btc_1d)}</td>
+        <td style="padding:6px 8px">${outcomeTxt(x.outcome?.eth_1d)}</td>
+        <td style="padding:6px 8px;color:${evalColor(x.evaluation?.auto_result)}">${x.evaluation?.auto_result||'⏳'}</td>
+      </tr>`;
+    }).join('')}</tbody>
   </table>`;
 
+  // Populate select
   const sel = $('j-select');
-  sel.innerHTML = logs.map(x => `<option value="${x.id}">${x.snapshot.day_key} · ${x.snapshot.conf_macro_sig} · BTC ${x.snapshot.btc_price ? '$'+Math.round(x.snapshot.btc_price).toLocaleString() : '--'}</option>`).join('');
+  sel.innerHTML = logs.map(x =>
+    `<option value="${x.id}">${typeIcon(x.snapshot?.type)} ${x.snapshot?.day_key} · ${x.snapshot?.conf_macro} · BTC ${x.snapshot?.btc_price?'$'+Math.round(x.snapshot.btc_price).toLocaleString():'--'}</option>`
+  ).join('');
   if(logs.length) journalPick(sel.value);
 }
 
 function journalPick(id) {
   const logs = journalLoad();
-  const x = logs.find(z => z.id === id);
+  const x = logs.find(z=>z.id===id);
   if(!x) return;
   $('j-select').value = id;
-  $('j-external').value = x.outcome.external_factor ? 'yes' : 'no';
-  $('j-happened').value = x.evaluation.what_happened || '';
-  $('j-missed').value = x.evaluation.what_we_missed || '';
-  $('j-lesson').value = x.evaluation.lesson_learned || '';
-  $('j-rec-status').value = x.recommendation.status || 'no_change';
+  $('j-external').value   = x.outcome?.external_factor ? 'yes' : 'no';
+  $('j-happened').value   = x.evaluation?.what_happened || '';
+  $('j-missed').value     = x.evaluation?.what_we_missed || '';
+  $('j-lesson').value     = x.evaluation?.lesson_learned || '';
+  $('j-rec-status').value = x.recommendation?.status || 'no_change';
 
   const s = x.snapshot;
-  $('j-detail').textContent = [
-    '═══ SNAPSHOT ' + s.day_key + (s.forced?' [MANUAL]':'') + ' ═══',
-    'BTC: $' + (s.btc_price ? Math.round(s.btc_price).toLocaleString() : '--') + ' (' + s.btc_chg_24h?.toFixed(2) + '%)',
-    'ETH: $' + (s.eth_price ? Math.round(s.eth_price).toLocaleString() : '--') + ' (' + s.eth_chg_24h?.toFixed(2) + '%)',
+  const typeLabel = s.type==='weekly'?'📅 WEEKLY CLOSE':s.type==='daily'?'📆 DAILY':s.type==='decision'?'🎯 DECIZIE':'📌';
+  const lines = [
+    '═══ SNAPSHOT ' + s.day_key + ' ═══',
+    typeLabel + (s.isRetro?' [RETROSPECTIV]':'') + (s.weeklyPartial?' [date 1W parțiale]':''),
     '',
-    'RSI 1W BTC: ' + s.btc_rsi_1w + ' · Div: ' + s.btc_rsi_div,
-    'Ichimoku BTC: ' + s.ichi_btc,
-    'EMA200 dist: ' + s.ema200_btc_dist + '%',
-    'Fear&Greed: ' + s.fg,
-    'Funding BTC: ' + s.btc_funding + '%',
-    'L/S Ratio: ' + s.btc_ls,
-    'BTC Dom: ' + s.dom + '%',
+    '─── BTC ───',
+    'Preț: $'+(s.btc_price?Math.round(s.btc_price).toLocaleString():'--')+' ('+( s.btc_chg_24h>=0?'+':'')+s.btc_chg_24h?.toFixed(2)+'% 24h)',
+    'RSI 1W: '+s.btc_rsi_1w+(s.btc_rsi_div&&s.btc_rsi_div!=='NICIO'?' · div '+s.btc_rsi_div.toLowerCase():'')+' | RSI 1D: '+s.btc_rsi_1d,
+    'Ichimoku 1W: '+s.btc_ichi,
+    'EMA200 daily: '+s.btc_ema200+'%',
+    'Funding: '+s.btc_funding+'% | L/S: '+s.btc_ls+' | Taker: '+s.btc_taker,
     '',
-    'Macro: ' + s.conf_macro_sig + ' (' + s.conf_macro_str + '%)',
-    'Micro: ' + s.conf_micro_sig + ' (' + s.conf_micro_str + '%)',
-    'Top/Bot: ' + s.topbot_signal + ' (Top:' + s.topbot_top_pct + '% / Bot:' + s.topbot_bot_pct + '%)',
-    'Regim: ' + s.regime,
+    '─── ETH ───',
+    'Preț: $'+(s.eth_price?Math.round(s.eth_price).toLocaleString():'--')+' ('+(s.eth_chg_24h>=0?'+':'')+s.eth_chg_24h?.toFixed(2)+'% 24h)',
+    'RSI 1D: '+s.eth_rsi_1d+' | EMA200 daily: '+s.eth_ema200+'% | Funding: '+s.eth_funding+'%',
     '',
-    '═══ OUTCOME ═══',
-    'BTC Δ 1D: ' + (x.outcome.btc_pct_1d !== null ? (x.outcome.btc_pct_1d >= 0 ? '+' : '') + x.outcome.btc_pct_1d + '%' : '⏳ necompletat'),
-    'ETH Δ 1D: ' + (x.outcome.eth_pct_1d !== null ? (x.outcome.eth_pct_1d >= 0 ? '+' : '') + x.outcome.eth_pct_1d + '%' : '⏳ necompletat'),
-    'Direcție: ' + (x.outcome.outcome_direction || '⏳'),
-    'Auto eval: ' + (x.evaluation.auto_result || '⏳'),
+    '─── PIAȚĂ ───',
+    'Fear & Greed: '+s.fg+' ('+s.fg_label+') | BTC Dominance: '+s.dom+'%',
     '',
-    '═══ REVIEW MANUAL ═══',
-    'Ce s-a întâmplat: ' + (x.evaluation.what_happened || '—'),
-    'Ce am ratat: ' + (x.evaluation.what_we_missed || '—'),
-    'Lecție: ' + (x.evaluation.lesson_learned || '—'),
-    'Recomandare: ' + x.recommendation.status,
-  ].join('\n');
+    '─── SEMNALE ───',
+    'Macro: '+s.conf_macro+' ('+s.conf_macro_str+'%) | Micro: '+s.conf_micro+' ('+s.conf_micro_str+'%)',
+    'Top/Bot: '+s.topbot+' (Top:'+s.topbot_top+'% / Bot:'+s.topbot_bot+'%)',
+    'Regim: '+s.regime,
+  ];
+
+  if(s.type==='decision') {
+    lines.push('', '─── DECIZIE ───');
+    lines.push('Acțiune: '+s.decision_action?.toUpperCase()+' '+s.decision_asset);
+    if(s.decision_entry)  lines.push('Entry: $'+s.decision_entry.toLocaleString());
+    if(s.decision_stop)   lines.push('Stop-loss: $'+s.decision_stop.toLocaleString());
+    if(s.decision_target) lines.push('Target: $'+s.decision_target.toLocaleString());
+    if(s.decision_reason) lines.push('Motiv: '+s.decision_reason);
+  }
+
+  lines.push('', '─── OUTCOME ───');
+  lines.push('BTC Δ1D: '+(x.outcome?.btc_1d??'⏳')+' | ETH Δ1D: '+(x.outcome?.eth_1d??'⏳'));
+  lines.push('Auto eval: '+(x.evaluation?.auto_result||'⏳'));
+  lines.push('', '─── REVIEW MANUAL ───');
+  lines.push('Ce s-a întâmplat: '+(x.evaluation?.what_happened||'—'));
+  lines.push('Ce am ratat: '+(x.evaluation?.what_we_missed||'—'));
+  lines.push('Lecție: '+(x.evaluation?.lesson_learned||'—'));
+  lines.push('Recomandare: '+(x.recommendation?.status||'—'));
+
+  $('j-detail').textContent = lines.join('\n');
 }
 
 function journalSaveReview() {
   const id = $('j-select').value;
   if(!id) return;
   const logs = journalLoad();
-  const idx = logs.findIndex(x => x.id === id);
-  if(idx < 0) return;
-  logs[idx].outcome.external_factor = $('j-external').value === 'yes';
-  logs[idx].evaluation.what_happened = $('j-happened').value.trim();
-  logs[idx].evaluation.what_we_missed = $('j-missed').value.trim();
-  logs[idx].evaluation.lesson_learned = $('j-lesson').value.trim();
-  logs[idx].recommendation.status = $('j-rec-status').value;
+  const idx = logs.findIndex(x=>x.id===id);
+  if(idx<0) return;
+  if(!logs[idx].outcome)      logs[idx].outcome = {};
+  if(!logs[idx].evaluation)   logs[idx].evaluation = {};
+  if(!logs[idx].recommendation) logs[idx].recommendation = {};
+  logs[idx].outcome.external_factor       = $('j-external').value === 'yes';
+  logs[idx].evaluation.what_happened      = $('j-happened').value.trim();
+  logs[idx].evaluation.what_we_missed     = $('j-missed').value.trim();
+  logs[idx].evaluation.lesson_learned     = $('j-lesson').value.trim();
+  logs[idx].recommendation.status         = $('j-rec-status').value;
   journalSave(logs);
   $('j-save-ok').style.display = 'block';
-  setTimeout(() => { $('j-save-ok').style.display = 'none'; }, 2000);
+  setTimeout(()=>{ $('j-save-ok').style.display='none'; }, 2000);
   journalRender();
   journalPick(id);
 }
 
-// ═══════════════════════════════════════════
-// MAIN REFRESH — Single sync call
-// ═══════════════════════════════════════════
-async function refresh() {
-  const btn=$('btn'),icon=$('btn-icon');
-  btn.disabled=true;icon.classList.add('spin');
-  btn.childNodes[1].textContent=' Se sincronizează...';
-  $('err-box').style.display='none';
-  $('loading-msg').style.display='block';
-  $('sync-badge').className='sync-badge sync-wait';
-  $('sync-badge').textContent='⏳ SE ACTUALIZEAZĂ...';
-  $('loading-msg').textContent='⏳ Fetch simultan: Binance Spot + Futures + CoinGecko + Alternative.me...';
 
-  try {
-    // ── SINGLE SYNC FETCH ──
-    const d = await fetchAllData();
+// ═══════════════════════════════════════════════════════
+// AUTO-REFRESH — 15 minute interval + countdown
+// ═══════════════════════════════════════════════════════
+const AUTO_REFRESH_MS = 15 * 60 * 1000; // 15 minutes
+let _arTimer   = null;  // setInterval handle
+let _cdTimer   = null;  // countdown setInterval handle
+let _nextRefresh = null; // timestamp of next refresh
 
-    $('loading-msg').textContent='⏳ Calculând indicatori...';
+function startCountdown() {
+  // Clear any existing countdown
+  if(_cdTimer) clearInterval(_cdTimer);
 
-    // ── RENDER PRICE BAR ──
-    renderPriceBar(d);
+  _nextRefresh = Date.now() + AUTO_REFRESH_MS;
 
-    // ── MACRO: Ichimoku 1W ──
-    const ichiRawB=calcIchimoku(d.btcW),ichiRawE=calcIchimoku(d.ethW);
-    const ichiB=renderIchimoku('btc',ichiRawB),ichiE=renderIchimoku('eth',ichiRawE);
-    show('sec-ichi');
-
-    // ── MACRO: RSI 1W ──
-    const rsiRawB1w=calcRSI(d.btcW,14),rsiRawE1w=calcRSI(d.ethW,14);
-    const rsiB1w=renderRSI('rsi-btc',rsiRawB1w,'1W'),rsiE1w=renderRSI('rsi-eth',rsiRawE1w,'1W');
-    const stochRaw=calcStochRSI(d.btcW,14,14);
-    const stochB=renderStochOBV(d.btcW,stochRaw);
-    show('sec-mom-macro');
-
-    // ── MACRO: Trendline ──
-    const trendData=analyzeTrendlines(d.btcW,d,ichiRawB,rsiB1w,stochB,d.fg);
-    show('sec-trendline');
-
-    // ── MACRO: Fibonacci Engine (swing detection) ──
-    const rsiD_btc = calcRSI(d.btcD, 14);
-    const rsiD_eth = calcRSI(d.ethD, 14);
-    const fibBTC = renderFibonacci('BTC', d.btc4H, d.btcD, d.btcW, rsiD_btc?.arr?.at(-1)??50, rsiB1w?.rsi??50, ichiRawB?.above??false);
-    const fibETH = renderFibonacci('ETH', d.eth4H, d.ethD, d.ethW, rsiD_eth?.arr?.at(-1)??50, calcRSI(d.ethW,14)?.arr?.at(-1)??50, ichiRawE?.above??false);
-    show('sec-fib');
-
-    // ── MACRO: Trendline Detection ──
-    const btcCloses4H = d.btc4H.map(x=>x.close);
-    const btcClosesD  = d.btcD.map(x=>x.close);
-    const btcClosesW  = d.btcW.map(x=>x.close);
-    const ethCloses4H = d.eth4H.map(x=>x.close);
-    const ethClosesD  = d.ethD.map(x=>x.close);
-    const ethClosesW  = d.ethW.map(x=>x.close);
-    renderTrendlines('BTC', btcCloses4H, btcClosesD, btcClosesW, d.btcPrice, fibBTC?.fibMicro, fibBTC?.fibMedium, fibBTC?.fibMacro);
-    renderTrendlines('ETH', ethCloses4H, ethClosesD, ethClosesW, d.ethPrice, fibETH?.fibMicro, fibETH?.fibMedium, fibETH?.fibMacro);
-    show('sec-trendline-detect');
-
-    // ── MACRO: Chikou 1M + Top/Bottom ──
-    const chikouBTC=analyzeChikou1M('btc',d.btcM);
-    const chikouETH=analyzeChikou1M('eth',d.ethM);
-    buildTopBottomSignal(d,ichiRawB,ichiRawE,rsiB1w,rsiE1w,stochB,chikouBTC,chikouETH);
-    show('sec-chikou-monthly');
-
-    // ── MACRO: Pivots 1M + Risk ──
-    renderPivots('piv-btc',d.btcM);renderPivots('piv-eth',d.ethM);
-    buildRiskMacro(d,ichiB,ichiE,rsiB1w,stochB);
-    show('sec-risk-macro');
-
-    // ── MACRO: Confluence ──
-    const confMacro=buildConfluence('macro',d,ichiB,ichiE,rsiB1w,rsiE1w,stochB,null,null,null,null,null,null);
-    buildVerdictMacro(d,ichiRawB,rsiB1w,confMacro);
-    show('sec-conf-macro');
-
-    // ── MICRO: Futures sentiment ──
-    renderFutures(d);
-    show('sec-futures');
-
-    // ── MICRO: EMA200 + RSI Daily (new) ──
-    const ema200BTC = renderEMA200('btc', d.btcD, d.btcPrice);
-    const ema200ETH = renderEMA200('eth', d.ethD, d.ethPrice);
-    const rsiRawB1d = calcRSI(d.btcD, 14);
-    const rsiRawE1d = calcRSI(d.ethD, 14);
-    const rsiB1d = renderRSI('rsi-btc-1d', rsiRawB1d, '1D');
-    const rsiE1d = renderRSI('rsi-eth-1d', rsiRawE1d, '1D');
-    show('sec-ema200');
-
-    // ── MICRO: ETH Relative Engine (new) ──
-    const ethRelative = buildEthRelative(d, rsiB1d?.rsi ?? null, rsiE1d?.rsi ?? null);
-    show('sec-eth-relative');
-
-    // ── MICRO: EMA 4H ──
-    const emaB=renderEMA('btc',d.btc4H,d.btcPrice);
-    const emaE=renderEMA('eth',d.eth4H,d.ethPrice);
-    show('sec-ema');
-
-    // ── MICRO: RSI 1H (real klines) ──
-    const rsiRawB1h=calcRSI(d.btc1H,14),rsiRawE1h=calcRSI(d.eth1H,14);
-    renderRSI('rsi-btc-1h',rsiRawB1h,'1H');
-    renderRSI('rsi-eth-1h',rsiRawE1h,'1H');
-
-    // ── MICRO: RSI 4H (real klines) ──
-    const rsiRawB4h=calcRSI(d.btc4H,14),rsiRawE4h=calcRSI(d.eth4H,14);
-    const rsiB4h=renderRSI('rsi-btc-4h',rsiRawB4h,'4H'),rsiE4h=renderRSI('rsi-eth-4h',rsiRawE4h,'4H');
-    const macdRaw=calcMACD(d.btc4H,12,26,9);
-    const macdB=renderMACD(macdRaw);
-    show('sec-mom-micro');
-
-    // ── MICRO: Volume Spike 4H ──
-    const volB=renderVolumeSpike('btc',d.btc4H);
-    const volE=renderVolumeSpike('eth',d.eth4H);
-    show('sec-vol-micro');
-
-    // ── MICRO: Liq Levels ──
-    const liqB=renderLiqLevels('btc',d.btcPrice);
-    const liqE=renderLiqLevels('eth',d.ethPrice);
-    show('sec-liq');
-
-    // ── MICRO: Action Map (new) ──
-    // shortBias: derived from RSI daily + EMA200
-    const btcShortBias = (rsiB1d?.rsi < 45 || ema200BTC?.dist < 0) ? 'Bearish' : (rsiB1d?.rsi > 55 && ema200BTC?.dist > 0 ? 'Bullish' : 'Neutral');
-    const ethShortBias = (rsiE1d?.rsi < 45 || ema200ETH?.dist < 0) ? 'Bearish' : (rsiE1d?.rsi > 55 && ema200ETH?.dist > 0 ? 'Bullish' : 'Neutral');
-    // Risk score simple (from EMA200 dist + RSI weekly + funding)
-    const btcRiskSimple = Math.min(100, Math.max(0, Math.round(
-      (rsiB1w?.rsi > 70 ? 25 : rsiB1w?.rsi > 60 ? 12 : 0) +
-      (ema200BTC?.dist > 25 ? 25 : ema200BTC?.dist > 15 ? 12 : ema200BTC?.dist < 0 ? 15 : 0) +
-      (d.btcFunding > 0.01 ? 12 : d.btcFunding < -0.01 ? -5 : 0) +
-      (rsiB1d?.rsi < rsiB1d?.prev ? 8 : 0)
-    )));
-    const ethRiskSimple = Math.min(100, Math.max(0, Math.round(
-      (rsiE1w?.rsi > 70 ? 25 : rsiE1w?.rsi > 60 ? 12 : 0) +
-      (ema200ETH?.dist > 25 ? 25 : ema200ETH?.dist > 15 ? 12 : ema200ETH?.dist < 0 ? 15 : 0) +
-      (d.ethFunding > 0.01 ? 12 : d.ethFunding < -0.01 ? -5 : 0)
-    )));
-    buildActionMap('BTC', d.btcPrice, btcRiskSimple, rsiB1d?.rsi??50, rsiB1w?.rsi??50, ema200BTC?.dist??0, btcShortBias, ethRelative.state);
-    buildActionMap('ETH', d.ethPrice, ethRiskSimple, rsiE1d?.rsi??50, rsiE1w?.rsi??50, ema200ETH?.dist??0, ethShortBias, ethRelative.state);
-    show('sec-action-map');
-
-    // ── MICRO: Confluence + Verdict ──
-    const confMicro=buildConfluence('micro',d,ichiB,ichiE,rsiB1w,rsiE1w,stochB,emaB,macdB,volB,liqB,rsiB4h,rsiE4h);
-    buildVerdictMicro(d,confMicro,emaB,macdB,volB,liqB,rsiB4h);
-    show('sec-conf-micro');show('sec-risk-micro');
-
-    // ── ALERT BANNER (new) — always last ──
-    updateAlertBanner(d, emaB, macdB, rsiB4h, ema200BTC, ethRelative);
-
-    // ── CROSS-TF ──
-    buildCrossTF(confMacro, confMicro, ichiRawB, trendData, d, rsiB1w, emaB, macdB, rsiB4h);
-
-    // ── DECISION JOURNAL — auto snapshot ──
-    const topBotResult = { signal: $('topbot-signal')?.textContent||'--', topPct: parseInt($('topbot-strength-val')?.textContent?.split(':')[1])||0, botPct: parseInt($('topbot-strength-val')?.textContent?.split('/')[1])||0 };
-    window._journalLastArgs = [d, confMacro, confMicro, ichiRawB, rsiB1w, ema200BTC, topBotResult];
-    journalCreateSnapshot(d, confMacro, confMicro, ichiRawB, rsiB1w, ema200BTC, topBotResult, false);
-    $('j-snap-status').textContent = 'Snapshot zilnic automat OK · ' + new Date().toLocaleTimeString('ro-RO');
-
-    $('loading-msg').style.display='none';
-
-  } catch(e) {
-    $('err-box').style.display='block';
-    $('err-box').textContent='⚠ Eroare sync: '+e.message;
-    $('sync-badge').className='sync-badge sync-err';
-    $('sync-badge').textContent='✗ EROARE';
-    $('loading-msg').style.display='none';
-  }
-
-  btn.disabled=false;icon.classList.remove('spin');
-  btn.childNodes[1].textContent=' Actualizează Toate Datele';
+  _cdTimer = setInterval(() => {
+    const remaining = Math.max(0, _nextRefresh - Date.now());
+    const mins = Math.floor(remaining / 60000);
+    const secs = Math.floor((remaining % 60000) / 1000);
+    const el = $('countdown');
+    if(el) {
+      el.textContent = String(mins).padStart(2,'0') + ':' + String(secs).padStart(2,'0');
+      // Color changes as time runs out
+      if(remaining < 60000)       el.style.color = '#ffb300'; // last minute = yellow
+      else if(remaining < 30000)  el.style.color = '#ff3355'; // last 30s = red
+      else                        el.style.color = '#4a6080'; // normal = muted
+    }
+    if(remaining === 0) clearInterval(_cdTimer);
+  }, 1000);
 }
 
-$('hdate').textContent=new Date().toLocaleDateString('ro-RO',{weekday:'long',year:'numeric',month:'long',day:'numeric'});
-refresh();
+function startAutoRefresh() {
+  // Clear any existing timer
+  if(_arTimer) clearInterval(_arTimer);
+
+  // Start countdown immediately
+  startCountdown();
+
+  // Schedule refresh every 15 minutes
+  _arTimer = setInterval(async () => {
+    // Only refresh if page is visible — don't waste API calls in background
+    if(document.visibilityState === 'visible') {
+      await refresh();
+    }
+    // Restart countdown after each refresh
+    startCountdown();
+  }, AUTO_REFRESH_MS);
+}
+
+// Manual refresh button also resets countdown
+// We patch the btn onclick instead of overriding refresh()
+function manualRefresh() {
+  refresh().then(() => startCountdown());
+}
+
+// Page visibility API — pause countdown when tab is hidden
+document.addEventListener('visibilitychange', () => {
+  if(document.visibilityState === 'visible') {
+    // Tab became visible — check if we missed a refresh
+    if(_nextRefresh && Date.now() > _nextRefresh) {
+      // Overdue — refresh immediately
+      refresh();
+    }
+  }
+});
+
+// Initialize
+$('hdate').textContent = new Date().toLocaleDateString('ro-RO', {
+  weekday:'long', year:'numeric', month:'long', day:'numeric'
+});
+// Initial load + start auto-refresh
+(async () => {
+  await refresh();
+  startAutoRefresh();
+})();
+
+
 </script>
 </body>
 </html>
