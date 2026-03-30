@@ -2015,13 +2015,16 @@ function buildCrossTF(confMacro, confMicro, ichiRawB, trendData, d, rsiB1w, emaB
       +'Raport risc/recompensă minim 1:3 înainte de a intra.';
   }
   else if(macroBear && microBear) {
-    action = 'EVITĂ / SHORT'; actionC = CC('danger');
-    actionDetail = 'Macro + Micro aliniate bearish.';
-    narrative = '<strong style="color:#ff3355">Aliniere bearish completă pe toate timeframe-urile.</strong> '
-      +'Aceasta este configurația în care capitalul trebuie protejat, nu riscat. '
-      +(ichiRawB?.below?'Ichimoku 1W arată că prețul se află sub norul Kumo'+kumoTop+' — structura macro s-a deteriorat. ':'')
-      +'Pe micro, '+(emaB?.stackBear?'EMA Stack bearish':'EMA mixt')+' și MACD descendent confirmă că nu există semne de recuperare pe termen scurt. '
-      +'Nu cumpăra rally-urile fără o confirmare clară — în această configurație, recuperările temporare sunt oportunități de reducere a expunerii, nu de intrare.';
+    action = 'EVITĂ / DEFENSIVE'; actionC = CC('danger');
+    actionDetail = 'Presiune bearish pe ambele timeframe-uri. Macro: '+confMacro.strength+'% bear · Micro: '+confMicro.strength+'% bear';
+    narrative = '<strong style="color:#ff3355">Context macro deteriorat — precauție maximă.</strong> '
+      +(ichiRawB?.below?'Ichimoku 1W confirmă că prețul se află sub norul Kumo'+kumoTop+' — structura macro s-a deteriorat. ':'')
+      +'RSI 1W la '+(rsiB1w?.rsi?.toFixed(1)??'--')+' și F&amp;G la '+(d?.fg??'--')+' indică frică extremă, nu capitulare completă.<br>'
+      +'Pe micro, '+(emaB?.stackBear?'EMA Stack bearish menține presiunea descendentă.':'EMA mixt pe 4H.')
+      +(macdB?.bullish
+        ?' <span style="color:#ffb300">⚠ MACD 4H a intrat în teritoriu bullish — un semnal de stabilizare tactică pe termen scurt, insuficient pentru a invalida contextul macro bearish.</span>'
+        :' MACD 4H confirmă lipsa impulsului de recuperare pe termen scurt.')
+      +'<br>Nu cumpăra fără confirmare structurală. Rally-urile în această configurație sunt oportunități de reducere a expunerii, nu de intrare.';
   }
   else if(macroBull && microBear) {
     action = 'AȘTEAPTĂ'; actionC = CC('warn');
