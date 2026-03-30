@@ -213,6 +213,8 @@ footer{font-family:'Space Mono',monospace;font-size:.54rem;color:var(--neutral);
   <div class="header-inner">
     <div class="logo">CRYPTO<span>RISK</span><sub>v5</sub></div>
     <div id="sync-badge" class="sync-badge sync-wait">⏳ NEACTUALIZAT</div>
+    <div id="dh-badge" onclick="toggleDHPanel()" style="font-family:'Space Mono',monospace;font-size:.56rem;padding:3px 10px;border-radius:3px;border:1px solid rgba(255,179,0,.4);color:#ffb300;margin-left:6px;cursor:pointer;vertical-align:middle" title="Data Health Score — click pentru detalii">💛 —%</div>
+    <div id="dh-panel" style="display:none;position:absolute;top:42px;right:16px;background:#0d1520;border:1px solid rgba(255,255,255,.12);border-radius:8px;padding:14px 16px;min-width:320px;max-width:400px;z-index:1000;box-shadow:0 8px 32px rgba(0,0,0,.5)"></div>
     <div class="hinfo">
       <div class="hdate" id="hdate"></div>
       <div class="hts" id="hts">—</div>
@@ -2250,9 +2252,12 @@ function buildEthRelative(d, rsiDbtc, rsiDeth) {
 
   // Render
   $('ethrel-ratio').textContent = ethbtc.toFixed(4);
-  $('ethrel-ratio').style.color = ethbtc > 0.045 ? '#00e87a' : ethbtc < 0.03 ? '#ff3355' : '#ffb300';
-  $('ethrel-ratio-sig').textContent = ethbtc > 0.055 ? 'PUTERNIC' : ethbtc < 0.03 ? 'SLAB' : 'MODERAT';
-  $('ethrel-ratio-sig').style.color = ethbtc > 0.045 ? '#00e87a' : ethbtc < 0.03 ? '#ff3355' : '#ffb300';
+  // UI aliniat cu state-ul calculat din score (nu cu ethbtc brut)
+  const _ratioColor = stateColor;
+  const _ratioLabel = state === 'STRENGTH' ? 'PUTERNIC' : state === 'WEAKNESS' ? 'SLAB' : 'MODERAT';
+  $('ethrel-ratio').style.color = _ratioColor;
+  $('ethrel-ratio-sig').textContent = _ratioLabel;
+  $('ethrel-ratio-sig').style.color = _ratioColor;
   $('ethrel-ratio-det').textContent = 'ETH/BTC ratio curent. Sub 0.03 = ETH slab istoric. Peste 0.055 = rotație risk-on.';
 
   const rsiDiff = rsiDeth !== null && rsiDbtc !== null ? (rsiDeth - rsiDbtc) : 0;
@@ -4247,7 +4252,174 @@ function renderRecoveryModule(d, confMacro, confMicro, emaB, macdB, rsiB4h, rsiB
   $('rec-verdict-detail').textContent = verdictDetail;
 }
 
+
+// ══════════════════════════════════════════════════════════════
+// DATA HEALTH SCORE
+// Verifică calitatea și completitudinea datelor după refresh
+// ══════════════════════════════════════════════════════════════
+
+function toggleDHPanel() {
+  const panel = $('dh-panel');
+  if(!panel) return;
+  const visible = panel.style.display !== 'none';
+  panel.style.display = visible ? 'none' : 'block';
+  // Close on outside click
+  if(!visible) {
+    setTimeout(() => {
+      document.addEventListener('click', function closeDH(e) {
+        if(!panel.contains(e.target) && e.target.id !== 'dh-badge') {
+          panel.style.display = 'none';
+          document.removeEventListener('click', closeDH);
+        }
+      });
+    }, 50);
+  }
+}
+
+function calcDataHealth(d, lastRefreshTs) {
+  if(!d) return { score: 0, label: 'LIPSĂ', color: '#ff3355', checks: [] };
+
+  const now = Date.now();
+  const age = lastRefreshTs ? Math.floor((now - lastRefreshTs) / 60000) : 999; // minute
+  const checks = [];
+
+  function chk(name, ok, partial, weight, critical, detail) {
+    const status = ok ? 'ok' : partial ? 'partial' : 'miss';
+    checks.push({ name, status, weight, critical, detail });
+    return ok ? weight : partial ? Math.round(weight * 0.5) : 0;
+  }
+
+  let score = 0;
+
+  // ── CRITICE (70% din total) ─────────────────────────────────
+  score += chk('BTC Price', d.btcPrice > 0, false, 15, true,
+    d.btcPrice > 0 ? '$'+d.btcPrice.toLocaleString('en-US') : 'lipsă');
+
+  score += chk('ETH Price', d.ethPrice > 0, false, 10, true,
+    d.ethPrice > 0 ? '$'+d.ethPrice.toLocaleString('en-US') : 'lipsă');
+
+  const btcD_ok = Array.isArray(d.btcD) && d.btcD.length >= 200;
+  const btcD_partial = Array.isArray(d.btcD) && d.btcD.length >= 100;
+  score += chk('BTC Candles 1D', btcD_ok, btcD_partial, 15, true,
+    Array.isArray(d.btcD) ? d.btcD.length + ' candle' : 'lipsă');
+
+  const btc4H_ok = Array.isArray(d.btc4H) && d.btc4H.length >= 100;
+  const btc4H_partial = Array.isArray(d.btc4H) && d.btc4H.length >= 50;
+  score += chk('BTC Candles 4H', btc4H_ok, btc4H_partial, 10, true,
+    Array.isArray(d.btc4H) ? d.btc4H.length + ' candle' : 'lipsă');
+
+  const fg_ok = d.fg >= 1 && d.fg <= 100;
+  score += chk('Fear & Greed', fg_ok, false, 10, true,
+    fg_ok ? 'Index: '+d.fg : 'lipsă / invalid');
+
+  const fund_ok = d.btcFunding !== null && d.btcFunding !== undefined && !isNaN(d.btcFunding);
+  score += chk('Funding Rate', fund_ok, false, 10, true,
+    fund_ok ? (d.btcFunding >= 0 ? '+' : '')+d.btcFunding.toFixed(4)+'%' : 'lipsă');
+
+  // ── SECUNDARE (30% din total) ───────────────────────────────
+  const ethD_ok = Array.isArray(d.ethD) && d.ethD.length >= 200;
+  score += chk('ETH Candles 1D', ethD_ok, Array.isArray(d.ethD) && d.ethD.length >= 100, 5, false,
+    Array.isArray(d.ethD) ? d.ethD.length + ' candle' : 'lipsă');
+
+  const btcW_ok = Array.isArray(d.btcW) && d.btcW.length >= 50;
+  score += chk('BTC Candles 1W', btcW_ok, Array.isArray(d.btcW) && d.btcW.length >= 20, 5, false,
+    Array.isArray(d.btcW) ? d.btcW.length + ' candle' : 'lipsă');
+
+  const eth4H_ok = Array.isArray(d.eth4H) && d.eth4H.length >= 100;
+  score += chk('ETH Candles 4H', eth4H_ok, Array.isArray(d.eth4H) && d.eth4H.length >= 50, 5, false,
+    Array.isArray(d.eth4H) ? d.eth4H.length + ' candle' : 'lipsă');
+
+  const oi_ok = d.btcOI > 0;
+  score += chk('Open Interest', oi_ok, false, 3, false,
+    oi_ok ? '$'+Math.round(d.btcOI/1e9*100)/100+'B' : 'lipsă');
+
+  const ls_ok = d.btcLS > 0;
+  score += chk('Long/Short Ratio', ls_ok, false, 3, false,
+    ls_ok ? d.btcLS.toFixed(3) : 'lipsă');
+
+  const taker_ok = d.btcBuySell > 0;
+  score += chk('Taker Ratio', taker_ok, false, 3, false,
+    taker_ok ? d.btcBuySell.toFixed(3) : 'lipsă');
+
+  const dom_ok = d.dom >= 20 && d.dom <= 80;
+  score += chk('BTC Dominance', dom_ok, false, 2, false,
+    dom_ok ? d.dom.toFixed(1)+'%' : 'lipsă / invalid');
+
+  const fundH_ok = Array.isArray(d.btcFundHist) && d.btcFundHist.length >= 10;
+  score += chk('Funding History', fundH_ok, Array.isArray(d.btcFundHist) && d.btcFundHist.length >= 3, 2, false,
+    Array.isArray(d.btcFundHist) ? d.btcFundHist.length + ' entries' : 'lipsă');
+
+  const takerH_ok = Array.isArray(d.btcTakerHist) && d.btcTakerHist.length >= 5;
+  score += chk('Taker History', takerH_ok, Array.isArray(d.btcTakerHist) && d.btcTakerHist.length >= 2, 2, false,
+    Array.isArray(d.btcTakerHist) ? d.btcTakerHist.length + ' entries' : 'lipsă');
+
+  // Penalizare freshness — dacă datele sunt vechi
+  if(age > 30) score = Math.max(0, score - 10);
+  else if(age > 20) score = Math.max(0, score - 5);
+
+  // Label și culoare
+  let label, color;
+  if(score >= 90)      { label = 'DATE COMPLETE';      color = '#00e87a'; }
+  else if(score >= 70) { label = 'DATE PARȚIALE';      color = '#ffb300'; }
+  else if(score >= 50) { label = 'DATE INCOMPLETE';    color = '#ff8c00'; }
+  else                 { label = 'DATE INSUFICIENTE';  color = '#ff3355'; }
+
+  const criticalFail = checks.filter(ch => ch.critical && ch.status === 'miss').length;
+  if(criticalFail > 0) {
+    label = 'DATE CRITICE LIPSĂ';
+    color = '#ff3355';
+    score = Math.min(score, 49);
+  }
+
+  return { score: Math.min(100, score), label, color, checks, age, criticalFail };
+}
+
+// ── Render Data Health badge + panel ─────────────────────────
+function renderDataHealth(d, lastRefreshTs) {
+  const h = calcDataHealth(d, lastRefreshTs);
+  const badge = $('dh-badge');
+  const panel = $('dh-panel');
+  if(!badge) return;
+
+  // Badge
+  const emoji = h.score >= 90 ? '💚' : h.score >= 70 ? '🟡' : h.score >= 50 ? '🟠' : '🔴';
+  badge.textContent = emoji + ' ' + h.score + '%';
+  badge.style.color = h.color;
+  badge.style.borderColor = h.color + '55';
+  badge.title = h.label + (h.age < 999 ? ' · refresh: ' + h.age + 'min fa' : '');
+
+  if(!panel) return;
+
+  // Panel detail
+  const rows = h.checks.map(ch => {
+    const icon = ch.status === 'ok' ? '✔' : ch.status === 'partial' ? '⚠' : '✖';
+    const col  = ch.status === 'ok' ? '#00e87a' : ch.status === 'partial' ? '#ffb300' : '#ff3355';
+    const crit = ch.critical ? '' : ' <span style="color:#4a6080;font-size:.55rem">(secundar)</span>';
+    return `<div style="display:flex;justify-content:space-between;align-items:center;padding:3px 0;border-bottom:1px solid rgba(255,255,255,.04)">
+      <span style="color:${col};font-size:.62rem;min-width:14px">${icon}</span>
+      <span style="flex:1;font-size:.62rem;color:#d0e4f0;margin:0 8px">${ch.name}${crit}</span>
+      <span style="font-size:.58rem;color:#4a6080">${ch.detail}</span>
+    </div>`;
+  }).join('');
+
+  const freshness = h.age < 999
+    ? `<div style="font-size:.58rem;color:#4a6080;margin-top:8px">Ultimul refresh: ${h.age} min în urmă</div>`
+    : '';
+
+  panel.innerHTML = `
+    <div style="font-family:'Space Mono',monospace;font-size:.62rem;font-weight:700;color:${h.color};margin-bottom:8px">
+      DATA HEALTH — ${h.score}% · ${h.label}
+    </div>
+    ${rows}
+    ${freshness}
+    ${h.criticalFail > 0 ? '<div style="font-size:.6rem;color:#ff3355;margin-top:8px">⚠ '+h.criticalFail+' sursă/surse critice lipsă — semnalele pot fi incorecte</div>' : ''}
+  `;
+}
+
 let _journalLastData = null; // stores last refresh data for snapshots
+let _lastRefreshTs = null;   // timestamp of last successful refresh
+let _lastD = null;           // last fetched data object for health check
+let _refreshInProgress = false; // mutex — prevent concurrent refreshes
 
 // ── RE-ENTRY BOUNCE SECTION UPDATE ─────────────────────────────────
 function updateReentrySection(active, data, btcPrice) {
@@ -4692,6 +4864,8 @@ function journalSaveReview() {
 // MAIN REFRESH — Single sync call
 // ═══════════════════════════════════════════
 async function refresh() {
+  if(_refreshInProgress) return; // mutex — prevent concurrent refreshes
+  _refreshInProgress = true;
   const btn=$('btn'), icon=$('btn-icon');
   btn.disabled=true; icon.classList.add('spin');
   $('btn-text').textContent=' Se sincronizează...';
@@ -4884,6 +5058,7 @@ async function refresh() {
     const _recScore = calcRecoveryScore(d,emaB,macdB,rsiB4h,rsiB1d,ethRelative,ichiRawB,tlDataBTC,_cochLevel);
     updateAlertBanner(d,emaB,macdB,rsiB4h,ema200BTC,ethRelative,confMacro,confMicro,null,rsiB1d,_reentryBounce,_reentryData,_recScore);
     renderRecoveryModule(d,confMacro,confMicro,emaB,macdB,rsiB4h,rsiB1d,ethRelative,ichiRawB,tlDataBTC,_recScore);
+    _lastD = d; // store for health check
     updateReentrySection(_reentryBounce, _reentryData, d.btcPrice);
 
     // ── CROSS-TF ──
@@ -4908,10 +5083,14 @@ async function refresh() {
     $('sync-badge').textContent='✗ EROARE';
     $('loading-msg').style.display='none';
     console.error('Refresh error:', e);
+    _refreshInProgress = false; // release mutex on error
   }
 
   btn.disabled=false; icon.classList.remove('spin');
   $('btn-text').textContent=' Actualizează Toate Datele';
+  _refreshInProgress = false; // release mutex
+  _lastRefreshTs = Date.now();
+  if(typeof _lastD !== 'undefined' && _lastD) renderDataHealth(_lastD, _lastRefreshTs);
 }
 
 // ═══════════════════════════════════════════════════════
@@ -4936,8 +5115,8 @@ function startCountdown() {
     if(el) {
       el.textContent = String(mins).padStart(2,'0') + ':' + String(secs).padStart(2,'0');
       // Color changes as time runs out
-      if(remaining < 60000)       el.style.color = '#ffb300'; // last minute = yellow
-      else if(remaining < 30000)  el.style.color = '#ff3355'; // last 30s = red
+      if(remaining < 30000)       el.style.color = '#ff3355'; // last 30s = red
+      else if(remaining < 60000)  el.style.color = '#ffb300'; // last minute = yellow
       else                        el.style.color = '#4a6080'; // normal = muted
     }
     if(remaining === 0) clearInterval(_cdTimer);
